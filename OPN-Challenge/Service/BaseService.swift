@@ -51,7 +51,7 @@ extension BaseService {
     }
     
     func fetchPostOrder(request: PostOrderRequestModel, completionHandler: @escaping ((OrderResponseModel) -> Void), errorHandler: @escaping (APIError) -> Void) {
-        guard let parameters = try? JSONFormatter.shared.convertToDictionary(value: request.products) else { return }
+        guard let parameters = try? JSONFormatter.shared.convertToDictionary(value: request) else { return }
         provider.request(
             BaseAPI.postOrder(parameters: parameters),
             completion: { response in

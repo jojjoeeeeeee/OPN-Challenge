@@ -53,6 +53,12 @@ class HomeProductPresenterTests: XCTestCase {
         XCTAssertTrue(spy.displayErrorCalled)
     }
     
+    func test_presentBeginFetchFlow() {
+        let spy = SpyHomeProductDisplay()
+        sut?.viewController = spy
+        sut?.presentBeginFetchFlow(response: HomeProduct.HomeProductCallBackFlow.Response())
+        XCTAssertTrue(spy.beginFetchFlowCalled)
+    }
 }
 
 extension HomeProductPresenterTests {
@@ -61,6 +67,7 @@ extension HomeProductPresenterTests {
         var displayStoreInfoCalled = false
         var displayProductsCalled = false
         var displayErrorCalled = false
+        var beginFetchFlowCalled = false
         
         func displayProductCart(viewModel: OPN_Challenge.HomeProduct.ProductCart.ViewModel) {
             displayProductCartCalled = true
@@ -78,5 +85,8 @@ extension HomeProductPresenterTests {
             displayErrorCalled = true
         }
         
+        func beginFetchFlow(viewModel: OPN_Challenge.HomeProduct.HomeProductCallBackFlow.ViewModel) {
+            beginFetchFlowCalled = true
+        }
     }
 }

@@ -78,4 +78,18 @@ enum HomeProduct {
         let totalProduct: Int
         let delivery_address: String?
     }
+    
+    enum HomeProductCallBackFlow {
+        struct Request {
+            let callBack: HomeProductCallBack?
+        }
+        struct Response {
+        }
+        struct ViewModel {
+        }
+    }
+    
+    enum HomeProductCallBack {
+        case orderSuccess
+    }
 }

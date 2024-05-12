@@ -59,6 +59,12 @@
 		73CE6B5D2BF15D430052CD8B /* StubProductSummaryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B5C2BF15D430052CD8B /* StubProductSummaryService.swift */; };
 		73CE6B5F2BF15D500052CD8B /* ProductSummaryInteractorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B5E2BF15D500052CD8B /* ProductSummaryInteractorTests.swift */; };
 		73CE6B612BF15D560052CD8B /* ProductSummaryPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B602BF15D560052CD8B /* ProductSummaryPresenterTests.swift */; };
+		73CE6B692BF164C60052CD8B /* OrderSuccessPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B632BF164C60052CD8B /* OrderSuccessPresenter.swift */; };
+		73CE6B6B2BF164C60052CD8B /* OrderSuccessRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B652BF164C60052CD8B /* OrderSuccessRouter.swift */; };
+		73CE6B6C2BF164C60052CD8B /* OrderSuccessModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B662BF164C60052CD8B /* OrderSuccessModels.swift */; };
+		73CE6B6D2BF164C60052CD8B /* OrderSuccessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B672BF164C60052CD8B /* OrderSuccessViewController.swift */; };
+		73CE6B6E2BF164C60052CD8B /* OrderSuccessInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B682BF164C60052CD8B /* OrderSuccessInteractor.swift */; };
+		73CE6B702BF165630052CD8B /* OrderSuccess.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 73CE6B6F2BF165630052CD8B /* OrderSuccess.storyboard */; };
 		AA06D3D5FD48A457D3189C5C /* Pods_OPN_ChallengeTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBC011E77B1AF7ADBC527B7E /* Pods_OPN_ChallengeTests.framework */; };
 		B6DEC6E51521EC1B2633083C /* Pods_OPN_Challenge_OPN_ChallengeUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F457EF9EFD3978A42D1B43EB /* Pods_OPN_Challenge_OPN_ChallengeUITests.framework */; };
 		DFCEF3341560DBA2A56575C0 /* Pods_OPN_Challenge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B18C9219862D4F67521B275C /* Pods_OPN_Challenge.framework */; };
@@ -142,6 +148,12 @@
 		73CE6B5C2BF15D430052CD8B /* StubProductSummaryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StubProductSummaryService.swift; sourceTree = "<group>"; };
 		73CE6B5E2BF15D500052CD8B /* ProductSummaryInteractorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductSummaryInteractorTests.swift; sourceTree = "<group>"; };
 		73CE6B602BF15D560052CD8B /* ProductSummaryPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductSummaryPresenterTests.swift; sourceTree = "<group>"; };
+		73CE6B632BF164C60052CD8B /* OrderSuccessPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderSuccessPresenter.swift; sourceTree = "<group>"; };
+		73CE6B652BF164C60052CD8B /* OrderSuccessRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderSuccessRouter.swift; sourceTree = "<group>"; };
+		73CE6B662BF164C60052CD8B /* OrderSuccessModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderSuccessModels.swift; sourceTree = "<group>"; };
+		73CE6B672BF164C60052CD8B /* OrderSuccessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderSuccessViewController.swift; sourceTree = "<group>"; };
+		73CE6B682BF164C60052CD8B /* OrderSuccessInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderSuccessInteractor.swift; sourceTree = "<group>"; };
+		73CE6B6F2BF165630052CD8B /* OrderSuccess.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = OrderSuccess.storyboard; sourceTree = "<group>"; };
 		7D4AB8114A17238EF43803E6 /* Pods-OPN-Challenge.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OPN-Challenge.release.xcconfig"; path = "Target Support Files/Pods-OPN-Challenge/Pods-OPN-Challenge.release.xcconfig"; sourceTree = "<group>"; };
 		B18C9219862D4F67521B275C /* Pods_OPN_Challenge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OPN_Challenge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C453A3A53A15AE7491B28818 /* Pods-OPN-ChallengeTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OPN-ChallengeTests.debug.xcconfig"; path = "Target Support Files/Pods-OPN-ChallengeTests/Pods-OPN-ChallengeTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -288,6 +300,7 @@
 			isa = PBXGroup;
 			children = (
 				739556552BF0DF53004AC74E /* CommonView */,
+				73CE6B622BF164AD0052CD8B /* OrderSuccess */,
 				73CE6B442BF102BE0052CD8B /* ProductSummary */,
 				7395560F2BEFFBEA004AC74E /* HomeProduct */,
 			);
@@ -415,6 +428,19 @@
 				73CE6B602BF15D560052CD8B /* ProductSummaryPresenterTests.swift */,
 			);
 			path = Scenes;
+			sourceTree = "<group>";
+		};
+		73CE6B622BF164AD0052CD8B /* OrderSuccess */ = {
+			isa = PBXGroup;
+			children = (
+				73CE6B632BF164C60052CD8B /* OrderSuccessPresenter.swift */,
+				73CE6B652BF164C60052CD8B /* OrderSuccessRouter.swift */,
+				73CE6B662BF164C60052CD8B /* OrderSuccessModels.swift */,
+				73CE6B672BF164C60052CD8B /* OrderSuccessViewController.swift */,
+				73CE6B682BF164C60052CD8B /* OrderSuccessInteractor.swift */,
+				73CE6B6F2BF165630052CD8B /* OrderSuccess.storyboard */,
+			);
+			path = OrderSuccess;
 			sourceTree = "<group>";
 		};
 		DA86BAAF8F2830EE47419387 /* Pods */ = {
@@ -552,6 +578,7 @@
 				73CE6B522BF102EA0052CD8B /* ProductSummary.storyboard in Resources */,
 				739555E92BEFF8E0004AC74E /* Assets.xcassets in Resources */,
 				739555EC2BEFF8E0004AC74E /* Base in Resources */,
+				73CE6B702BF165630052CD8B /* OrderSuccess.storyboard in Resources */,
 				739556322BF018F0004AC74E /* ProductTableViewCell.xib in Resources */,
 				739555E72BEFF8DA004AC74E /* Base in Resources */,
 				7395565F2BF0DF5F004AC74E /* UILoadingFullView.xib in Resources */,
@@ -722,6 +749,11 @@
 				739556602BF0DF5F004AC74E /* UILoadingFullViewInteractor.swift in Sources */,
 				739556372BF028B6004AC74E /* ImageUtils.swift in Sources */,
 				739556412BF0C81D004AC74E /* Environment.swift in Sources */,
+				73CE6B692BF164C60052CD8B /* OrderSuccessPresenter.swift in Sources */,
+				73CE6B6B2BF164C60052CD8B /* OrderSuccessRouter.swift in Sources */,
+				73CE6B6C2BF164C60052CD8B /* OrderSuccessModels.swift in Sources */,
+				73CE6B6D2BF164C60052CD8B /* OrderSuccessViewController.swift in Sources */,
+				73CE6B6E2BF164C60052CD8B /* OrderSuccessInteractor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

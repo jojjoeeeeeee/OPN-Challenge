@@ -2,12 +2,17 @@ protocol HomeProductBusinessLogic {
     func updateCart(request: HomeProduct.ProductCart.Request)
     func getStoreInfoInquiry(request: HomeProduct.StoreInfoInquiry.Request)
     func getProductsInquiry(request: HomeProduct.ProductsInquiry.Request)
+    func handleCallBack(request: HomeProduct.HomeProductCallBackFlow.Request)
 }
 
 protocol HomeProductDataStore {
+    var callBack: HomeProduct.HomeProductCallBack? { get set }
+    var productCartContext: HomeProduct.ProductCartContext? { get set }
 }
 
 class HomeProductInteractor: HomeProductBusinessLogic, HomeProductDataStore {
+    var productCartContext: HomeProduct.ProductCartContext?
+    var callBack: HomeProduct.HomeProductCallBack?
     var presenter: HomeProductPresentationLogic?
     let serviceConnection: ServiceConnection
     
@@ -42,5 +47,15 @@ class HomeProductInteractor: HomeProductBusinessLogic, HomeProductDataStore {
                 response: HomeProduct.HomeProductError.Response(serviceError: error, customAction: request.customAction)
             )
         })
+    }
+    
+    func handleCallBack(request: HomeProduct.HomeProductCallBackFlow.Request) {
+        switch request.callBack {
+        case .orderSuccess:
+            presenter?.presentBeginFetchFlow(response: HomeProduct.HomeProductCallBackFlow.Response())
+        default:
+            break
+        }
+        callBack = nil
     }
 }

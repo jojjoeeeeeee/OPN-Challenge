@@ -57,11 +57,16 @@ class ProductSummaryViewController: UIViewController, ProductSummaryDisplayLogic
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        setupTextView()
         initialDataFromProductCartContext()
     }
     
     private func setupView() {
         navigationController?.navigationBar.isHidden = true
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         
         let onTapBackGesture = UITapGestureRecognizer(target: self, action: #selector(onTapBack))
         backButtonImageView.isUserInteractionEnabled = true
@@ -89,12 +94,15 @@ class ProductSummaryViewController: UIViewController, ProductSummaryDisplayLogic
         addressTextView.roundCorner(cornerRadius: 8)
         addressTextView.layer.borderWidth = 1
         addressTextView.layer.borderColor = UIColor.lightGreyPrimary.cgColor
-        addressTextView.text = "Please fill in address..."
-        addressTextView.textColor = UIColor.lightGreySecondary
-        enableNextButton(false)
         
         let tapGestureDismissKeyboard = UITapGestureRecognizer(target: self, action: #selector(onTapDismissKeyboard))
         view.addGestureRecognizer(tapGestureDismissKeyboard)
+    }
+    
+    private func setupTextView() {
+        addressTextView.text = "Please fill in address..."
+        addressTextView.textColor = UIColor.lightGreySecondary
+        enableNextButton(false)
     }
     
     private func initialDataFromProductCartContext() {
@@ -107,7 +115,22 @@ class ProductSummaryViewController: UIViewController, ProductSummaryDisplayLogic
     }
     
     @objc private func onTapBack() {
-        router?.routeBack()
+        guard let context = router?.dataStore?.productCartContext else { return }
+        router?.routeBack(
+            productCartContext: HomeProduct.ProductCartContext(
+                store: context.store,
+                productList: context.productList,
+                totalPrice: context.totalPrice,
+                totalProduct: context.totalProduct,
+                delivery_address: addressTextView.text != "Please fill in address..." ? addressTextView.text : nil
+            )
+        )
+    }
+    
+    func hideLoading() {
+        DispatchQueue.main.async { [weak self] in
+            self?.uiLoadingFullView.interactor?.showLoading(request: UILoadingFullView.Loading.Request(show: false))
+        }
     }
     
     func enableNextButton(_ isEnable: Bool) {
@@ -118,6 +141,7 @@ class ProductSummaryViewController: UIViewController, ProductSummaryDisplayLogic
     func displayProductCartContext(viewModel: ProductSummary.ProductCart.ViewModel) {
         let store = viewModel.store
         let productList = viewModel.productList
+        let address = viewModel.delivery_address
         
         screenTitleLabel.text = "\(store.name) - Order"
         productCart = productList
@@ -127,6 +151,11 @@ class ProductSummaryViewController: UIViewController, ProductSummaryDisplayLogic
         totalPriceLabel.text = "฿\(totalPrice)"
         bottomTotalPriceLabel.text = "฿\(totalPrice)"
         productListTableView.reloadData()
+        if address != nil {
+            addressTextView.text = address
+            addressTextView.textColor = UIColor.black
+            enableNextButton(true)
+        }
     }
     
     func displayError(viewModel: ProductSummary.ProductSummaryError.ViewModel) {
@@ -135,6 +164,7 @@ class ProductSummaryViewController: UIViewController, ProductSummaryDisplayLogic
     }
     
     func displayOrderSuccess(viewModel: ProductSummary.OrderInquiry.ViewModel) {
+        hideLoading()
         router?.routeToOrderSuccess()
     }
     

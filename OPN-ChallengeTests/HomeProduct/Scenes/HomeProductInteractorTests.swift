@@ -65,7 +65,23 @@ class HomeProductInteractorTests: XCTestCase {
         XCTAssertTrue(spy.presentErrorCalled)
     }
 
+    func test_handleCallBack_orderSuccess() {
+        let spy = SpyHomeProductPresenter()
+        let stub = StubHomeProductService(result: .error)
+        sut = HomeProductInteractor(serviceConnection: stub)
+        sut?.presenter = spy
+        sut?.handleCallBack(request: HomeProduct.HomeProductCallBackFlow.Request(callBack: .orderSuccess))
+        XCTAssertTrue(spy.presentBeginFetchFlowCalled)
+    }
     
+    func test_handleCallBack_none() {
+        let spy = SpyHomeProductPresenter()
+        let stub = StubHomeProductService(result: .error)
+        sut = HomeProductInteractor(serviceConnection: stub)
+        sut?.presenter = spy
+        sut?.handleCallBack(request: HomeProduct.HomeProductCallBackFlow.Request(callBack: nil))
+        XCTAssertFalse(spy.presentBeginFetchFlowCalled)
+    }
 }
 
 extension HomeProductInteractorTests {
@@ -74,6 +90,7 @@ extension HomeProductInteractorTests {
         var presentStoreInfoCalled = false
         var presentProductsCalled = false
         var presentErrorCalled = false
+        var presentBeginFetchFlowCalled = false
         
         func presentProductCart(response: OPN_Challenge.HomeProduct.ProductCart.Response) {
             presentProductCartCalled = true
@@ -89,6 +106,10 @@ extension HomeProductInteractorTests {
         
         func presentError(response: OPN_Challenge.HomeProduct.HomeProductError.Response) {
             presentErrorCalled = true
+        }
+        
+        func presentBeginFetchFlow(response: HomeProduct.HomeProductCallBackFlow.Response) {
+            presentBeginFetchFlowCalled = true
         }
     }
 }

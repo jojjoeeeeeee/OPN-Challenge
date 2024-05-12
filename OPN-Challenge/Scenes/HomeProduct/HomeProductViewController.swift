@@ -5,6 +5,7 @@ protocol HomeProductDisplayLogic: AnyObject {
     func displayStoreInfo(viewModel: HomeProduct.StoreInfoInquiry.ViewModel)
     func displayProducts(viewModel: HomeProduct.ProductsInquiry.ViewModel)
     func displayError(viewModel: HomeProduct.HomeProductError.ViewModel)
+    func beginFetchFlow(viewModel: HomeProduct.HomeProductCallBackFlow.ViewModel)
 }
 
 class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
@@ -59,9 +60,34 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        router?.showFullViewLoading(destination: uiLoadingFullView)
         setupView()
+        beginFetchFlow(viewModel: HomeProduct.HomeProductCallBackFlow.ViewModel())
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        let callBack = router?.dataStore?.callBack
+        interactor?.handleCallBack(request: HomeProduct.HomeProductCallBackFlow.Request(callBack: callBack))
+    }
+    
+    func beginFetchFlow(viewModel: HomeProduct.HomeProductCallBackFlow.ViewModel) {
+        productCart = []
+        totalPrice = 0
+        totalProduct = 0
+        enableNextButton(false)
+        productTableView.reloadData()
+        showLoading()
         fetchInitialProducts()
+    }
+    
+    func showLoading() {
+        router?.showFullViewLoading(destination: uiLoadingFullView)
+    }
+    
+    func hideLoading() {
+        DispatchQueue.main.async { [weak self] in
+            self?.uiLoadingFullView.interactor?.showLoading(request: UILoadingFullView.Loading.Request(show: false))
+        }
     }
     
     private func setupView() {
@@ -117,9 +143,7 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
         storeNameLabel.text = storeInfo.name
         businessHoursLabel.text = storeInfo.businessHours
         rateLabel.text = storeInfo.rating
-        DispatchQueue.main.async { [weak self] in
-            self?.uiLoadingFullView.interactor?.showLoading(request: UILoadingFullView.Loading.Request(show: false))
-        }
+        hideLoading()
     }
     
     func displayProducts(viewModel: HomeProduct.ProductsInquiry.ViewModel) {
@@ -140,7 +164,7 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
     
     private func showLoadingAndFetchAgain(fetchAction: (() -> Void)?) {
         guard let action = fetchAction else { return }
-        router?.showFullViewLoading(destination: uiLoadingFullView)
+        showLoading()
         action()
     }
     
@@ -188,7 +212,7 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
                 productList: productCart,
                 totalPrice: totalPrice,
                 totalProduct: totalProduct,
-                delivery_address: nil
+                delivery_address: router?.dataStore?.productCartContext?.delivery_address ?? nil
             )
         )
     }

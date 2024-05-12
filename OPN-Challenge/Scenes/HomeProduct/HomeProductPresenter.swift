@@ -5,6 +5,7 @@ protocol HomeProductPresentationLogic {
     func presentStoreInfo(response: HomeProduct.StoreInfoInquiry.Response)
     func presentProducts(response: HomeProduct.ProductsInquiry.Response)
     func presentError(response: HomeProduct.HomeProductError.Response)
+    func presentBeginFetchFlow(response: HomeProduct.HomeProductCallBackFlow.Response)
 }
 
 class HomeProductPresenter: HomeProductPresentationLogic {
@@ -60,5 +61,9 @@ class HomeProductPresenter: HomeProductPresentationLogic {
                 return nil
             }
         }
+    }
+    
+    func presentBeginFetchFlow(response: HomeProduct.HomeProductCallBackFlow.Response) {
+        viewController?.beginFetchFlow(viewModel: HomeProduct.HomeProductCallBackFlow.ViewModel())
     }
 }

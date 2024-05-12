@@ -25,7 +25,7 @@ class ImageUtils {
                 switch result {
                 case .success(let image):
                     completionHandler?(image.image)
-                case .failure(let error):
+                case .failure:
                     imageView.image = placeholder
                 }
             })
