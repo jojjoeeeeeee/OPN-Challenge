@@ -1,0 +1,822 @@
+From e5b3d518289563c59eb5e46d1d2776a63e47d4b4 Mon Sep 17 00:00:00 2001
+From: "phakkharachate.j" <phakkharachate.j@arise.tech>
+Date: Mon, 13 May 2024 03:54:26 +0700
+Subject: [PATCH 6/8] [TCxOPN] integrated ProductSummary with Postman Mock API
+ & added ProductSummary Interator, Presenter UnitTest
+
+---
+ OPN-Challenge.xcodeproj/project.pbxproj       | 40 +++++++++
+ .../UILoadingFullViewInteractor.swift         |  2 +-
+ .../UILoadingFullViewPresenter.swift          |  3 +-
+ .../UILoadingFullViewViewController.swift     |  5 +-
+ .../HomeProduct/HomeProductModels.swift       |  2 +-
+ .../HomeProductViewController.swift           |  2 +-
+ .../ProductSummary/ProductSummary.storyboard  |  3 +
+ .../ProductSummaryInteractor.swift            | 36 +++++++-
+ .../ProductSummary/ProductSummaryModels.swift | 25 +++++-
+ .../ProductSummaryPresenter.swift             | 13 ++-
+ .../ProductSummary/ProductSummaryRouter.swift | 10 +++
+ .../ProductSummaryViewController.swift        | 23 +++++-
+ OPN-Challenge/Service/BaseAPI/BaseAPI.swift   |  6 +-
+ OPN-Challenge/Service/BaseService.swift       | 10 +++
+ .../Service/Model/RequestModel.swift          |  2 +-
+ .../Service/Model/ResponseModel.swift         |  4 +
+ OPN-Challenge/Service/ServiceConnection.swift | 20 ++---
+ OPN-Challenge/Utilities/JSONFormatter.swift   | 25 ++++++
+ .../Scenes/HomeProductInteractorTests.swift   |  8 +-
+ .../Scenes/HomeProductPresenterTests.swift    | 13 ++-
+ .../ProductSummaryInteractorTests.swift       | 78 ++++++++++++++++++
+ .../Scenes/ProductSummaryPresenterTests.swift | 82 +++++++++++++++++++
+ .../Stubs/StubProductSummaryService.swift     | 24 ++++++
+ 23 files changed, 404 insertions(+), 32 deletions(-)
+ create mode 100644 OPN-Challenge/Utilities/JSONFormatter.swift
+ create mode 100644 OPN-ChallengeTests/ProductSummary/Scenes/ProductSummaryInteractorTests.swift
+ create mode 100644 OPN-ChallengeTests/ProductSummary/Scenes/ProductSummaryPresenterTests.swift
+ create mode 100644 OPN-ChallengeTests/ProductSummary/Stubs/StubProductSummaryService.swift
+
+diff --git a/OPN-Challenge.xcodeproj/project.pbxproj b/OPN-Challenge.xcodeproj/project.pbxproj
+index febadf3..3b333ed 100644
+--- a/OPN-Challenge.xcodeproj/project.pbxproj
++++ b/OPN-Challenge.xcodeproj/project.pbxproj
+@@ -55,6 +55,10 @@
+ 		73CE6B522BF102EA0052CD8B /* ProductSummary.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 73CE6B512BF102EA0052CD8B /* ProductSummary.storyboard */; };
+ 		73CE6B542BF1107F0052CD8B /* ProductSumaryViewController+TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B532BF1107F0052CD8B /* ProductSumaryViewController+TableView.swift */; };
+ 		73CE6B562BF119880052CD8B /* ProductSummaryViewController+TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B552BF119880052CD8B /* ProductSummaryViewController+TextView.swift */; };
++		73CE6B582BF14D4F0052CD8B /* JSONFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B572BF14D4F0052CD8B /* JSONFormatter.swift */; };
++		73CE6B5D2BF15D430052CD8B /* StubProductSummaryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B5C2BF15D430052CD8B /* StubProductSummaryService.swift */; };
++		73CE6B5F2BF15D500052CD8B /* ProductSummaryInteractorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B5E2BF15D500052CD8B /* ProductSummaryInteractorTests.swift */; };
++		73CE6B612BF15D560052CD8B /* ProductSummaryPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B602BF15D560052CD8B /* ProductSummaryPresenterTests.swift */; };
+ 		AA06D3D5FD48A457D3189C5C /* Pods_OPN_ChallengeTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBC011E77B1AF7ADBC527B7E /* Pods_OPN_ChallengeTests.framework */; };
+ 		B6DEC6E51521EC1B2633083C /* Pods_OPN_Challenge_OPN_ChallengeUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F457EF9EFD3978A42D1B43EB /* Pods_OPN_Challenge_OPN_ChallengeUITests.framework */; };
+ 		DFCEF3341560DBA2A56575C0 /* Pods_OPN_Challenge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B18C9219862D4F67521B275C /* Pods_OPN_Challenge.framework */; };
+@@ -134,6 +138,10 @@
+ 		73CE6B512BF102EA0052CD8B /* ProductSummary.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = ProductSummary.storyboard; sourceTree = "<group>"; };
+ 		73CE6B532BF1107F0052CD8B /* ProductSumaryViewController+TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProductSumaryViewController+TableView.swift"; sourceTree = "<group>"; };
+ 		73CE6B552BF119880052CD8B /* ProductSummaryViewController+TextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProductSummaryViewController+TextView.swift"; sourceTree = "<group>"; };
++		73CE6B572BF14D4F0052CD8B /* JSONFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONFormatter.swift; sourceTree = "<group>"; };
++		73CE6B5C2BF15D430052CD8B /* StubProductSummaryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StubProductSummaryService.swift; sourceTree = "<group>"; };
++		73CE6B5E2BF15D500052CD8B /* ProductSummaryInteractorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductSummaryInteractorTests.swift; sourceTree = "<group>"; };
++		73CE6B602BF15D560052CD8B /* ProductSummaryPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductSummaryPresenterTests.swift; sourceTree = "<group>"; };
+ 		7D4AB8114A17238EF43803E6 /* Pods-OPN-Challenge.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OPN-Challenge.release.xcconfig"; path = "Target Support Files/Pods-OPN-Challenge/Pods-OPN-Challenge.release.xcconfig"; sourceTree = "<group>"; };
+ 		B18C9219862D4F67521B275C /* Pods_OPN_Challenge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OPN_Challenge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+ 		C453A3A53A15AE7491B28818 /* Pods-OPN-ChallengeTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OPN-ChallengeTests.debug.xcconfig"; path = "Target Support Files/Pods-OPN-ChallengeTests/Pods-OPN-ChallengeTests.debug.xcconfig"; sourceTree = "<group>"; };
+@@ -213,6 +221,7 @@
+ 		739555F52BEFF8E2004AC74E /* OPN-ChallengeTests */ = {
+ 			isa = PBXGroup;
+ 			children = (
++				73CE6B592BF15D2C0052CD8B /* ProductSummary */,
+ 				739556652BF0F352004AC74E /* HomeProduct */,
+ 			);
+ 			path = "OPN-ChallengeTests";
+@@ -244,6 +253,7 @@
+ 			children = (
+ 				739556262BF0129B004AC74E /* DateFormatter.swift */,
+ 				739556362BF028B6004AC74E /* ImageUtils.swift */,
++				73CE6B572BF14D4F0052CD8B /* JSONFormatter.swift */,
+ 			);
+ 			path = Utilities;
+ 			sourceTree = "<group>";
+@@ -381,6 +391,32 @@
+ 			path = ProductSummary;
+ 			sourceTree = "<group>";
+ 		};
++		73CE6B592BF15D2C0052CD8B /* ProductSummary */ = {
++			isa = PBXGroup;
++			children = (
++				73CE6B5B2BF15D340052CD8B /* Scenes */,
++				73CE6B5A2BF15D310052CD8B /* Stubs */,
++			);
++			path = ProductSummary;
++			sourceTree = "<group>";
++		};
++		73CE6B5A2BF15D310052CD8B /* Stubs */ = {
++			isa = PBXGroup;
++			children = (
++				73CE6B5C2BF15D430052CD8B /* StubProductSummaryService.swift */,
++			);
++			path = Stubs;
++			sourceTree = "<group>";
++		};
++		73CE6B5B2BF15D340052CD8B /* Scenes */ = {
++			isa = PBXGroup;
++			children = (
++				73CE6B5E2BF15D500052CD8B /* ProductSummaryInteractorTests.swift */,
++				73CE6B602BF15D560052CD8B /* ProductSummaryPresenterTests.swift */,
++			);
++			path = Scenes;
++			sourceTree = "<group>";
++		};
+ 		DA86BAAF8F2830EE47419387 /* Pods */ = {
+ 			isa = PBXGroup;
+ 			children = (
+@@ -673,6 +709,7 @@
+ 				739556212BF004EE004AC74E /* UIViewExtension.swift in Sources */,
+ 				7395565E2BF0DF5F004AC74E /* BaseXIBView.swift in Sources */,
+ 				739556522BF0CC7A004AC74E /* RequestModel.swift in Sources */,
++				73CE6B582BF14D4F0052CD8B /* JSONFormatter.swift in Sources */,
+ 				7395564A2BF0CABB004AC74E /* BaseErrorModel.swift in Sources */,
+ 				739556472BF0CA8F004AC74E /* ResponseHandler.swift in Sources */,
+ 				739555E02BEFF8DA004AC74E /* AppDelegate.swift in Sources */,
+@@ -692,8 +729,11 @@
+ 			isa = PBXSourcesBuildPhase;
+ 			buildActionMask = 2147483647;
+ 			files = (
++				73CE6B5D2BF15D430052CD8B /* StubProductSummaryService.swift in Sources */,
+ 				739556682BF0F396004AC74E /* StubHomeProductService.swift in Sources */,
+ 				7395566B2BF0F69C004AC74E /* HomeProductInteractorTests.swift in Sources */,
++				73CE6B612BF15D560052CD8B /* ProductSummaryPresenterTests.swift in Sources */,
++				73CE6B5F2BF15D500052CD8B /* ProductSummaryInteractorTests.swift in Sources */,
+ 				73CE6B432BF0FF650052CD8B /* HomeProductPresenterTests.swift in Sources */,
+ 			);
+ 			runOnlyForDeploymentPostprocessing = 0;
+diff --git a/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewInteractor.swift b/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewInteractor.swift
+index 1efc508..7f9cbe9 100644
+--- a/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewInteractor.swift
++++ b/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewInteractor.swift
+@@ -14,6 +14,6 @@ class UILoadingFullViewInteractor: UILoadingFullViewBusinessLogic, UILoadingFull
+     }
+     
+     func showError(request: UILoadingFullView.Error.Request) {
+-        presenter?.presentError(respose: .init(show: request.show, serviceError: request.serviceError, customAction: request.customAction))
++        presenter?.presentError(respose: UILoadingFullView.Error.Response(show: request.show, serviceError: request.serviceError, customAction: request.customAction))
+     }
+ }
+diff --git a/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewPresenter.swift b/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewPresenter.swift
+index 51e294c..bd9f8fd 100644
+--- a/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewPresenter.swift
++++ b/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewPresenter.swift
+@@ -11,7 +11,6 @@ class UILoadingFullViewPresenter: UILoadingFullViewPresentationLogic {
+     }
+     
+     func presentError(respose: UILoadingFullView.Error.Response) {
+-        viewController?.displayError(viewModel: .init(show: respose.show, serviceError: respose.serviceError, customAction: respose.customAction))
++        viewController?.displayError(viewModel: UILoadingFullView.Error.ViewModel(show: respose.show, serviceError: respose.serviceError, customAction: respose.customAction))
+     }
+-    
+ }
+diff --git a/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewViewController.swift b/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewViewController.swift
+index 3d013f3..1adb6be 100644
+--- a/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewViewController.swift
++++ b/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewViewController.swift
+@@ -87,10 +87,11 @@ class UILoadingFullViewViewController: UIViewController, UILoadingFullViewDispla
+     }
+     
+     @IBAction func onTappedTryAgain(_ sender: Any) {
+-        guard let action = customAction else { return }
+         view.isHidden = true
+         errorViewContainer.isHidden = true
+         router?.close()
+-        action()
++        if let action = customAction {
++            action()
++        }
+     }
+ }
+diff --git a/OPN-Challenge/Scenes/HomeProduct/HomeProductModels.swift b/OPN-Challenge/Scenes/HomeProduct/HomeProductModels.swift
+index af5c736..15e6210 100644
+--- a/OPN-Challenge/Scenes/HomeProduct/HomeProductModels.swift
++++ b/OPN-Challenge/Scenes/HomeProduct/HomeProductModels.swift
+@@ -76,6 +76,6 @@ enum HomeProduct {
+         let productList: [Product]
+         let totalPrice: Int
+         let totalProduct: Int
+-        let address: String?
++        let delivery_address: String?
+     }
+ }
+diff --git a/OPN-Challenge/Scenes/HomeProduct/HomeProductViewController.swift b/OPN-Challenge/Scenes/HomeProduct/HomeProductViewController.swift
+index a739043..735a288 100644
+--- a/OPN-Challenge/Scenes/HomeProduct/HomeProductViewController.swift
++++ b/OPN-Challenge/Scenes/HomeProduct/HomeProductViewController.swift
+@@ -188,7 +188,7 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
+                 productList: productCart,
+                 totalPrice: totalPrice,
+                 totalProduct: totalProduct,
+-                address: nil
++                delivery_address: nil
+             )
+         )
+     }
+diff --git a/OPN-Challenge/Scenes/ProductSummary/ProductSummary.storyboard b/OPN-Challenge/Scenes/ProductSummary/ProductSummary.storyboard
+index 8dbf00c..e62bcfa 100644
+--- a/OPN-Challenge/Scenes/ProductSummary/ProductSummary.storyboard
++++ b/OPN-Challenge/Scenes/ProductSummary/ProductSummary.storyboard
+@@ -169,6 +169,9 @@
+                                             <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                             <userDefinedRuntimeAttribute type="boolean" keyPath="isHiddenWhenSkeletonIsActive" value="YES"/>
+                                         </userDefinedRuntimeAttributes>
++                                        <connections>
++                                            <action selector="onTappedOrder:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="RlF-Co-ubx"/>
++                                        </connections>
+                                     </button>
+                                 </subviews>
+                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+diff --git a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryInteractor.swift b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryInteractor.swift
+index d7f74b8..f8a9cdc 100644
+--- a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryInteractor.swift
++++ b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryInteractor.swift
+@@ -1,5 +1,6 @@
+ protocol ProductSummaryBusinessLogic {
+     func getProductCartContext(request: ProductSummary.ProductCart.Request)
++    func postOrderInquiry(request: ProductSummary.OrderInquiry.Request)
+ }
+ 
+ protocol ProductSummaryDataStore {
+@@ -9,10 +10,41 @@ protocol ProductSummaryDataStore {
+ class ProductSummaryInteractor: ProductSummaryBusinessLogic, ProductSummaryDataStore {
+     var productCartContext: HomeProduct.ProductCartContext?
+     var presenter: ProductSummaryPresentationLogic?
++    let serviceConnection: ServiceConnection
++    
++    init(serviceConnection: ServiceConnection = ServiceConnection()) {
++        self.serviceConnection = serviceConnection
++    }
+     
+     func getProductCartContext(request: ProductSummary.ProductCart.Request) {
+-        guard let context = productCartContext else { return }
+-        let response = ProductSummary.ProductCart.Response(context: context)
++        let response = ProductSummary.ProductCart.Response(context: request.context)
+         presenter?.presentProductCartContext(response: response)
+     }
++    
++    func postOrderInquiry(request: ProductSummary.OrderInquiry.Request) {
++        let postRequest = PostOrderRequestModel(products: mapProductsRequest(productList: request.productList), delivery_address: request.delivery_address)
++        serviceConnection.postOrderService(request: postRequest, completionHandler: { [weak self] result in
++            self?.presenter?.presentOrderSuccess(response: ProductSummary.OrderInquiry.Response())
++        }, errorHandler: { [weak self] error in
++            self?.presenter?.presentError(
++                response: ProductSummary.ProductSummaryError.Response(serviceError: error)
++            )
++        })
++    }
++    
++    func mapProductsRequest(productList: [HomeProduct.Product]) -> [ProductRequestModel] {
++        var productRequestModelArray: [ProductRequestModel] = []
++        productList.forEach{ product in
++            for _ in 1...product.amount {
++                productRequestModelArray.append(
++                    ProductRequestModel(
++                        name: product.name,
++                        price: product.price,
++                        imageUrl: "\(product.imageUrl)"
++                    )
++                )
++            }
++        }
++        return productRequestModelArray
++    }
+ }
+diff --git a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryModels.swift b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryModels.swift
+index 370c1e8..d6d092f 100644
+--- a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryModels.swift
++++ b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryModels.swift
+@@ -2,6 +2,7 @@ enum ProductSummary {
+     
+     enum ProductCart {
+         struct Request {
++            let context: HomeProduct.ProductCartContext
+         }
+         struct Response {
+             let context: HomeProduct.ProductCartContext
+@@ -11,7 +12,29 @@ enum ProductSummary {
+             let productList: [HomeProduct.Product]
+             let totalPrice: Int
+             let totalProduct: Int
+-            let address: String?
++            let delivery_address: String?
++        }
++    }
++    
++    enum OrderInquiry {
++        struct Request {
++            let productList: [HomeProduct.Product]
++            let delivery_address: String
++        }
++        struct Response {
++        }
++        struct ViewModel {
++        }
++    }
++    
++    enum ProductSummaryError {
++        struct Request {
++        }
++        struct Response {
++            let serviceError: ServiceError?
++        }
++        struct ViewModel {
++            let serviceError: ServiceError?
+         }
+     }
+ }
+diff --git a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryPresenter.swift b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryPresenter.swift
+index b01e0af..0f1221d 100644
+--- a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryPresenter.swift
++++ b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryPresenter.swift
+@@ -1,16 +1,27 @@
+ protocol ProductSummaryPresentationLogic {
+     func presentProductCartContext(response: ProductSummary.ProductCart.Response)
++    func presentError(response: ProductSummary.ProductSummaryError.Response)
++    func presentOrderSuccess(response: ProductSummary.OrderInquiry.Response)
+ }
+ 
+ class ProductSummaryPresenter: ProductSummaryPresentationLogic {
+     weak var viewController: ProductSummaryDisplayLogic?
+     
+     func presentProductCartContext(response: ProductSummary.ProductCart.Response) {
+-        let viewModel = ProductSummary.ProductCart.ViewModel(store: response.context.store, productList: filterProductCart(productList: response.context.productList), totalPrice: response.context.totalPrice, totalProduct: response.context.totalProduct, address: response.context.address)
++        let viewModel = ProductSummary.ProductCart.ViewModel(store: response.context.store, productList: filterProductCart(productList: response.context.productList), totalPrice: response.context.totalPrice, totalProduct: response.context.totalProduct, delivery_address: response.context.delivery_address)
+         viewController?.displayProductCartContext(viewModel: viewModel)
+     }
+     
+     func filterProductCart(productList: [HomeProduct.Product]) -> [HomeProduct.Product] {
+         return productList.filter{$0.amount != 0}
+     }
++    
++    func presentError(response: ProductSummary.ProductSummaryError.Response) {
++        let viewModel = ProductSummary.ProductSummaryError.ViewModel(serviceError: response.serviceError)
++        viewController?.displayError(viewModel: viewModel)
++    }
++    
++    func presentOrderSuccess(response: ProductSummary.OrderInquiry.Response) {
++        viewController?.displayOrderSuccess(viewModel: ProductSummary.OrderInquiry.ViewModel())
++    }
+ }
+diff --git a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryRouter.swift b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryRouter.swift
+index f719eb8..4ebc181 100644
+--- a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryRouter.swift
++++ b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryRouter.swift
+@@ -1,5 +1,7 @@
+ protocol ProductSummaryRoutingLogic {
++    func showFullViewLoading(destination: UILoadingFullViewViewController)
+     func routeBack()
++    func routeToOrderSuccess()
+ }
+ 
+ protocol ProductSummaryDataPassing {
+@@ -9,8 +11,16 @@ protocol ProductSummaryDataPassing {
+ class ProductSummaryRouter: ProductSummaryRoutingLogic, ProductSummaryDataPassing {
+     weak var viewController: ProductSummaryViewController?
+     var dataStore: ProductSummaryDataStore?
++    
++    func showFullViewLoading(destination: UILoadingFullViewViewController) {
++        viewController?.present(destination, animated: true)
++    }
+ 
+     func routeBack() {
+         viewController?.navigationController?.popViewController(animated: true)
+     }
++    
++    func routeToOrderSuccess() {
++        
++    }
+ }
+diff --git a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryViewController.swift b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryViewController.swift
+index c24a96f..0d97904 100644
+--- a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryViewController.swift
++++ b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryViewController.swift
+@@ -2,6 +2,8 @@ import UIKit
+ 
+ protocol ProductSummaryDisplayLogic: AnyObject {
+     func displayProductCartContext(viewModel: ProductSummary.ProductCart.ViewModel)
++    func displayError(viewModel: ProductSummary.ProductSummaryError.ViewModel)
++    func displayOrderSuccess(viewModel: ProductSummary.OrderInquiry.ViewModel)
+ }
+ 
+ class ProductSummaryViewController: UIViewController, ProductSummaryDisplayLogic {
+@@ -18,6 +20,8 @@ class ProductSummaryViewController: UIViewController, ProductSummaryDisplayLogic
+     @IBOutlet private weak var bottomTotalPriceLabel: UILabel!
+     @IBOutlet private weak var nextButton: UIButton!
+     
++    public var uiLoadingFullView = UILoadingFullViewViewController()
++    
+     var productCart: [HomeProduct.Product] = []
+     var totalPrice = 0
+     var totalProduct = 0
+@@ -94,7 +98,8 @@ class ProductSummaryViewController: UIViewController, ProductSummaryDisplayLogic
+     }
+     
+     private func initialDataFromProductCartContext() {
+-        interactor?.getProductCartContext(request: ProductSummary.ProductCart.Request())
++        guard let context = router?.dataStore?.productCartContext else { return }
++        interactor?.getProductCartContext(request: ProductSummary.ProductCart.Request(context: context))
+     }
+     
+     @objc private func onTapDismissKeyboard() {
+@@ -123,4 +128,20 @@ class ProductSummaryViewController: UIViewController, ProductSummaryDisplayLogic
+         bottomTotalPriceLabel.text = "฿\(totalPrice)"
+         productListTableView.reloadData()
+     }
++    
++    func displayError(viewModel: ProductSummary.ProductSummaryError.ViewModel) {
++        let serviceError = viewModel.serviceError
++        uiLoadingFullView.interactor?.showError(request: UILoadingFullView.Error.Request(show: true, serviceError: serviceError, customAction: nil))
++    }
++    
++    func displayOrderSuccess(viewModel: ProductSummary.OrderInquiry.ViewModel) {
++        router?.routeToOrderSuccess()
++    }
++    
++    @IBAction func onTappedOrder(_ sender: Any) {
++        router?.showFullViewLoading(destination: uiLoadingFullView)
++        interactor?.postOrderInquiry(request: ProductSummary.OrderInquiry.Request(
++            productList: productCart, delivery_address: addressTextView.text)
++        )
++    }
+ }
+diff --git a/OPN-Challenge/Service/BaseAPI/BaseAPI.swift b/OPN-Challenge/Service/BaseAPI/BaseAPI.swift
+index 07d1cf2..9aebddc 100644
+--- a/OPN-Challenge/Service/BaseAPI/BaseAPI.swift
++++ b/OPN-Challenge/Service/BaseAPI/BaseAPI.swift
+@@ -3,7 +3,7 @@ import Moya
+ enum BaseAPI {
+     case getStoreInfo
+     case getProducts
+-    case postOrder(request: PostOrderRequestModel)
++    case postOrder(parameters: [String: Any])
+ }
+ 
+ extension BaseAPI: TargetType {
+@@ -32,8 +32,8 @@ extension BaseAPI: TargetType {
+         switch self{
+         case .getProducts, .getStoreInfo:
+             return .requestPlain
+-        case let .postOrder(request):
+-            return .requestParameters(parameters: ["products": request.products, "delivery_address": request.address], encoding: JSONEncoding.default)
++        case let .postOrder(parameters):
++            return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
+         }
+     }
+     
+diff --git a/OPN-Challenge/Service/BaseService.swift b/OPN-Challenge/Service/BaseService.swift
+index de54244..47598e0 100644
+--- a/OPN-Challenge/Service/BaseService.swift
++++ b/OPN-Challenge/Service/BaseService.swift
+@@ -49,4 +49,14 @@ extension BaseService {
+             }
+         )
+     }
++    
++    func fetchPostOrder(request: PostOrderRequestModel, completionHandler: @escaping ((OrderResponseModel) -> Void), errorHandler: @escaping (APIError) -> Void) {
++        guard let parameters = try? JSONFormatter.shared.convertToDictionary(value: request.products) else { return }
++        provider.request(
++            BaseAPI.postOrder(parameters: parameters),
++            completion: { response in
++                ResponseHandler().processResponse(result: response, success: completionHandler, failure: errorHandler)
++            }
++        )
++    }
+ }
+diff --git a/OPN-Challenge/Service/Model/RequestModel.swift b/OPN-Challenge/Service/Model/RequestModel.swift
+index 0f49fab..a5bb07d 100644
+--- a/OPN-Challenge/Service/Model/RequestModel.swift
++++ b/OPN-Challenge/Service/Model/RequestModel.swift
+@@ -1,6 +1,6 @@
+ struct PostOrderRequestModel: Codable {
+     let products: [ProductRequestModel]
+-    let address: String
++    let delivery_address: String
+ }
+ 
+ struct ProductRequestModel: Codable {
+diff --git a/OPN-Challenge/Service/Model/ResponseModel.swift b/OPN-Challenge/Service/Model/ResponseModel.swift
+index 744cfe2..f0dd5ae 100644
+--- a/OPN-Challenge/Service/Model/ResponseModel.swift
++++ b/OPN-Challenge/Service/Model/ResponseModel.swift
+@@ -10,3 +10,7 @@ struct ProductsResponseModel: Codable {
+     var price: Int?
+     var imageUrl: String?
+ }
++
++struct OrderResponseModel: Codable {
++    
++}
+diff --git a/OPN-Challenge/Service/ServiceConnection.swift b/OPN-Challenge/Service/ServiceConnection.swift
+index edea781..9c5e864 100644
+--- a/OPN-Challenge/Service/ServiceConnection.swift
++++ b/OPN-Challenge/Service/ServiceConnection.swift
+@@ -19,15 +19,13 @@ class ServiceConnection {
+         )
+     }
+     
+-//    func CoinDetailService(uuid: String, completionHandler: @escaping (BaseCoinResponseData) -> Void, errorHandler: @escaping (ServiceError?) -> Void) {
+-//        let requestData = CoinDetailRequestData(uuid: uuid)
+-//        BaseService().fetchCoinDetail(
+-//            uuid: requestData.uuid,
+-//            completionHandler: { (response: BaseCoinResponseData) in
+-//                completionHandler(response)
+-//            }, errorHandler: { error in
+-//                errorHandler(error)
+-//            }
+-//        )
+-//    }
++    func postOrderService(request: PostOrderRequestModel, completionHandler: @escaping ((OrderResponseModel) -> Void), errorHandler: @escaping (ServiceError?) -> Void) {
++        BaseService().fetchPostOrder(request: request,
++            completionHandler: { (response: OrderResponseModel) in
++                completionHandler(response)
++            }, errorHandler: { error in
++                errorHandler(error)
++            }
++        )
++    }
+ }
+diff --git a/OPN-Challenge/Utilities/JSONFormatter.swift b/OPN-Challenge/Utilities/JSONFormatter.swift
+new file mode 100644
+index 0000000..59ac41d
+--- /dev/null
++++ b/OPN-Challenge/Utilities/JSONFormatter.swift
+@@ -0,0 +1,25 @@
++import Foundation
++
++class JSONFormatter {
++    static let shared = JSONFormatter()
++    
++    func getPrettyJSON(_ dic: [String: Any]) -> String {
++        guard let jsonData = try? JSONSerialization.data(withJSONObject: dic, options: .prettyPrinted) else {
++            return "Unable to convert dictionary to json string"
++        }
++        guard let jsonString = String(data: jsonData, encoding: .utf8) else {
++            return "Unable to convert dictionary to json string"
++        }
++        return jsonString
++    }
++    
++    func convertToDictionary<T: Codable>(value: T, encoder: JSONEncoder = JSONEncoder()) throws -> [String: Any] {
++        let data = try encoder.encode(value)
++        let object = try JSONSerialization.jsonObject(with: data)
++        if let json = object as? [String: Any] {
++            return json
++        }
++        let context = DecodingError.Context(codingPath: [], debugDescription: "Deserialized object is not a dictionary")
++        throw DecodingError.typeMismatch(type(of: object), context)
++    }
++}
+diff --git a/OPN-ChallengeTests/HomeProduct/Scenes/HomeProductInteractorTests.swift b/OPN-ChallengeTests/HomeProduct/Scenes/HomeProductInteractorTests.swift
+index d763889..88f3768 100644
+--- a/OPN-ChallengeTests/HomeProduct/Scenes/HomeProductInteractorTests.swift
++++ b/OPN-ChallengeTests/HomeProduct/Scenes/HomeProductInteractorTests.swift
+@@ -34,7 +34,7 @@ class HomeProductInteractorTests: XCTestCase {
+         let stub = StubHomeProductService(result: .success)
+         sut = HomeProductInteractor(serviceConnection: stub)
+         sut?.presenter = spy
+-        sut?.getStoreInfoInquiry(request: .init(customAction: nil))
++        sut?.getStoreInfoInquiry(request: HomeProduct.StoreInfoInquiry.Request(customAction: nil))
+         XCTAssertTrue(spy.presentStoreInfoCalled)
+     }
+     
+@@ -43,7 +43,7 @@ class HomeProductInteractorTests: XCTestCase {
+         let stub = StubHomeProductService(result: .error)
+         sut = HomeProductInteractor(serviceConnection: stub)
+         sut?.presenter = spy
+-        sut?.getStoreInfoInquiry(request: .init(customAction: nil))
++        sut?.getStoreInfoInquiry(request: HomeProduct.StoreInfoInquiry.Request(customAction: nil))
+         XCTAssertTrue(spy.presentErrorCalled)
+     }
+     
+@@ -52,7 +52,7 @@ class HomeProductInteractorTests: XCTestCase {
+         let stub = StubHomeProductService(result: .success)
+         sut = HomeProductInteractor(serviceConnection: stub)
+         sut?.presenter = spy
+-        sut?.getProductsInquiry(request: .init(customAction: nil))
++        sut?.getProductsInquiry(request: HomeProduct.ProductsInquiry.Request(customAction: nil))
+         XCTAssertTrue(spy.presentProductsCalled)
+     }
+     
+@@ -61,7 +61,7 @@ class HomeProductInteractorTests: XCTestCase {
+         let stub = StubHomeProductService(result: .error)
+         sut = HomeProductInteractor(serviceConnection: stub)
+         sut?.presenter = spy
+-        sut?.getProductsInquiry(request: .init(customAction: nil))
++        sut?.getProductsInquiry(request: HomeProduct.ProductsInquiry.Request(customAction: nil))
+         XCTAssertTrue(spy.presentErrorCalled)
+     }
+ 
+diff --git a/OPN-ChallengeTests/HomeProduct/Scenes/HomeProductPresenterTests.swift b/OPN-ChallengeTests/HomeProduct/Scenes/HomeProductPresenterTests.swift
+index 4d0a4f0..b6012cd 100644
+--- a/OPN-ChallengeTests/HomeProduct/Scenes/HomeProductPresenterTests.swift
++++ b/OPN-ChallengeTests/HomeProduct/Scenes/HomeProductPresenterTests.swift
+@@ -38,7 +38,18 @@ class HomeProductPresenterTests: XCTestCase {
+     func test_presentError() {
+         let spy = SpyHomeProductDisplay()
+         sut?.viewController = spy
+-        sut?.presentError(response: HomeProduct.HomeProductError.Response(serviceError: APIError(error: BaseServiceError(name: "MOCK", header: "MOCK", message: "MOCK")), customAction: nil))
++        sut?.presentError(
++            response: HomeProduct.HomeProductError.Response(
++                serviceError: APIError(
++                    error: BaseServiceError(
++                        name: "MOCK",
++                        header: "MOCK",
++                        message: "MOCK"
++                    )
++                ),
++                customAction: nil
++            )
++        )
+         XCTAssertTrue(spy.displayErrorCalled)
+     }
+     
+diff --git a/OPN-ChallengeTests/ProductSummary/Scenes/ProductSummaryInteractorTests.swift b/OPN-ChallengeTests/ProductSummary/Scenes/ProductSummaryInteractorTests.swift
+new file mode 100644
+index 0000000..8527570
+--- /dev/null
++++ b/OPN-ChallengeTests/ProductSummary/Scenes/ProductSummaryInteractorTests.swift
+@@ -0,0 +1,78 @@
++@testable import OPN_Challenge
++import XCTest
++
++class ProductSummaryInteractorTests: XCTestCase {
++    var sut: ProductSummaryInteractor?
++    
++    override func setUp() {
++        super.setUp()
++        sut = ProductSummaryInteractor()
++    }
++    
++    override func tearDown() {
++        sut = nil
++        super.tearDown()
++    }
++    
++    func test_getProductCartContext() {
++        let spy = SpyProductSummaryPresenter()
++        let stub = StubProductSummaryService(result: .success)
++        sut = ProductSummaryInteractor(serviceConnection: stub)
++        sut?.presenter = spy
++        sut?.getProductCartContext(
++            request: ProductSummary.ProductCart.Request(
++                context: HomeProduct.ProductCartContext(
++                    store: HomeProduct.StoreInfo(
++                        name: "",
++                        rating: "",
++                        businessHours: ""
++                    ),
++                    productList: [],
++                    totalPrice: 0,
++                    totalProduct: 0,
++                    delivery_address: ""
++                )
++            )
++        )
++        XCTAssertTrue(spy.presentProductCartContextCalled)
++    }
++    
++    func test_postOrderInquiry_success() {
++        let spy = SpyProductSummaryPresenter()
++        let stub = StubProductSummaryService(result: .success)
++        sut = ProductSummaryInteractor(serviceConnection: stub)
++        sut?.presenter = spy
++        sut?.postOrderInquiry(request: ProductSummary.OrderInquiry.Request(productList: [], delivery_address: ""))
++        XCTAssertTrue(spy.presentOrderSuccessCalled)
++    }
++    
++    func test_postOrderInquiry_error() {
++        let spy = SpyProductSummaryPresenter()
++        let stub = StubProductSummaryService(result: .error)
++        sut = ProductSummaryInteractor(serviceConnection: stub)
++        sut?.presenter = spy
++        sut?.postOrderInquiry(request: ProductSummary.OrderInquiry.Request(productList: [], delivery_address: ""))
++        XCTAssertTrue(spy.presentErrorCalled)
++    }
++
++}
++
++extension ProductSummaryInteractorTests {
++    class SpyProductSummaryPresenter: ProductSummaryPresentationLogic {
++        var presentProductCartContextCalled = false
++        var presentErrorCalled = false
++        var presentOrderSuccessCalled = false
++        
++        func presentProductCartContext(response: OPN_Challenge.ProductSummary.ProductCart.Response) {
++            presentProductCartContextCalled = true
++        }
++        
++        func presentError(response: OPN_Challenge.ProductSummary.ProductSummaryError.Response) {
++            presentErrorCalled = true
++        }
++        
++        func presentOrderSuccess(response: OPN_Challenge.ProductSummary.OrderInquiry.Response) {
++            presentOrderSuccessCalled = true
++        }
++    }
++}
+diff --git a/OPN-ChallengeTests/ProductSummary/Scenes/ProductSummaryPresenterTests.swift b/OPN-ChallengeTests/ProductSummary/Scenes/ProductSummaryPresenterTests.swift
+new file mode 100644
+index 0000000..ee65805
+--- /dev/null
++++ b/OPN-ChallengeTests/ProductSummary/Scenes/ProductSummaryPresenterTests.swift
+@@ -0,0 +1,82 @@
++@testable import OPN_Challenge
++import XCTest
++
++class ProductSummaryPresenterTests: XCTestCase {
++    var sut: ProductSummaryPresenter?
++    
++    override func setUp() {
++        super.setUp()
++        sut = ProductSummaryPresenter()
++    }
++    
++    override func tearDown() {
++        sut = nil
++        super.tearDown()
++    }
++    
++    func test_presentProductCartContext() {
++        let spy = SpyProductSummaryDisplay()
++        sut?.viewController = spy
++        sut?.presentProductCartContext(
++            response: ProductSummary.ProductCart.Response(
++                context: HomeProduct.ProductCartContext(
++                    store: HomeProduct.StoreInfo(
++                            name: "",
++                            rating: "",
++                            businessHours: ""
++                        ),
++                    productList: [],
++                    totalPrice: 0,
++                    totalProduct: 0,
++                    delivery_address: ""
++                )
++            )
++        )
++        XCTAssertTrue(spy.displayProductCartContextCalled)
++    }
++    
++    func test_presentOrderSuccess() {
++        let spy = SpyProductSummaryDisplay()
++        sut?.viewController = spy
++        sut?.presentOrderSuccess(response: ProductSummary.OrderInquiry.Response())
++        XCTAssertTrue(spy.displayOrderSuccssCalled)
++    }
++    
++    func test_presentError() {
++        let spy = SpyProductSummaryDisplay()
++        sut?.viewController = spy
++        sut?.presentError(
++            response: ProductSummary.ProductSummaryError.Response(
++                serviceError: APIError(
++                    error: BaseServiceError(
++                        name: "MOCK",
++                        header: "MOCK",
++                        message: "MOCK"
++                    )
++                )
++            )
++        )
++        XCTAssertTrue(spy.displayErrorCalled)
++    }
++    
++}
++
++extension ProductSummaryPresenterTests {
++    class SpyProductSummaryDisplay: ProductSummaryDisplayLogic {
++        var displayErrorCalled = false
++        var displayProductCartContextCalled = false
++        var displayOrderSuccssCalled = false
++        
++        func displayError(viewModel: OPN_Challenge.ProductSummary.ProductSummaryError.ViewModel) {
++            displayErrorCalled = true
++        }
++        
++        func displayProductCartContext(viewModel: OPN_Challenge.ProductSummary.ProductCart.ViewModel) {
++            displayProductCartContextCalled = true
++        }
++        
++        func displayOrderSuccess(viewModel: OPN_Challenge.ProductSummary.OrderInquiry.ViewModel) {
++            displayOrderSuccssCalled = true
++        }
++    }
++}
+diff --git a/OPN-ChallengeTests/ProductSummary/Stubs/StubProductSummaryService.swift b/OPN-ChallengeTests/ProductSummary/Stubs/StubProductSummaryService.swift
+new file mode 100644
+index 0000000..15f685e
+--- /dev/null
++++ b/OPN-ChallengeTests/ProductSummary/Stubs/StubProductSummaryService.swift
+@@ -0,0 +1,24 @@
++import Moya
++@testable import OPN_Challenge
++
++class StubProductSummaryService: ServiceConnection {
++    enum Result {
++        case success, error
++    }
++    
++    private let result: Result
++    
++    init(result: Result) {
++        self.result = result
++        super.init()
++    }
++    
++    override func postOrderService(request: PostOrderRequestModel, completionHandler: @escaping ((OrderResponseModel) -> Void), errorHandler: @escaping ((any ServiceError)?) -> Void) {
++        switch result {
++        case .success:
++            completionHandler(OrderResponseModel())
++        case .error:
++            errorHandler(APIError(error: BaseServiceError(name: "MOCK", header: "MOCK", message: "MOCK")))
++        }
++    }
++}
+-- 
+2.39.3 (Apple Git-146)
+

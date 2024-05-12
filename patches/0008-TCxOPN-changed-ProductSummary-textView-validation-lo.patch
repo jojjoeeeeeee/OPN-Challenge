@@ -1,0 +1,25 @@
+From e3566d1bcf4746dd5a5c87dc93c75f5653b6520f Mon Sep 17 00:00:00 2001
+From: "phakkharachate.j" <phakkharachate.j@arise.tech>
+Date: Mon, 13 May 2024 05:56:38 +0700
+Subject: [PATCH 8/8] [TCxOPN] changed ProductSummary textView validation logic
+
+---
+ .../ProductSummary/ProductSummaryViewController+TextView.swift  | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryViewController+TextView.swift b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryViewController+TextView.swift
+index 9d52802..1b36522 100644
+--- a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryViewController+TextView.swift
++++ b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryViewController+TextView.swift
+@@ -11,7 +11,7 @@ extension ProductSummaryViewController: UITextViewDelegate {
+     
+     func textViewDidEndEditing(_ textView: UITextView) {
+         textView.layer.borderColor = UIColor.lightGreyPrimary.cgColor
+-        if textView.text.isEmpty {
++        if textView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+             textView.text = "Please fill in address..."
+             textView.textColor = UIColor.lightGreySecondary
+             enableNextButton(false)
+-- 
+2.39.3 (Apple Git-146)
+

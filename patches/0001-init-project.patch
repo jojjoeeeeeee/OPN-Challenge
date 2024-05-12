@@ -1,0 +1,104 @@
+From 0086c277ddf6a8b167741ae67de3bac5d16425f3 Mon Sep 17 00:00:00 2001
+From: "phakkharachate.j" <phakkharachate.j@arise.tech>
+Date: Sun, 12 May 2024 02:16:01 +0700
+Subject: [PATCH 1/8] init project
+
+---
+ .gitignore | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Podfile    | 19 ++++++++++++++++++
+ 2 files changed, 77 insertions(+)
+ create mode 100644 .gitignore
+ create mode 100644 Podfile
+
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..25315d3
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,58 @@
++# Xcode
++#
++# gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
++
++## Build generated
++build/
++DerivedData/
++
++## Various settings
++*.pbxuser
++!default.pbxuser
++*.mode1v3
++!default.mode1v3
++*.mode2v3
++!default.mode2v3
++*.perspectivev3
++!default.perspectivev3
++xcuserdata/
++
++## Other
++*.moved-aside
++*.xcuserstate
++
++## Obj-C/Swift specific
++*.hmap
++*.ipa
++*.dSYM.zip
++*.dSYM
++
++## Playgrounds
++timeline.xctimeline
++playground.xcworkspace
++
++# Swift Package Manager
++#
++# Add this line if you want to avoid checking in source code from Swift Package Manager dependencies.
++# Packages/
++.build/
++
++# CocoaPods
++#
++# We recommend against adding the Pods directory to your .gitignore. However
++# you should judge for yourself, the pros and cons are mentioned at:
++# https://guides.cocoapods.org/using/using-cocoapods.html#should-i-check-the-pods-directory-into-source-control
++#
++Pods/
++Podfile.lock
++
++# Carthage
++#
++# Add this line if you want to avoid checking in source code from Carthage dependencies.
++# Carthage/Checkouts
++
++Carthage/Build
++
++
++# MAC OS
++*.DS_Store
+diff --git a/Podfile b/Podfile
+new file mode 100644
+index 0000000..7aeaa5c
+--- /dev/null
++++ b/Podfile
+@@ -0,0 +1,19 @@
++# Uncomment the next line to define a global platform for your project
++# platform :ios, '9.0'
++
++target 'OPN-Challenge' do
++  # Comment the next line if you don't want to use dynamic frameworks
++  use_frameworks!
++
++  # Pods for OPN-Challenge
++
++  target 'OPN-ChallengeTests' do
++    inherit! :search_paths
++    # Pods for testing
++  end
++
++  target 'OPN-ChallengeUITests' do
++    # Pods for testing
++  end
++
++end
+-- 
+2.39.3 (Apple Git-146)
+

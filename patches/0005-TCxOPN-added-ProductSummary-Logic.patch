@@ -1,0 +1,1270 @@
+From 48a2f79899e5d25cc129a23b20b7bf13b243117c Mon Sep 17 00:00:00 2001
+From: "phakkharachate.j" <phakkharachate.j@arise.tech>
+Date: Mon, 13 May 2024 00:41:47 +0700
+Subject: [PATCH 5/8] [TCxOPN] added ProductSummary Logic
+
+---
+ OPN-Challenge.xcodeproj/project.pbxproj       |   8 +
+ .../Extensions/UIColorExtension.swift         |   2 +
+ .../ProductCell/ProductTableViewCell.swift    |  28 +++
+ .../ProductCell/ProductTableViewCell.xib      |  57 ++++-
+ .../UILoadingFullView/UILoadingFullView.xib   |   6 +-
+ .../UILoadingFullViewViewController.swift     |   4 +-
+ .../HomeProduct/HomeProductInteractor.swift   |   2 -
+ .../HomeProduct/HomeProductModels.swift       |  11 +-
+ .../HomeProduct/HomeProductPresenter.swift    |   4 +-
+ .../HomeProduct/HomeProductRouter.swift       |  13 +-
+ .../HomeProductViewController.swift           |  39 +--
+ ...roductSumaryViewController+TableView.swift |  24 ++
+ .../ProductSummary/ProductSummary.storyboard  | 231 +++++++++++++++---
+ .../ProductSummaryInteractor.swift            |  47 +---
+ .../ProductSummary/ProductSummaryModels.swift |  44 ++--
+ .../ProductSummaryPresenter.swift             |  41 +---
+ .../ProductSummary/ProductSummaryRouter.swift |  64 +----
+ ...roductSummaryViewController+TextView.swift |  22 ++
+ .../ProductSummaryViewController.swift        | 201 ++++++++-------
+ 19 files changed, 548 insertions(+), 300 deletions(-)
+ create mode 100644 OPN-Challenge/Scenes/ProductSummary/ProductSumaryViewController+TableView.swift
+ create mode 100644 OPN-Challenge/Scenes/ProductSummary/ProductSummaryViewController+TextView.swift
+
+diff --git a/OPN-Challenge.xcodeproj/project.pbxproj b/OPN-Challenge.xcodeproj/project.pbxproj
+index b354fe9..febadf3 100644
+--- a/OPN-Challenge.xcodeproj/project.pbxproj
++++ b/OPN-Challenge.xcodeproj/project.pbxproj
+@@ -53,6 +53,8 @@
+ 		73CE6B4F2BF102D20052CD8B /* ProductSummaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B492BF102D20052CD8B /* ProductSummaryViewController.swift */; };
+ 		73CE6B502BF102D20052CD8B /* ProductSummaryInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B4A2BF102D20052CD8B /* ProductSummaryInteractor.swift */; };
+ 		73CE6B522BF102EA0052CD8B /* ProductSummary.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 73CE6B512BF102EA0052CD8B /* ProductSummary.storyboard */; };
++		73CE6B542BF1107F0052CD8B /* ProductSumaryViewController+TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B532BF1107F0052CD8B /* ProductSumaryViewController+TableView.swift */; };
++		73CE6B562BF119880052CD8B /* ProductSummaryViewController+TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B552BF119880052CD8B /* ProductSummaryViewController+TextView.swift */; };
+ 		AA06D3D5FD48A457D3189C5C /* Pods_OPN_ChallengeTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBC011E77B1AF7ADBC527B7E /* Pods_OPN_ChallengeTests.framework */; };
+ 		B6DEC6E51521EC1B2633083C /* Pods_OPN_Challenge_OPN_ChallengeUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F457EF9EFD3978A42D1B43EB /* Pods_OPN_Challenge_OPN_ChallengeUITests.framework */; };
+ 		DFCEF3341560DBA2A56575C0 /* Pods_OPN_Challenge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B18C9219862D4F67521B275C /* Pods_OPN_Challenge.framework */; };
+@@ -130,6 +132,8 @@
+ 		73CE6B492BF102D20052CD8B /* ProductSummaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductSummaryViewController.swift; sourceTree = "<group>"; };
+ 		73CE6B4A2BF102D20052CD8B /* ProductSummaryInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductSummaryInteractor.swift; sourceTree = "<group>"; };
+ 		73CE6B512BF102EA0052CD8B /* ProductSummary.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = ProductSummary.storyboard; sourceTree = "<group>"; };
++		73CE6B532BF1107F0052CD8B /* ProductSumaryViewController+TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProductSumaryViewController+TableView.swift"; sourceTree = "<group>"; };
++		73CE6B552BF119880052CD8B /* ProductSummaryViewController+TextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProductSummaryViewController+TextView.swift"; sourceTree = "<group>"; };
+ 		7D4AB8114A17238EF43803E6 /* Pods-OPN-Challenge.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OPN-Challenge.release.xcconfig"; path = "Target Support Files/Pods-OPN-Challenge/Pods-OPN-Challenge.release.xcconfig"; sourceTree = "<group>"; };
+ 		B18C9219862D4F67521B275C /* Pods_OPN_Challenge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OPN_Challenge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+ 		C453A3A53A15AE7491B28818 /* Pods-OPN-ChallengeTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OPN-ChallengeTests.debug.xcconfig"; path = "Target Support Files/Pods-OPN-ChallengeTests/Pods-OPN-ChallengeTests.debug.xcconfig"; sourceTree = "<group>"; };
+@@ -371,6 +375,8 @@
+ 				73CE6B492BF102D20052CD8B /* ProductSummaryViewController.swift */,
+ 				73CE6B4A2BF102D20052CD8B /* ProductSummaryInteractor.swift */,
+ 				73CE6B512BF102EA0052CD8B /* ProductSummary.storyboard */,
++				73CE6B532BF1107F0052CD8B /* ProductSumaryViewController+TableView.swift */,
++				73CE6B552BF119880052CD8B /* ProductSummaryViewController+TextView.swift */,
+ 			);
+ 			path = ProductSummary;
+ 			sourceTree = "<group>";
+@@ -654,6 +660,7 @@
+ 				7395561E2BF001A2004AC74E /* UIColorExtension.swift in Sources */,
+ 				739556332BF018F0004AC74E /* ProductTableViewCell.swift in Sources */,
+ 				739556642BF0DF5F004AC74E /* UILoadingFullViewViewController.swift in Sources */,
++				73CE6B542BF1107F0052CD8B /* ProductSumaryViewController+TableView.swift in Sources */,
+ 				739556272BF0129B004AC74E /* DateFormatter.swift in Sources */,
+ 				7395561A2BEFFC1B004AC74E /* HomeProductViewController.swift in Sources */,
+ 				739556632BF0DF5F004AC74E /* UILoadingFullViewRouter.swift in Sources */,
+@@ -673,6 +680,7 @@
+ 				739555E22BEFF8DA004AC74E /* SceneDelegate.swift in Sources */,
+ 				739556612BF0DF5F004AC74E /* UILoadingFullViewModels.swift in Sources */,
+ 				7395564C2BF0CAE7004AC74E /* ServiceError.swift in Sources */,
++				73CE6B562BF119880052CD8B /* ProductSummaryViewController+TextView.swift in Sources */,
+ 				739556452BF0CA5B004AC74E /* NetworkRequestRetrier.swift in Sources */,
+ 				739556602BF0DF5F004AC74E /* UILoadingFullViewInteractor.swift in Sources */,
+ 				739556372BF028B6004AC74E /* ImageUtils.swift in Sources */,
+diff --git a/OPN-Challenge/Extensions/UIColorExtension.swift b/OPN-Challenge/Extensions/UIColorExtension.swift
+index 96e13a2..33aa847 100644
+--- a/OPN-Challenge/Extensions/UIColorExtension.swift
++++ b/OPN-Challenge/Extensions/UIColorExtension.swift
+@@ -3,4 +3,6 @@ import UIKit
+ extension UIColor {
+     static let glass = UIColor(red: 1, green: 1, blue: 1, alpha: 0.35)
+     static let primary = UIColor(red: 141/255, green: 88/255, blue: 165/255, alpha: 1)
++    static let lightGreyPrimary = UIColor(red: 226/255, green: 226/255, blue: 226/255, alpha: 1)
++    static let lightGreySecondary = UIColor(red: 131/255, green: 131/255, blue: 131/255, alpha: 1)
+ }
+diff --git a/OPN-Challenge/Scenes/CommonView/ProductCell/ProductTableViewCell.swift b/OPN-Challenge/Scenes/CommonView/ProductCell/ProductTableViewCell.swift
+index 54f24d6..d5e8c93 100644
+--- a/OPN-Challenge/Scenes/CommonView/ProductCell/ProductTableViewCell.swift
++++ b/OPN-Challenge/Scenes/CommonView/ProductCell/ProductTableViewCell.swift
+@@ -17,6 +17,10 @@ class ProductTableViewCell: UITableViewCell {
+     @IBOutlet private weak var priceLabel: UILabel!
+     @IBOutlet private weak var amountLabel: UILabel!
+     @IBOutlet private weak var removeProductButton: UIButton!
++    @IBOutlet private weak var quantityEditStackView: UIStackView!
++    @IBOutlet private weak var quantityView: UIView!
++    @IBOutlet private weak var quantityViewLabel: UILabel!
++    @IBOutlet private weak var totalProductPriceLabel: UILabel!
+     @IBOutlet private weak var addProductButton: UIButton!
+     
+     private var addProduct: (() -> ())?
+@@ -35,6 +39,9 @@ class ProductTableViewCell: UITableViewCell {
+             masksToBounds: false
+         )
+         menuImageView.roundCorner(cornerRadius: 8)
++        quantityView.roundCorner(cornerRadius: 8)
++        quantityView.layer.borderWidth = 1
++        quantityView.layer.borderColor = UIColor.lightGreyPrimary.cgColor
+     }
+     
+     public func configureCell(product: HomeProduct.Product, addProduct: (() -> ())?, removeProduct: (() -> ())?) {
+@@ -59,6 +66,27 @@ class ProductTableViewCell: UITableViewCell {
+         } else if product.amount == 99 {
+             addProductButton.tintColor = .lightGray
+         }
++        
++        quantityEditStackView.isHidden = false
++        priceLabel.isHidden = false
++        quantityView.isHidden = true
++        totalProductPriceLabel.isHidden = true
++    }
++    
++    public func configureCellSummary(product: HomeProduct.Product) {
++        titleLabel.text = product.name
++        priceLabel.text = "฿\(product.price)"
++        ImageUtils.setImageWithUrl(
++            imageView: menuImageView,
++            url: product.imageUrl
++        )
++        amountLabel.text = "\(product.amount)"
++        quantityEditStackView.isHidden = true
++        priceLabel.isHidden = true
++        quantityView.isHidden = false
++        totalProductPriceLabel.isHidden = false
++        quantityViewLabel.text = "\(product.amount)"
++        totalProductPriceLabel.text = "฿\(product.price * product.amount)"
+     }
+     
+     @IBAction func onTappedRemoveProduct(_ sender: Any) {
+diff --git a/OPN-Challenge/Scenes/CommonView/ProductCell/ProductTableViewCell.xib b/OPN-Challenge/Scenes/CommonView/ProductCell/ProductTableViewCell.xib
+index c10915d..d349ce4 100644
+--- a/OPN-Challenge/Scenes/CommonView/ProductCell/ProductTableViewCell.xib
++++ b/OPN-Challenge/Scenes/CommonView/ProductCell/ProductTableViewCell.xib
+@@ -6,6 +6,7 @@
+         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
+         <capability name="Image references" minToolsVersion="12.0"/>
+         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
++        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+     </dependencies>
+     <objects>
+@@ -28,14 +29,43 @@
+                                     <constraint firstAttribute="height" constant="80" id="dGm-Rq-AMh"/>
+                                 </constraints>
+                             </imageView>
+-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Dark Tiramisu Mocha" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mSs-Sy-sif">
++                            <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Vyc-GR-e4E">
+                                 <rect key="frame" x="104" y="16" width="241" height="28"/>
+-                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="16"/>
++                                <subviews>
++                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Dark Tiramisu Mocha" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mSs-Sy-sif">
++                                        <rect key="frame" x="0.0" y="0.0" width="241" height="28"/>
++                                        <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="16"/>
++                                        <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++                                        <nil key="highlightedColor"/>
++                                    </label>
++                                    <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="EwR-Jf-jn7">
++                                        <rect key="frame" x="241" y="0.0" width="28" height="28"/>
++                                        <subviews>
++                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="99" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xy7-La-MMe">
++                                                <rect key="frame" x="2.3333333333333144" y="3.3333333333333321" width="23.333333333333332" height="21.666666666666668"/>
++                                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="18"/>
++                                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++                                                <nil key="highlightedColor"/>
++                                            </label>
++                                        </subviews>
++                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
++                                        <constraints>
++                                            <constraint firstAttribute="width" constant="28" id="BEy-vs-Cbj"/>
++                                            <constraint firstItem="Xy7-La-MMe" firstAttribute="centerX" secondItem="EwR-Jf-jn7" secondAttribute="centerX" id="TLf-gP-mjY"/>
++                                            <constraint firstItem="Xy7-La-MMe" firstAttribute="centerY" secondItem="EwR-Jf-jn7" secondAttribute="centerY" id="vYo-Hz-vKh"/>
++                                            <constraint firstAttribute="height" constant="28" id="vwA-ti-XdE"/>
++                                        </constraints>
++                                    </view>
++                                </subviews>
++                            </stackView>
++                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="฿70" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aaX-L6-qR6">
++                                <rect key="frame" x="104" y="52" width="25" height="17"/>
++                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                 <nil key="highlightedColor"/>
+                             </label>
+-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="฿70" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aaX-L6-qR6">
+-                                <rect key="frame" x="104" y="52" width="25" height="17"/>
++                            <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="฿70" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bxy-Rt-50v">
++                                <rect key="frame" x="320" y="52" width="25" height="17"/>
+                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                 <nil key="highlightedColor"/>
+@@ -84,18 +114,20 @@
+                         </subviews>
+                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                         <constraints>
+-                            <constraint firstItem="b3F-ZR-Wql" firstAttribute="top" secondItem="mSs-Sy-sif" secondAttribute="bottom" constant="24" id="8eS-s3-r5x"/>
+                             <constraint firstItem="aaX-L6-qR6" firstAttribute="leading" secondItem="iLt-vF-ozf" secondAttribute="trailing" constant="8" id="A7w-ia-I5q"/>
+-                            <constraint firstItem="mSs-Sy-sif" firstAttribute="leading" secondItem="iLt-vF-ozf" secondAttribute="trailing" constant="8" id="Any-1u-oCL"/>
+                             <constraint firstItem="iLt-vF-ozf" firstAttribute="leading" secondItem="coI-Bh-gKs" secondAttribute="leading" constant="16" id="BWa-yu-mJT"/>
++                            <constraint firstAttribute="trailing" secondItem="Vyc-GR-e4E" secondAttribute="trailing" constant="16" id="Cry-RL-JQy"/>
+                             <constraint firstAttribute="trailing" secondItem="b3F-ZR-Wql" secondAttribute="trailing" constant="8" id="DAz-iN-n1j"/>
++                            <constraint firstItem="aaX-L6-qR6" firstAttribute="top" secondItem="Vyc-GR-e4E" secondAttribute="bottom" constant="8" id="DsX-xx-hks"/>
+                             <constraint firstAttribute="bottom" secondItem="b3F-ZR-Wql" secondAttribute="bottom" constant="8" id="Hek-Ea-89j"/>
+-                            <constraint firstItem="mSs-Sy-sif" firstAttribute="top" secondItem="coI-Bh-gKs" secondAttribute="top" constant="16" id="IX9-3h-5PH"/>
+-                            <constraint firstItem="aaX-L6-qR6" firstAttribute="top" secondItem="mSs-Sy-sif" secondAttribute="bottom" constant="8" id="KPg-DZ-s0O"/>
+                             <constraint firstAttribute="bottom" secondItem="iLt-vF-ozf" secondAttribute="bottom" constant="16" id="Pfx-Wh-RZP"/>
++                            <constraint firstItem="bxy-Rt-50v" firstAttribute="top" secondItem="Vyc-GR-e4E" secondAttribute="bottom" constant="8" id="Pk8-28-kjM"/>
++                            <constraint firstItem="Vyc-GR-e4E" firstAttribute="top" secondItem="coI-Bh-gKs" secondAttribute="top" constant="16" id="aii-aY-kOB"/>
++                            <constraint firstItem="b3F-ZR-Wql" firstAttribute="top" secondItem="Vyc-GR-e4E" secondAttribute="bottom" constant="24" id="czE-eB-0Go"/>
+                             <constraint firstItem="b3F-ZR-Wql" firstAttribute="leading" secondItem="iLt-vF-ozf" secondAttribute="trailing" constant="140" id="hww-gq-UZF"/>
+                             <constraint firstItem="iLt-vF-ozf" firstAttribute="top" secondItem="coI-Bh-gKs" secondAttribute="top" constant="16" id="ixn-yU-kvu"/>
+-                            <constraint firstAttribute="trailing" secondItem="mSs-Sy-sif" secondAttribute="trailing" constant="16" id="ooO-b3-OGp"/>
++                            <constraint firstItem="Vyc-GR-e4E" firstAttribute="leading" secondItem="iLt-vF-ozf" secondAttribute="trailing" constant="8" id="sXS-ry-nHm"/>
++                            <constraint firstAttribute="trailing" secondItem="bxy-Rt-50v" secondAttribute="trailing" constant="16" id="tDY-OH-yyF"/>
+                         </constraints>
+                     </view>
+                 </subviews>
+@@ -114,8 +146,12 @@
+                 <outlet property="cellView" destination="coI-Bh-gKs" id="qPo-2c-kg7"/>
+                 <outlet property="menuImageView" destination="iLt-vF-ozf" id="Hsx-uh-tyJ"/>
+                 <outlet property="priceLabel" destination="aaX-L6-qR6" id="WQS-c0-6Ms"/>
++                <outlet property="quantityEditStackView" destination="b3F-ZR-Wql" id="8J6-Hw-I11"/>
++                <outlet property="quantityView" destination="EwR-Jf-jn7" id="lzk-fp-c5x"/>
++                <outlet property="quantityViewLabel" destination="Xy7-La-MMe" id="URj-cr-G9H"/>
+                 <outlet property="removeProductButton" destination="fLV-2R-uQF" id="aWa-fo-FjT"/>
+                 <outlet property="titleLabel" destination="mSs-Sy-sif" id="xN2-Cm-ZTA"/>
++                <outlet property="totalProductPriceLabel" destination="bxy-Rt-50v" id="5ku-H9-1Zd"/>
+             </connections>
+             <point key="canvasLocation" x="16.030534351145036" y="46.478873239436624"/>
+         </tableViewCell>
+@@ -123,5 +159,8 @@
+     <resources>
+         <image name="minus.circle.fill" catalog="system" width="128" height="123"/>
+         <image name="plus.circle.fill" catalog="system" width="128" height="123"/>
++        <systemColor name="systemBackgroundColor">
++            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++        </systemColor>
+     </resources>
+ </document>
+diff --git a/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullView.xib b/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullView.xib
+index a47fd0b..898aa9b 100644
+--- a/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullView.xib
++++ b/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullView.xib
+@@ -47,19 +47,19 @@
+                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Header" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dw0-Cc-JXY">
+                                     <rect key="frame" x="0.0" y="0.0" width="273" height="21.666666666666668"/>
+                                     <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
+-                                    <nil key="textColor"/>
++                                    <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                     <nil key="highlightedColor"/>
+                                 </label>
+                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Mock error message that have two or more line to display." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Aub-VH-Q6g">
+                                     <rect key="frame" x="0.0" y="29.666666666666689" width="273" height="38.333333333333343"/>
+                                     <fontDescription key="fontDescription" type="system" pointSize="16"/>
+-                                    <nil key="textColor"/>
++                                    <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                     <nil key="highlightedColor"/>
+                                 </label>
+                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="[mockErrorName]" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6H1-mj-l4O">
+                                     <rect key="frame" x="0.0" y="76" width="273" height="19.333333333333329"/>
+                                     <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="16"/>
+-                                    <nil key="textColor"/>
++                                    <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                     <nil key="highlightedColor"/>
+                                 </label>
+                             </subviews>
+diff --git a/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewViewController.swift b/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewViewController.swift
+index 579e93b..3d013f3 100644
+--- a/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewViewController.swift
++++ b/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewViewController.swift
+@@ -32,7 +32,6 @@ class UILoadingFullViewViewController: UIViewController, UILoadingFullViewDispla
+         configure(viewController: self)
+     }
+ 
+-    //MARK: Setup
+     func configure(viewController: UILoadingFullViewViewController) {
+         let interactor = UILoadingFullViewInteractor()
+         let presenter = UILoadingFullViewPresenter()
+@@ -46,8 +45,7 @@ class UILoadingFullViewViewController: UIViewController, UILoadingFullViewDispla
+         modalPresentationStyle = .overFullScreen
+         modalTransitionStyle = .crossDissolve
+     }
+-  
+-    //MARK: View lifecycle
++    
+     override func viewDidLoad() {
+         super.viewDidLoad()
+         setupView()
+diff --git a/OPN-Challenge/Scenes/HomeProduct/HomeProductInteractor.swift b/OPN-Challenge/Scenes/HomeProduct/HomeProductInteractor.swift
+index cd071d9..90c4f24 100644
+--- a/OPN-Challenge/Scenes/HomeProduct/HomeProductInteractor.swift
++++ b/OPN-Challenge/Scenes/HomeProduct/HomeProductInteractor.swift
+@@ -1,5 +1,3 @@
+-import UIKit
+-
+ protocol HomeProductBusinessLogic {
+     func updateCart(request: HomeProduct.ProductCart.Request)
+     func getStoreInfoInquiry(request: HomeProduct.StoreInfoInquiry.Request)
+diff --git a/OPN-Challenge/Scenes/HomeProduct/HomeProductModels.swift b/OPN-Challenge/Scenes/HomeProduct/HomeProductModels.swift
+index b14e650..af5c736 100644
+--- a/OPN-Challenge/Scenes/HomeProduct/HomeProductModels.swift
++++ b/OPN-Challenge/Scenes/HomeProduct/HomeProductModels.swift
+@@ -1,7 +1,6 @@
+-import UIKit
++import Foundation
+ 
+ enum HomeProduct {
+-    // MARK: Use cases
+     
+     enum ProductCart {
+         struct Request {
+@@ -71,4 +70,12 @@ enum HomeProduct {
+         let rating: String
+         let businessHours: String
+     }
++    
++    public struct ProductCartContext {
++        let store: StoreInfo
++        let productList: [Product]
++        let totalPrice: Int
++        let totalProduct: Int
++        let address: String?
++    }
+ }
+diff --git a/OPN-Challenge/Scenes/HomeProduct/HomeProductPresenter.swift b/OPN-Challenge/Scenes/HomeProduct/HomeProductPresenter.swift
+index a2de239..ebc7b84 100644
+--- a/OPN-Challenge/Scenes/HomeProduct/HomeProductPresenter.swift
++++ b/OPN-Challenge/Scenes/HomeProduct/HomeProductPresenter.swift
+@@ -1,4 +1,4 @@
+-import UIKit
++import Foundation
+ 
+ protocol HomeProductPresentationLogic {
+     func presentProductCart(response: HomeProduct.ProductCart.Response)
+@@ -10,8 +10,6 @@ protocol HomeProductPresentationLogic {
+ class HomeProductPresenter: HomeProductPresentationLogic {
+     weak var viewController: HomeProductDisplayLogic?
+     
+-    // MARK: Do something
+-    
+     func presentProductCart(response: HomeProduct.ProductCart.Response) {
+         let viewModel = HomeProduct.ProductCart.ViewModel(productList: response.productList, totalPrice: response.totalPrice, totalProduct: response.totalProduct)
+         viewController?.displayProductCart(viewModel: viewModel)
+diff --git a/OPN-Challenge/Scenes/HomeProduct/HomeProductRouter.swift b/OPN-Challenge/Scenes/HomeProduct/HomeProductRouter.swift
+index 5039552..95e0544 100644
+--- a/OPN-Challenge/Scenes/HomeProduct/HomeProductRouter.swift
++++ b/OPN-Challenge/Scenes/HomeProduct/HomeProductRouter.swift
+@@ -1,5 +1,6 @@
+ protocol HomeProductRoutingLogic {
+     func showFullViewLoading(destination: UILoadingFullViewViewController)
++    func routeToProductSummary(productCartContext: HomeProduct.ProductCartContext)
+ }
+ 
+ protocol HomeProductDataPassing {
+@@ -10,8 +11,16 @@ class HomeProductRouter: HomeProductRoutingLogic, HomeProductDataPassing {
+     weak var viewController: HomeProductViewController?
+     var dataStore: HomeProductDataStore?
+     
+-    // MARK: Routing
+-    public func showFullViewLoading(destination: UILoadingFullViewViewController) {
++    func showFullViewLoading(destination: UILoadingFullViewViewController) {
+         viewController?.present(destination, animated: true)
+     }
++    
++    func routeToProductSummary(productCartContext: HomeProduct.ProductCartContext) {
++        guard let vc = ProductSummaryViewController.initStoryboard() else { return }
++        guard var vcDataStore = vc.router?.dataStore else {
++            return
++        }
++        vcDataStore.productCartContext = productCartContext
++        viewController?.navigationController?.pushViewController(vc, animated: true)
++    }
+ }
+diff --git a/OPN-Challenge/Scenes/HomeProduct/HomeProductViewController.swift b/OPN-Challenge/Scenes/HomeProduct/HomeProductViewController.swift
+index 76ddba7..a739043 100644
+--- a/OPN-Challenge/Scenes/HomeProduct/HomeProductViewController.swift
++++ b/OPN-Challenge/Scenes/HomeProduct/HomeProductViewController.swift
+@@ -24,12 +24,11 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
+     
+     public var uiLoadingFullView = UILoadingFullViewViewController()
+     
++    var storeInfo = HomeProduct.StoreInfo(name: "", rating: "", businessHours: "")
+     var productCart: [HomeProduct.Product] = []
+     var totalPrice = 0
+     var totalProduct = 0
+     
+-    // MARK: Object lifecycle
+-    
+     public static func initStoryboard() -> HomeProductViewController? {
+         let storyboard = UIStoryboard(name: "HomeProduct", bundle: .main)
+         return storyboard.instantiateViewController(withIdentifier: "HomeProduct") as? HomeProductViewController
+@@ -45,8 +44,6 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
+         setup()
+     }
+     
+-    // MARK: Setup
+-    
+     private func setup() {
+         let viewController = self
+         let interactor = HomeProductInteractor()
+@@ -60,13 +57,10 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
+         router.dataStore = interactor
+     }
+     
+-    // MARK: View lifecycle
+-    
+     override func viewDidLoad() {
+         super.viewDidLoad()
+-        setupView()
+         router?.showFullViewLoading(destination: uiLoadingFullView)
+-        fetchInitialStoreInfo()
++        setupView()
+         fetchInitialProducts()
+     }
+     
+@@ -115,15 +109,17 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
+         totalPrice = viewModel.totalPrice
+         totalProduct = viewModel.totalProduct
+         productTableView.reloadData()
+-        updateBottomView(isShow: totalProduct > 0)
++        enableNextButton(totalProduct > 0)
+     }
+     
+     func displayStoreInfo(viewModel: HomeProduct.StoreInfoInquiry.ViewModel) {
+-        let storeInfo = viewModel.storeInfo
++        storeInfo = viewModel.storeInfo
+         storeNameLabel.text = storeInfo.name
+         businessHoursLabel.text = storeInfo.businessHours
+         rateLabel.text = storeInfo.rating
+-        uiLoadingFullView.interactor?.showLoading(request: UILoadingFullView.Loading.Request(show: false))
++        DispatchQueue.main.async { [weak self] in
++            self?.uiLoadingFullView.interactor?.showLoading(request: UILoadingFullView.Loading.Request(show: false))
++        }
+     }
+     
+     func displayProducts(viewModel: HomeProduct.ProductsInquiry.ViewModel) {
+@@ -133,8 +129,7 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
+             productCart = viewModel.products
+             productTableView.reloadData()
+         }
+-        
+-        uiLoadingFullView.interactor?.showLoading(request: UILoadingFullView.Loading.Request(show: false))
++        fetchInitialStoreInfo()
+     }
+     
+     func displayError(viewModel: HomeProduct.HomeProductError.ViewModel) {
+@@ -161,13 +156,13 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
+         }))
+     }
+     
+-    private func updateBottomView(isShow: Bool) {
+-        orderButtonStackView.backgroundColor = isShow ? .primary : .lightGray
++    private func enableNextButton(_ isEnable: Bool) {
++        orderButtonStackView.backgroundColor = isEnable ? .primary : .lightGray
+         UIView.animate(withDuration: 0.2) { [weak self] in
+-            self?.orderTotalPriceLabel.isHidden = !isShow
++            self?.orderTotalPriceLabel.isHidden = !isEnable
+         }
+         orderTotalPriceLabel.text = "฿\(totalPrice)"
+-        orderButton.isUserInteractionEnabled = isShow
++        orderButton.isEnabled = isEnable
+     }
+     
+     func updateProduct(cellIndex: Int, isAdd: Bool = true) {
+@@ -187,6 +182,14 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
+     }
+     
+     @IBAction func onTappedOrderButton(_ sender: Any) {
+-        print("TappedOrder")
++        router?.routeToProductSummary(
++            productCartContext: HomeProduct.ProductCartContext(
++                store: storeInfo,
++                productList: productCart,
++                totalPrice: totalPrice,
++                totalProduct: totalProduct,
++                address: nil
++            )
++        )
+     }
+ }
+diff --git a/OPN-Challenge/Scenes/ProductSummary/ProductSumaryViewController+TableView.swift b/OPN-Challenge/Scenes/ProductSummary/ProductSumaryViewController+TableView.swift
+new file mode 100644
+index 0000000..c9443c8
+--- /dev/null
++++ b/OPN-Challenge/Scenes/ProductSummary/ProductSumaryViewController+TableView.swift
+@@ -0,0 +1,24 @@
++import UIKit
++
++extension ProductSummaryViewController: UITableViewDelegate, UITableViewDataSource {
++    func numberOfSections(in tableView: UITableView) -> Int {
++        return 1
++    }
++    
++    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
++        return productCart.count
++    }
++    
++    
++    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
++        guard let cell = tableView.dequeueReusableCell(withIdentifier: ProductTableViewCell.identifier, for: indexPath) as? ProductTableViewCell else {
++            return UITableViewCell()
++        }
++        let index = indexPath.row
++        
++        cell.configureCellSummary(product: productCart[index])
++        
++        return cell
++    }
++    
++}
+diff --git a/OPN-Challenge/Scenes/ProductSummary/ProductSummary.storyboard b/OPN-Challenge/Scenes/ProductSummary/ProductSummary.storyboard
+index 1510c70..8dbf00c 100644
+--- a/OPN-Challenge/Scenes/ProductSummary/ProductSummary.storyboard
++++ b/OPN-Challenge/Scenes/ProductSummary/ProductSummary.storyboard
+@@ -9,16 +9,16 @@
+         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+     </dependencies>
+     <scenes>
+-        <!--View Controller-->
++        <!--Product Summary View Controller-->
+         <scene sceneID="s0d-6b-0kx">
+             <objects>
+-                <viewController id="Y6W-OH-hqX" sceneMemberID="viewController">
++                <viewController storyboardIdentifier="ProductSummary" id="Y6W-OH-hqX" customClass="ProductSummaryViewController" customModule="OPN_Challenge" customModuleProvider="target" sceneMemberID="viewController">
+                     <view key="view" contentMode="scaleToFill" id="5EZ-qb-Rvc">
+                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                         <subviews>
+                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="chevron.left.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="Nxz-o4-7Jr">
+-                                <rect key="frame" x="16" y="66.666666666666657" width="40" height="38.666666666666671"/>
++                                <rect key="frame" x="16" y="60.000000000000007" width="40" height="38.666666666666664"/>
+                                 <color key="tintColor" red="0.55156713719999995" green="0.34558042880000001" blue="0.64526998999999996" alpha="1" colorSpace="custom" customColorSpace="adobeRGB1998"/>
+                                 <constraints>
+                                     <constraint firstAttribute="width" constant="40" id="0q7-Hg-zKi"/>
+@@ -26,44 +26,212 @@
+                                 </constraints>
+                             </imageView>
+                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Store name - Order" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Pvr-4Y-pB8">
+-                                <rect key="frame" x="16" y="75" width="361" height="21"/>
++                                <rect key="frame" x="16" y="68.333333333333329" width="345" height="21.666666666666671"/>
+                                 <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="18"/>
+-                                <nil key="textColor"/>
++                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                 <nil key="highlightedColor"/>
+                             </label>
+-                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ova-NG-NaQ">
+-                                <rect key="frame" x="0.0" y="288" width="393" height="5"/>
+-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+-                                <color key="backgroundColor" white="0.88943218240093225" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+-                            </view>
+-                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Nea-WK-lnh">
+-                                <rect key="frame" x="0.0" y="513" width="393" height="5"/>
+-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+-                                <color key="backgroundColor" white="0.88943218239999999" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+-                            </view>
+-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Delivery Address" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XAu-iw-aXW">
+-                                <rect key="frame" x="24" y="134" width="109" height="17"/>
+-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+-                                <nil key="textColor"/>
+-                                <nil key="highlightedColor"/>
+-                            </label>
+-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="RKV-IP-JB0">
+-                                <rect key="frame" x="0.0" y="307" width="393" height="187"/>
+-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
++                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" allowsSelection="NO" rowHeight="130" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="RKV-IP-JB0">
++                                <rect key="frame" x="0.0" y="99" width="393" height="511"/>
+                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
++                                <constraints>
++                                    <constraint firstAttribute="width" secondItem="RKV-IP-JB0" secondAttribute="height" multiplier="393:511" id="tWW-CR-F1R"/>
++                                </constraints>
++                                <view key="tableHeaderView" contentMode="scaleToFill" id="EDa-AY-Fp4">
++                                    <rect key="frame" x="0.0" y="0.0" width="393" height="197"/>
++                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
++                                    <subviews>
++                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Delivery Address" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XAu-iw-aXW">
++                                            <rect key="frame" x="15.999999999999993" y="24" width="114.33333333333331" height="20"/>
++                                            <constraints>
++                                                <constraint firstAttribute="height" constant="20" id="zFf-vT-Uyt"/>
++                                            </constraints>
++                                            <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="14"/>
++                                            <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++                                            <nil key="highlightedColor"/>
++                                        </label>
++                                        <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="hei-iR-MpG">
++                                            <rect key="frame" x="16" y="60" width="361" height="100"/>
++                                            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
++                                            <constraints>
++                                                <constraint firstAttribute="height" constant="100" id="KL1-nW-9Ce"/>
++                                            </constraints>
++                                            <color key="textColor" systemColor="labelColor"/>
++                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
++                                            <textInputTraits key="textInputTraits" autocapitalizationType="sentences" enablesReturnKeyAutomatically="YES" textContentType="street-address"/>
++                                        </textView>
++                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ova-NG-NaQ">
++                                            <rect key="frame" x="0.0" y="176" width="393" height="5"/>
++                                            <color key="backgroundColor" red="0.88623166084289551" green="0.88623166084289551" blue="0.88623166084289551" alpha="1" colorSpace="custom" customColorSpace="adobeRGB1998"/>
++                                            <constraints>
++                                                <constraint firstAttribute="height" constant="5" id="bFR-kq-MqK"/>
++                                            </constraints>
++                                        </view>
++                                    </subviews>
++                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
++                                    <constraints>
++                                        <constraint firstItem="ova-NG-NaQ" firstAttribute="top" secondItem="hei-iR-MpG" secondAttribute="bottom" constant="16" id="4da-bB-J9X"/>
++                                        <constraint firstItem="hei-iR-MpG" firstAttribute="top" secondItem="XAu-iw-aXW" secondAttribute="bottom" constant="16" id="8kX-Rp-b27"/>
++                                        <constraint firstItem="hei-iR-MpG" firstAttribute="leading" secondItem="EDa-AY-Fp4" secondAttribute="leading" constant="16" id="9eo-nV-zf6"/>
++                                        <constraint firstItem="ova-NG-NaQ" firstAttribute="leading" secondItem="EDa-AY-Fp4" secondAttribute="leading" id="Nmv-Du-OuX"/>
++                                        <constraint firstItem="XAu-iw-aXW" firstAttribute="top" secondItem="EDa-AY-Fp4" secondAttribute="top" constant="24" id="Ud7-zg-f1f"/>
++                                        <constraint firstAttribute="bottom" secondItem="ova-NG-NaQ" secondAttribute="bottom" constant="16" id="WgS-Fa-07O"/>
++                                        <constraint firstAttribute="trailing" secondItem="hei-iR-MpG" secondAttribute="trailing" constant="16" id="skU-eN-b8i"/>
++                                        <constraint firstItem="XAu-iw-aXW" firstAttribute="leading" secondItem="EDa-AY-Fp4" secondAttribute="leading" constant="16" id="sqN-rf-DNr"/>
++                                        <constraint firstAttribute="trailing" secondItem="ova-NG-NaQ" secondAttribute="trailing" id="yLk-PT-FBK"/>
++                                    </constraints>
++                                </view>
+                             </tableView>
++                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="iGR-lz-sPG">
++                                <rect key="frame" x="0.0" y="626" width="393" height="5"/>
++                                <color key="backgroundColor" white="0.88943218239999999" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++                                <constraints>
++                                    <constraint firstAttribute="height" constant="5" id="RJ7-Zm-9z0"/>
++                                </constraints>
++                            </view>
++                            <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ye2-cX-Kt8">
++                                <rect key="frame" x="16" y="647" width="361" height="22"/>
++                                <subviews>
++                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" text="Total" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sxa-M1-XiQ">
++                                        <rect key="frame" x="0.0" y="0.0" width="321" height="22"/>
++                                        <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="18"/>
++                                        <nil key="textColor"/>
++                                        <nil key="highlightedColor"/>
++                                    </label>
++                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="฿700" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="D0r-R8-3qS">
++                                        <rect key="frame" x="321" y="0.0" width="40" height="22"/>
++                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
++                                        <nil key="textColor"/>
++                                        <nil key="highlightedColor"/>
++                                    </label>
++                                </subviews>
++                                <constraints>
++                                    <constraint firstAttribute="height" constant="22" id="Zsb-Dy-7kR"/>
++                                </constraints>
++                            </stackView>
++                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="V0c-Ju-W4t" userLabel="Bottom View">
++                                <rect key="frame" x="0.0" y="738" width="393" height="114"/>
++                                <subviews>
++                                    <stackView opaque="NO" contentMode="scaleToFill" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="kRM-Vo-dw4">
++                                        <rect key="frame" x="16" y="16" width="361" height="48"/>
++                                        <subviews>
++                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="G8n-ht-Pg1">
++                                                <rect key="frame" x="0.0" y="0.0" width="0.0" height="48"/>
++                                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++                                                <constraints>
++                                                    <constraint firstAttribute="width" id="cNt-G7-0qW"/>
++                                                </constraints>
++                                            </view>
++                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" text="Order Now !" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NHL-7W-nme">
++                                                <rect key="frame" x="16" y="0.0" width="278.33333333333331" height="48"/>
++                                                <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
++                                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++                                                <nil key="highlightedColor"/>
++                                            </label>
++                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="฿80" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cSP-jA-bWz">
++                                                <rect key="frame" x="310.33333333333331" y="0.0" width="34.666666666666686" height="48"/>
++                                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="18"/>
++                                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++                                                <nil key="highlightedColor"/>
++                                            </label>
++                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="yoY-3k-xZp">
++                                                <rect key="frame" x="361" y="0.0" width="0.0" height="48"/>
++                                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++                                                <constraints>
++                                                    <constraint firstAttribute="width" id="Puu-ex-L9e"/>
++                                                </constraints>
++                                            </view>
++                                        </subviews>
++                                        <color key="backgroundColor" red="0.55156713719999995" green="0.34558042880000001" blue="0.64526998999999996" alpha="1" colorSpace="custom" customColorSpace="adobeRGB1998"/>
++                                        <constraints>
++                                            <constraint firstAttribute="height" constant="48" id="1sp-zV-EaJ"/>
++                                        </constraints>
++                                        <userDefinedRuntimeAttributes>
++                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
++                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isHiddenWhenSkeletonIsActive" value="YES"/>
++                                        </userDefinedRuntimeAttributes>
++                                    </stackView>
++                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2VS-wg-Afa" userLabel="Next Button">
++                                        <rect key="frame" x="16" y="16" width="361" height="48"/>
++                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++                                        <constraints>
++                                            <constraint firstAttribute="height" constant="48" id="6UI-ck-Stf"/>
++                                        </constraints>
++                                        <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="18"/>
++                                        <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++                                        <state key="normal">
++                                            <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++                                        </state>
++                                        <userDefinedRuntimeAttributes>
++                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
++                                                <real key="value" value="8"/>
++                                            </userDefinedRuntimeAttribute>
++                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
++                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isHiddenWhenSkeletonIsActive" value="YES"/>
++                                        </userDefinedRuntimeAttributes>
++                                    </button>
++                                </subviews>
++                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++                                <constraints>
++                                    <constraint firstItem="kRM-Vo-dw4" firstAttribute="leading" secondItem="V0c-Ju-W4t" secondAttribute="leading" constant="16" id="2ph-WI-n7E"/>
++                                    <constraint firstAttribute="trailing" secondItem="2VS-wg-Afa" secondAttribute="trailing" constant="16" id="44Q-ik-piX"/>
++                                    <constraint firstItem="kRM-Vo-dw4" firstAttribute="top" secondItem="V0c-Ju-W4t" secondAttribute="top" constant="16" id="CCC-7K-vFf"/>
++                                    <constraint firstItem="2VS-wg-Afa" firstAttribute="centerY" secondItem="kRM-Vo-dw4" secondAttribute="centerY" id="iIs-dv-B7e"/>
++                                    <constraint firstAttribute="trailing" secondItem="kRM-Vo-dw4" secondAttribute="trailing" constant="16" id="mZF-hk-z83"/>
++                                    <constraint firstItem="2VS-wg-Afa" firstAttribute="leading" secondItem="V0c-Ju-W4t" secondAttribute="leading" constant="16" id="oyW-TZ-4jz"/>
++                                </constraints>
++                                <userDefinedRuntimeAttributes>
++                                    <userDefinedRuntimeAttribute type="color" keyPath="hShadowColor">
++                                        <color key="value" red="0.0" green="0.0" blue="0.0" alpha="0.1035820578" colorSpace="custom" customColorSpace="sRGB"/>
++                                    </userDefinedRuntimeAttribute>
++                                    <userDefinedRuntimeAttribute type="number" keyPath="hShadowOpacity">
++                                        <real key="value" value="1"/>
++                                    </userDefinedRuntimeAttribute>
++                                    <userDefinedRuntimeAttribute type="number" keyPath="hShadowRadius">
++                                        <real key="value" value="12"/>
++                                    </userDefinedRuntimeAttribute>
++                                    <userDefinedRuntimeAttribute type="size" keyPath="hShadowOffset">
++                                        <size key="value" width="0.0" height="-4"/>
++                                    </userDefinedRuntimeAttribute>
++                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
++                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isHiddenWhenSkeletonIsActive" value="YES"/>
++                                </userDefinedRuntimeAttributes>
++                            </view>
+                         </subviews>
+                         <viewLayoutGuide key="safeArea" id="vDu-zF-Fre"/>
+                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                         <constraints>
+-                            <constraint firstItem="Nxz-o4-7Jr" firstAttribute="centerY" secondItem="Pvr-4Y-pB8" secondAttribute="centerY" id="1Fm-zD-6fe"/>
+-                            <constraint firstItem="Pvr-4Y-pB8" firstAttribute="centerX" secondItem="5EZ-qb-Rvc" secondAttribute="centerX" id="QEd-RE-6id"/>
+-                            <constraint firstItem="Pvr-4Y-pB8" firstAttribute="top" secondItem="vDu-zF-Fre" secondAttribute="top" constant="16" id="cK3-MJ-rLi"/>
+-                            <constraint firstItem="Nxz-o4-7Jr" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="16" id="gqA-Mz-gkH"/>
+-                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="Pvr-4Y-pB8" secondAttribute="trailing" constant="16" id="wrj-fI-BEi"/>
++                            <constraint firstItem="Pvr-4Y-pB8" firstAttribute="centerY" secondItem="Nxz-o4-7Jr" secondAttribute="centerY" id="2kw-VI-UJg"/>
++                            <constraint firstItem="RKV-IP-JB0" firstAttribute="leading" secondItem="5EZ-qb-Rvc" secondAttribute="leading" id="5yt-z4-BG8"/>
++                            <constraint firstItem="Nxz-o4-7Jr" firstAttribute="top" secondItem="vDu-zF-Fre" secondAttribute="top" id="6j6-6P-R0L"/>
++                            <constraint firstItem="vDu-zF-Fre" firstAttribute="bottom" secondItem="kRM-Vo-dw4" secondAttribute="bottom" constant="16" id="Lq9-iI-GHt"/>
++                            <constraint firstItem="V0c-Ju-W4t" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="QKw-MW-v9I"/>
++                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="Ye2-cX-Kt8" secondAttribute="trailing" constant="16" id="Qp0-xs-yPV"/>
++                            <constraint firstItem="iGR-lz-sPG" firstAttribute="trailing" secondItem="vDu-zF-Fre" secondAttribute="trailing" id="Rl4-me-xBP"/>
++                            <constraint firstItem="Ye2-cX-Kt8" firstAttribute="top" secondItem="iGR-lz-sPG" secondAttribute="bottom" constant="16" id="Toj-M0-iY0"/>
++                            <constraint firstItem="iGR-lz-sPG" firstAttribute="top" secondItem="RKV-IP-JB0" secondAttribute="bottom" constant="16" id="YkV-pG-NIT"/>
++                            <constraint firstAttribute="bottom" secondItem="V0c-Ju-W4t" secondAttribute="bottom" id="bgO-nc-1Hz"/>
++                            <constraint firstItem="Ye2-cX-Kt8" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="16" id="cGz-0G-f5o"/>
++                            <constraint firstAttribute="trailing" secondItem="RKV-IP-JB0" secondAttribute="trailing" id="iXF-FC-8uH"/>
++                            <constraint firstItem="Nxz-o4-7Jr" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="16" id="p2D-Wb-hyI"/>
++                            <constraint firstItem="RKV-IP-JB0" firstAttribute="top" secondItem="Nxz-o4-7Jr" secondAttribute="bottom" id="sZ3-vK-eqo"/>
++                            <constraint firstItem="iGR-lz-sPG" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="t07-mt-TmO"/>
++                            <constraint firstAttribute="trailingMargin" secondItem="Pvr-4Y-pB8" secondAttribute="trailing" constant="16" id="taM-gK-ZF1"/>
++                            <constraint firstItem="Pvr-4Y-pB8" firstAttribute="leading" secondItem="5EZ-qb-Rvc" secondAttribute="leading" constant="16" id="yoa-EH-EQ6"/>
++                            <constraint firstItem="V0c-Ju-W4t" firstAttribute="trailing" secondItem="vDu-zF-Fre" secondAttribute="trailing" id="zQh-j9-8H2"/>
+                         </constraints>
+                     </view>
++                    <connections>
++                        <outlet property="addressTextView" destination="hei-iR-MpG" id="jhz-3X-2lo"/>
++                        <outlet property="backButtonImageView" destination="Nxz-o4-7Jr" id="MfZ-EV-pLu"/>
++                        <outlet property="bottomTotalPriceLabel" destination="cSP-jA-bWz" id="b0v-16-QdH"/>
++                        <outlet property="bottomView" destination="V0c-Ju-W4t" id="9ts-C3-CkY"/>
++                        <outlet property="nextButton" destination="2VS-wg-Afa" id="2eM-Yv-A51"/>
++                        <outlet property="orderButtonStackView" destination="kRM-Vo-dw4" id="i8A-zC-eWX"/>
++                        <outlet property="productListTableView" destination="RKV-IP-JB0" id="2KL-b8-Mtb"/>
++                        <outlet property="screenTitleLabel" destination="Pvr-4Y-pB8" id="mAJ-Gq-bHo"/>
++                        <outlet property="totalPriceLabel" destination="D0r-R8-3qS" id="6iZ-Ds-Muo"/>
++                    </connections>
+                 </viewController>
+                 <placeholder placeholderIdentifier="IBFirstResponder" id="Ief-a0-LHa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+             </objects>
+@@ -72,6 +240,9 @@
+     </scenes>
+     <resources>
+         <image name="chevron.left.circle.fill" catalog="system" width="128" height="123"/>
++        <systemColor name="labelColor">
++            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++        </systemColor>
+         <systemColor name="systemBackgroundColor">
+             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+         </systemColor>
+diff --git a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryInteractor.swift b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryInteractor.swift
+index 6f2d5d1..d7f74b8 100644
+--- a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryInteractor.swift
++++ b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryInteractor.swift
+@@ -1,41 +1,18 @@
+-//
+-//  ProductSummaryInteractor.swift
+-//  OPN-Challenge
+-//
+-//  Created by A667209 A667209 on 12/5/2567 BE.
+-//  Copyright (c) 2567 BE ___ORGANIZATIONNAME___. All rights reserved.
+-//
+-//  This file was generated by the Clean Swift Xcode Templates so
+-//  you can apply clean architecture to your iOS and Mac projects,
+-//  see http://clean-swift.com
+-//
+-
+-import UIKit
+-
+-protocol ProductSummaryBusinessLogic
+-{
+-  func doSomething(request: ProductSummary.Something.Request)
++protocol ProductSummaryBusinessLogic {
++    func getProductCartContext(request: ProductSummary.ProductCart.Request)
+ }
+ 
+-protocol ProductSummaryDataStore
+-{
+-  //var name: String { get set }
++protocol ProductSummaryDataStore {
++    var productCartContext: HomeProduct.ProductCartContext? { get set }
+ }
+ 
+-class ProductSummaryInteractor: ProductSummaryBusinessLogic, ProductSummaryDataStore
+-{
+-  var presenter: ProductSummaryPresentationLogic?
+-  var worker: ProductSummaryWorker?
+-  //var name: String = ""
+-  
+-  // MARK: Do something
+-  
+-  func doSomething(request: ProductSummary.Something.Request)
+-  {
+-    worker = ProductSummaryWorker()
+-    worker?.doSomeWork()
++class ProductSummaryInteractor: ProductSummaryBusinessLogic, ProductSummaryDataStore {
++    var productCartContext: HomeProduct.ProductCartContext?
++    var presenter: ProductSummaryPresentationLogic?
+     
+-    let response = ProductSummary.Something.Response()
+-    presenter?.presentSomething(response: response)
+-  }
++    func getProductCartContext(request: ProductSummary.ProductCart.Request) {
++        guard let context = productCartContext else { return }
++        let response = ProductSummary.ProductCart.Response(context: context)
++        presenter?.presentProductCartContext(response: response)
++    }
+ }
+diff --git a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryModels.swift b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryModels.swift
+index 1ef2fb6..370c1e8 100644
+--- a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryModels.swift
++++ b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryModels.swift
+@@ -1,31 +1,17 @@
+-//
+-//  ProductSummaryModels.swift
+-//  OPN-Challenge
+-//
+-//  Created by A667209 A667209 on 12/5/2567 BE.
+-//  Copyright (c) 2567 BE ___ORGANIZATIONNAME___. All rights reserved.
+-//
+-//  This file was generated by the Clean Swift Xcode Templates so
+-//  you can apply clean architecture to your iOS and Mac projects,
+-//  see http://clean-swift.com
+-//
+-
+-import UIKit
+-
+-enum ProductSummary
+-{
+-  // MARK: Use cases
+-  
+-  enum Something
+-  {
+-    struct Request
+-    {
++enum ProductSummary {
++    
++    enum ProductCart {
++        struct Request {
++        }
++        struct Response {
++            let context: HomeProduct.ProductCartContext
++        }
++        struct ViewModel {
++            let store: HomeProduct.StoreInfo
++            let productList: [HomeProduct.Product]
++            let totalPrice: Int
++            let totalProduct: Int
++            let address: String?
++        }
+     }
+-    struct Response
+-    {
+-    }
+-    struct ViewModel
+-    {
+-    }
+-  }
+ }
+diff --git a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryPresenter.swift b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryPresenter.swift
+index b504612..b01e0af 100644
+--- a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryPresenter.swift
++++ b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryPresenter.swift
+@@ -1,31 +1,16 @@
+-//
+-//  ProductSummaryPresenter.swift
+-//  OPN-Challenge
+-//
+-//  Created by A667209 A667209 on 12/5/2567 BE.
+-//  Copyright (c) 2567 BE ___ORGANIZATIONNAME___. All rights reserved.
+-//
+-//  This file was generated by the Clean Swift Xcode Templates so
+-//  you can apply clean architecture to your iOS and Mac projects,
+-//  see http://clean-swift.com
+-//
+-
+-import UIKit
+-
+-protocol ProductSummaryPresentationLogic
+-{
+-  func presentSomething(response: ProductSummary.Something.Response)
++protocol ProductSummaryPresentationLogic {
++    func presentProductCartContext(response: ProductSummary.ProductCart.Response)
+ }
+ 
+-class ProductSummaryPresenter: ProductSummaryPresentationLogic
+-{
+-  weak var viewController: ProductSummaryDisplayLogic?
+-  
+-  // MARK: Do something
+-  
+-  func presentSomething(response: ProductSummary.Something.Response)
+-  {
+-    let viewModel = ProductSummary.Something.ViewModel()
+-    viewController?.displaySomething(viewModel: viewModel)
+-  }
++class ProductSummaryPresenter: ProductSummaryPresentationLogic {
++    weak var viewController: ProductSummaryDisplayLogic?
++    
++    func presentProductCartContext(response: ProductSummary.ProductCart.Response) {
++        let viewModel = ProductSummary.ProductCart.ViewModel(store: response.context.store, productList: filterProductCart(productList: response.context.productList), totalPrice: response.context.totalPrice, totalProduct: response.context.totalProduct, address: response.context.address)
++        viewController?.displayProductCartContext(viewModel: viewModel)
++    }
++    
++    func filterProductCart(productList: [HomeProduct.Product]) -> [HomeProduct.Product] {
++        return productList.filter{$0.amount != 0}
++    }
+ }
+diff --git a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryRouter.swift b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryRouter.swift
+index 22585ad..f719eb8 100644
+--- a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryRouter.swift
++++ b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryRouter.swift
+@@ -1,60 +1,16 @@
+-//
+-//  ProductSummaryRouter.swift
+-//  OPN-Challenge
+-//
+-//  Created by A667209 A667209 on 12/5/2567 BE.
+-//  Copyright (c) 2567 BE ___ORGANIZATIONNAME___. All rights reserved.
+-//
+-//  This file was generated by the Clean Swift Xcode Templates so
+-//  you can apply clean architecture to your iOS and Mac projects,
+-//  see http://clean-swift.com
+-//
+-
+-import UIKit
+-
+-@objc protocol ProductSummaryRoutingLogic
+-{
+-  //func routeToSomewhere(segue: UIStoryboardSegue?)
++protocol ProductSummaryRoutingLogic {
++    func routeBack()
+ }
+ 
+-protocol ProductSummaryDataPassing
+-{
+-  var dataStore: ProductSummaryDataStore? { get }
++protocol ProductSummaryDataPassing {
++    var dataStore: ProductSummaryDataStore? { get }
+ }
+ 
+-class ProductSummaryRouter: NSObject, ProductSummaryRoutingLogic, ProductSummaryDataPassing
+-{
+-  weak var viewController: ProductSummaryViewController?
+-  var dataStore: ProductSummaryDataStore?
+-  
+-  // MARK: Routing
+-  
+-  //func routeToSomewhere(segue: UIStoryboardSegue?)
+-  //{
+-  //  if let segue = segue {
+-  //    let destinationVC = segue.destination as! SomewhereViewController
+-  //    var destinationDS = destinationVC.router!.dataStore!
+-  //    passDataToSomewhere(source: dataStore!, destination: &destinationDS)
+-  //  } else {
+-  //    let storyboard = UIStoryboard(name: "Main", bundle: nil)
+-  //    let destinationVC = storyboard.instantiateViewController(withIdentifier: "SomewhereViewController") as! SomewhereViewController
+-  //    var destinationDS = destinationVC.router!.dataStore!
+-  //    passDataToSomewhere(source: dataStore!, destination: &destinationDS)
+-  //    navigateToSomewhere(source: viewController!, destination: destinationVC)
+-  //  }
+-  //}
++class ProductSummaryRouter: ProductSummaryRoutingLogic, ProductSummaryDataPassing {
++    weak var viewController: ProductSummaryViewController?
++    var dataStore: ProductSummaryDataStore?
+ 
+-  // MARK: Navigation
+-  
+-  //func navigateToSomewhere(source: ProductSummaryViewController, destination: SomewhereViewController)
+-  //{
+-  //  source.show(destination, sender: nil)
+-  //}
+-  
+-  // MARK: Passing data
+-  
+-  //func passDataToSomewhere(source: ProductSummaryDataStore, destination: inout SomewhereDataStore)
+-  //{
+-  //  destination.name = source.name
+-  //}
++    func routeBack() {
++        viewController?.navigationController?.popViewController(animated: true)
++    }
+ }
+diff --git a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryViewController+TextView.swift b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryViewController+TextView.swift
+new file mode 100644
+index 0000000..9d52802
+--- /dev/null
++++ b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryViewController+TextView.swift
+@@ -0,0 +1,22 @@
++import UIKit
++
++extension ProductSummaryViewController: UITextViewDelegate {
++    func textViewDidBeginEditing(_ textView: UITextView) {
++        textView.layer.borderColor = UIColor.primary.cgColor
++        if textView.textColor == UIColor.lightGreySecondary {
++            textView.text = nil
++            textView.textColor = UIColor.black
++        }
++    }
++    
++    func textViewDidEndEditing(_ textView: UITextView) {
++        textView.layer.borderColor = UIColor.lightGreyPrimary.cgColor
++        if textView.text.isEmpty {
++            textView.text = "Please fill in address..."
++            textView.textColor = UIColor.lightGreySecondary
++            enableNextButton(false)
++            return
++        }
++        enableNextButton(true)
++    }
++}
+diff --git a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryViewController.swift b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryViewController.swift
+index 4fca1ed..c24a96f 100644
+--- a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryViewController.swift
++++ b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryViewController.swift
+@@ -1,89 +1,126 @@
+-//
+-//  ProductSummaryViewController.swift
+-//  OPN-Challenge
+-//
+-//  Created by A667209 A667209 on 12/5/2567 BE.
+-//  Copyright (c) 2567 BE ___ORGANIZATIONNAME___. All rights reserved.
+-//
+-//  This file was generated by the Clean Swift Xcode Templates so
+-//  you can apply clean architecture to your iOS and Mac projects,
+-//  see http://clean-swift.com
+-//
+-
+ import UIKit
+ 
+-protocol ProductSummaryDisplayLogic: class
+-{
+-  func displaySomething(viewModel: ProductSummary.Something.ViewModel)
++protocol ProductSummaryDisplayLogic: AnyObject {
++    func displayProductCartContext(viewModel: ProductSummary.ProductCart.ViewModel)
+ }
+ 
+-class ProductSummaryViewController: UIViewController, ProductSummaryDisplayLogic
+-{
+-  var interactor: ProductSummaryBusinessLogic?
+-  var router: (NSObjectProtocol & ProductSummaryRoutingLogic & ProductSummaryDataPassing)?
++class ProductSummaryViewController: UIViewController, ProductSummaryDisplayLogic {
++    var interactor: ProductSummaryBusinessLogic?
++    var router: (ProductSummaryRoutingLogic & ProductSummaryDataPassing)?
++    
++    @IBOutlet private weak var backButtonImageView: UIImageView!
++    @IBOutlet private weak var screenTitleLabel: UILabel!
++    @IBOutlet weak var productListTableView: UITableView!
++    @IBOutlet weak var addressTextView: UITextView!
++    @IBOutlet private weak var totalPriceLabel: UILabel!
++    @IBOutlet private weak var bottomView: UIView!
++    @IBOutlet private weak var orderButtonStackView: UIStackView!
++    @IBOutlet private weak var bottomTotalPriceLabel: UILabel!
++    @IBOutlet private weak var nextButton: UIButton!
++    
++    var productCart: [HomeProduct.Product] = []
++    var totalPrice = 0
++    var totalProduct = 0
++    
++    public static func initStoryboard() -> ProductSummaryViewController? {
++        let storyboard = UIStoryboard(name: "ProductSummary", bundle: .main)
++        return storyboard.instantiateViewController(withIdentifier: "ProductSummary") as? ProductSummaryViewController
++    }
++    
++    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
++        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
++        setup()
++    }
++    
++    required init?(coder aDecoder: NSCoder) {
++        super.init(coder: aDecoder)
++        setup()
++    }
++    
++    private func setup() {
++        let viewController = self
++        let interactor = ProductSummaryInteractor()
++        let presenter = ProductSummaryPresenter()
++        let router = ProductSummaryRouter()
++        viewController.interactor = interactor
++        viewController.router = router
++        interactor.presenter = presenter
++        presenter.viewController = viewController
++        router.viewController = viewController
++        router.dataStore = interactor
++    }
+ 
+-  // MARK: Object lifecycle
+-  
+-  override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?)
+-  {
+-    super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+-    setup()
+-  }
+-  
+-  required init?(coder aDecoder: NSCoder)
+-  {
+-    super.init(coder: aDecoder)
+-    setup()
+-  }
+-  
+-  // MARK: Setup
+-  
+-  private func setup()
+-  {
+-    let viewController = self
+-    let interactor = ProductSummaryInteractor()
+-    let presenter = ProductSummaryPresenter()
+-    let router = ProductSummaryRouter()
+-    viewController.interactor = interactor
+-    viewController.router = router
+-    interactor.presenter = presenter
+-    presenter.viewController = viewController
+-    router.viewController = viewController
+-    router.dataStore = interactor
+-  }
+-  
+-  // MARK: Routing
+-  
+-  override func prepare(for segue: UIStoryboardSegue, sender: Any?)
+-  {
+-    if let scene = segue.identifier {
+-      let selector = NSSelectorFromString("routeTo\(scene)WithSegue:")
+-      if let router = router, router.responds(to: selector) {
+-        router.perform(selector, with: segue)
+-      }
++    override func viewDidLoad() {
++        super.viewDidLoad()
++        setupView()
++        initialDataFromProductCartContext()
++    }
++    
++    private func setupView() {
++        navigationController?.navigationBar.isHidden = true
++        
++        let onTapBackGesture = UITapGestureRecognizer(target: self, action: #selector(onTapBack))
++        backButtonImageView.isUserInteractionEnabled = true
++        backButtonImageView.addGestureRecognizer(onTapBackGesture)
++        
++        productListTableView.delegate = self
++        productListTableView.dataSource = self
++        
++        productListTableView.register(
++            UINib(nibName: ProductTableViewCell.identifier, bundle: .main),
++            forCellReuseIdentifier: ProductTableViewCell.identifier
++        )
++        
++        orderButtonStackView.roundCorner(cornerRadius: 8)
++        
++        bottomView.roundCornerTop(cornerRadius: 8)
++        bottomView.addShadow(
++            withCornerRadius: 12,
++            shadowRadius: 12,
++            shadowOffset: CGSize(width: 0, height: -4),
++            masksToBounds: false
++        )
++        
++        addressTextView.delegate = self
++        addressTextView.roundCorner(cornerRadius: 8)
++        addressTextView.layer.borderWidth = 1
++        addressTextView.layer.borderColor = UIColor.lightGreyPrimary.cgColor
++        addressTextView.text = "Please fill in address..."
++        addressTextView.textColor = UIColor.lightGreySecondary
++        enableNextButton(false)
++        
++        let tapGestureDismissKeyboard = UITapGestureRecognizer(target: self, action: #selector(onTapDismissKeyboard))
++        view.addGestureRecognizer(tapGestureDismissKeyboard)
++    }
++    
++    private func initialDataFromProductCartContext() {
++        interactor?.getProductCartContext(request: ProductSummary.ProductCart.Request())
++    }
++    
++    @objc private func onTapDismissKeyboard() {
++        addressTextView.resignFirstResponder()
++    }
++    
++    @objc private func onTapBack() {
++        router?.routeBack()
++    }
++    
++    func enableNextButton(_ isEnable: Bool) {
++        orderButtonStackView.backgroundColor = isEnable ? .primary : .lightGray
++        nextButton.isEnabled = isEnable
++    }
++    
++    func displayProductCartContext(viewModel: ProductSummary.ProductCart.ViewModel) {
++        let store = viewModel.store
++        let productList = viewModel.productList
++        
++        screenTitleLabel.text = "\(store.name) - Order"
++        productCart = productList
++        totalPrice = viewModel.totalPrice
++        totalProduct = viewModel.totalProduct
++        
++        totalPriceLabel.text = "฿\(totalPrice)"
++        bottomTotalPriceLabel.text = "฿\(totalPrice)"
++        productListTableView.reloadData()
+     }
+-  }
+-  
+-  // MARK: View lifecycle
+-  
+-  override func viewDidLoad()
+-  {
+-    super.viewDidLoad()
+-    doSomething()
+-  }
+-  
+-  // MARK: Do something
+-  
+-  //@IBOutlet weak var nameTextField: UITextField!
+-  
+-  func doSomething()
+-  {
+-    let request = ProductSummary.Something.Request()
+-    interactor?.doSomething(request: request)
+-  }
+-  
+-  func displaySomething(viewModel: ProductSummary.Something.ViewModel)
+-  {
+-    //nameTextField.text = viewModel.name
+-  }
+ }
+-- 
+2.39.3 (Apple Git-146)
+

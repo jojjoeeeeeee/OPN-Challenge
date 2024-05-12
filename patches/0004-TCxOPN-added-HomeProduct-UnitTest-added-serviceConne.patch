@@ -1,0 +1,1468 @@
+From cb3581043819e31a02a5e0c543ff4a5256d22b5b Mon Sep 17 00:00:00 2001
+From: "phakkharachate.j" <phakkharachate.j@arise.tech>
+Date: Sun, 12 May 2024 21:16:03 +0700
+Subject: [PATCH 4/8] [TCxOPN] added HomeProduct UnitTest & added
+ serviceConnection for HomeProductInteractor to use in UniTest stub & added
+ ProductSummary scene
+
+---
+ OPN-Challenge.xcodeproj/project.pbxproj       |  86 +++++++++++---
+ .../xcschemes/OPN-Challenge.xcscheme          | 107 ++++++++++++++++++
+ .../xcschemes/OPN-ChallengeTests.xcscheme     |  55 +++++++++
+ .../xcschemes/xcschememanagement.plist        |  23 ++++
+ .../contents.xcworkspacedata                  |   3 +
+ .../ProductCell/ProductTableViewCell.swift    |   0
+ .../ProductCell/ProductTableViewCell.xib      |   0
+ .../Base.lproj/HomeProduct.storyboard         |   8 ++
+ .../HomeProduct/HomeProductInteractor.swift   |  23 +++-
+ .../HomeProduct/HomeProductModels.swift       |  13 +++
+ .../HomeProduct/HomeProductPresenter.swift    |  28 ++++-
+ .../HomeProductViewController.swift           |  39 ++++++-
+ .../ProductSummary/ProductSummary.storyboard  |  79 +++++++++++++
+ .../ProductSummaryInteractor.swift            |  41 +++++++
+ .../ProductSummary/ProductSummaryModels.swift |  31 +++++
+ .../ProductSummaryPresenter.swift             |  31 +++++
+ .../ProductSummary/ProductSummaryRouter.swift |  60 ++++++++++
+ .../ProductSummaryViewController.swift        |  89 +++++++++++++++
+ .../Scenes/HomeProductInteractorTests.swift   |  94 +++++++++++++++
+ .../Scenes/HomeProductPresenterTests.swift    |  71 ++++++++++++
+ .../Stubs/StubHomeProductService.swift        |  33 ++++++
+ OPN-ChallengeTests/OPN_ChallengeTests.swift   |  36 ------
+ .../OPN_ChallengeUITests.swift                |  41 -------
+ .../OPN_ChallengeUITestsLaunchTests.swift     |  32 ------
+ 24 files changed, 889 insertions(+), 134 deletions(-)
+ create mode 100644 OPN-Challenge.xcodeproj/xcshareddata/xcschemes/OPN-Challenge.xcscheme
+ create mode 100644 OPN-Challenge.xcodeproj/xcshareddata/xcschemes/OPN-ChallengeTests.xcscheme
+ rename OPN-Challenge/Scenes/{HomeProduct => CommonView}/ProductCell/ProductTableViewCell.swift (100%)
+ rename OPN-Challenge/Scenes/{HomeProduct => CommonView}/ProductCell/ProductTableViewCell.xib (100%)
+ create mode 100644 OPN-Challenge/Scenes/ProductSummary/ProductSummary.storyboard
+ create mode 100644 OPN-Challenge/Scenes/ProductSummary/ProductSummaryInteractor.swift
+ create mode 100644 OPN-Challenge/Scenes/ProductSummary/ProductSummaryModels.swift
+ create mode 100644 OPN-Challenge/Scenes/ProductSummary/ProductSummaryPresenter.swift
+ create mode 100644 OPN-Challenge/Scenes/ProductSummary/ProductSummaryRouter.swift
+ create mode 100644 OPN-Challenge/Scenes/ProductSummary/ProductSummaryViewController.swift
+ create mode 100644 OPN-ChallengeTests/HomeProduct/Scenes/HomeProductInteractorTests.swift
+ create mode 100644 OPN-ChallengeTests/HomeProduct/Scenes/HomeProductPresenterTests.swift
+ create mode 100644 OPN-ChallengeTests/HomeProduct/Stubs/StubHomeProductService.swift
+ delete mode 100644 OPN-ChallengeTests/OPN_ChallengeTests.swift
+ delete mode 100644 OPN-ChallengeUITests/OPN_ChallengeUITests.swift
+ delete mode 100644 OPN-ChallengeUITests/OPN_ChallengeUITestsLaunchTests.swift
+
+diff --git a/OPN-Challenge.xcodeproj/project.pbxproj b/OPN-Challenge.xcodeproj/project.pbxproj
+index 2984821..b354fe9 100644
+--- a/OPN-Challenge.xcodeproj/project.pbxproj
++++ b/OPN-Challenge.xcodeproj/project.pbxproj
+@@ -12,9 +12,6 @@
+ 		739555E72BEFF8DA004AC74E /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 739555E62BEFF8DA004AC74E /* Base */; };
+ 		739555E92BEFF8E0004AC74E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 739555E82BEFF8E0004AC74E /* Assets.xcassets */; };
+ 		739555EC2BEFF8E0004AC74E /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 739555EB2BEFF8E0004AC74E /* Base */; };
+-		739555F72BEFF8E2004AC74E /* OPN_ChallengeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739555F62BEFF8E2004AC74E /* OPN_ChallengeTests.swift */; };
+-		739556012BEFF8E2004AC74E /* OPN_ChallengeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739556002BEFF8E2004AC74E /* OPN_ChallengeUITests.swift */; };
+-		739556032BEFF8E2004AC74E /* OPN_ChallengeUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739556022BEFF8E2004AC74E /* OPN_ChallengeUITestsLaunchTests.swift */; };
+ 		739556162BEFFC1B004AC74E /* HomeProductPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739556102BEFFC1B004AC74E /* HomeProductPresenter.swift */; };
+ 		739556182BEFFC1B004AC74E /* HomeProductRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739556122BEFFC1B004AC74E /* HomeProductRouter.swift */; };
+ 		739556192BEFFC1B004AC74E /* HomeProductModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739556132BEFFC1B004AC74E /* HomeProductModels.swift */; };
+@@ -47,6 +44,15 @@
+ 		739556622BF0DF5F004AC74E /* UILoadingFullViewPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7395565A2BF0DF5F004AC74E /* UILoadingFullViewPresenter.swift */; };
+ 		739556632BF0DF5F004AC74E /* UILoadingFullViewRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7395565B2BF0DF5F004AC74E /* UILoadingFullViewRouter.swift */; };
+ 		739556642BF0DF5F004AC74E /* UILoadingFullViewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7395565C2BF0DF5F004AC74E /* UILoadingFullViewViewController.swift */; };
++		739556682BF0F396004AC74E /* StubHomeProductService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739556672BF0F396004AC74E /* StubHomeProductService.swift */; };
++		7395566B2BF0F69C004AC74E /* HomeProductInteractorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7395566A2BF0F69C004AC74E /* HomeProductInteractorTests.swift */; };
++		73CE6B432BF0FF650052CD8B /* HomeProductPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B422BF0FF650052CD8B /* HomeProductPresenterTests.swift */; };
++		73CE6B4B2BF102D20052CD8B /* ProductSummaryPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B452BF102D20052CD8B /* ProductSummaryPresenter.swift */; };
++		73CE6B4D2BF102D20052CD8B /* ProductSummaryRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B472BF102D20052CD8B /* ProductSummaryRouter.swift */; };
++		73CE6B4E2BF102D20052CD8B /* ProductSummaryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B482BF102D20052CD8B /* ProductSummaryModels.swift */; };
++		73CE6B4F2BF102D20052CD8B /* ProductSummaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B492BF102D20052CD8B /* ProductSummaryViewController.swift */; };
++		73CE6B502BF102D20052CD8B /* ProductSummaryInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B4A2BF102D20052CD8B /* ProductSummaryInteractor.swift */; };
++		73CE6B522BF102EA0052CD8B /* ProductSummary.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 73CE6B512BF102EA0052CD8B /* ProductSummary.storyboard */; };
+ 		AA06D3D5FD48A457D3189C5C /* Pods_OPN_ChallengeTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBC011E77B1AF7ADBC527B7E /* Pods_OPN_ChallengeTests.framework */; };
+ 		B6DEC6E51521EC1B2633083C /* Pods_OPN_Challenge_OPN_ChallengeUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F457EF9EFD3978A42D1B43EB /* Pods_OPN_Challenge_OPN_ChallengeUITests.framework */; };
+ 		DFCEF3341560DBA2A56575C0 /* Pods_OPN_Challenge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B18C9219862D4F67521B275C /* Pods_OPN_Challenge.framework */; };
+@@ -82,10 +88,7 @@
+ 		739555EB2BEFF8E0004AC74E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+ 		739555ED2BEFF8E0004AC74E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+ 		739555F22BEFF8E2004AC74E /* OPN-ChallengeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "OPN-ChallengeTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+-		739555F62BEFF8E2004AC74E /* OPN_ChallengeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OPN_ChallengeTests.swift; sourceTree = "<group>"; };
+ 		739555FC2BEFF8E2004AC74E /* OPN-ChallengeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "OPN-ChallengeUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+-		739556002BEFF8E2004AC74E /* OPN_ChallengeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OPN_ChallengeUITests.swift; sourceTree = "<group>"; };
+-		739556022BEFF8E2004AC74E /* OPN_ChallengeUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OPN_ChallengeUITestsLaunchTests.swift; sourceTree = "<group>"; };
+ 		739556102BEFFC1B004AC74E /* HomeProductPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeProductPresenter.swift; sourceTree = "<group>"; };
+ 		739556122BEFFC1B004AC74E /* HomeProductRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeProductRouter.swift; sourceTree = "<group>"; };
+ 		739556132BEFFC1B004AC74E /* HomeProductModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeProductModels.swift; sourceTree = "<group>"; };
+@@ -118,6 +121,15 @@
+ 		7395565A2BF0DF5F004AC74E /* UILoadingFullViewPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILoadingFullViewPresenter.swift; sourceTree = "<group>"; };
+ 		7395565B2BF0DF5F004AC74E /* UILoadingFullViewRouter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILoadingFullViewRouter.swift; sourceTree = "<group>"; };
+ 		7395565C2BF0DF5F004AC74E /* UILoadingFullViewViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILoadingFullViewViewController.swift; sourceTree = "<group>"; };
++		739556672BF0F396004AC74E /* StubHomeProductService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StubHomeProductService.swift; sourceTree = "<group>"; };
++		7395566A2BF0F69C004AC74E /* HomeProductInteractorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeProductInteractorTests.swift; sourceTree = "<group>"; };
++		73CE6B422BF0FF650052CD8B /* HomeProductPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeProductPresenterTests.swift; sourceTree = "<group>"; };
++		73CE6B452BF102D20052CD8B /* ProductSummaryPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductSummaryPresenter.swift; sourceTree = "<group>"; };
++		73CE6B472BF102D20052CD8B /* ProductSummaryRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductSummaryRouter.swift; sourceTree = "<group>"; };
++		73CE6B482BF102D20052CD8B /* ProductSummaryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductSummaryModels.swift; sourceTree = "<group>"; };
++		73CE6B492BF102D20052CD8B /* ProductSummaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductSummaryViewController.swift; sourceTree = "<group>"; };
++		73CE6B4A2BF102D20052CD8B /* ProductSummaryInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductSummaryInteractor.swift; sourceTree = "<group>"; };
++		73CE6B512BF102EA0052CD8B /* ProductSummary.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = ProductSummary.storyboard; sourceTree = "<group>"; };
+ 		7D4AB8114A17238EF43803E6 /* Pods-OPN-Challenge.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OPN-Challenge.release.xcconfig"; path = "Target Support Files/Pods-OPN-Challenge/Pods-OPN-Challenge.release.xcconfig"; sourceTree = "<group>"; };
+ 		B18C9219862D4F67521B275C /* Pods_OPN_Challenge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OPN_Challenge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+ 		C453A3A53A15AE7491B28818 /* Pods-OPN-ChallengeTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OPN-ChallengeTests.debug.xcconfig"; path = "Target Support Files/Pods-OPN-ChallengeTests/Pods-OPN-ChallengeTests.debug.xcconfig"; sourceTree = "<group>"; };
+@@ -197,7 +209,7 @@
+ 		739555F52BEFF8E2004AC74E /* OPN-ChallengeTests */ = {
+ 			isa = PBXGroup;
+ 			children = (
+-				739555F62BEFF8E2004AC74E /* OPN_ChallengeTests.swift */,
++				739556652BF0F352004AC74E /* HomeProduct */,
+ 			);
+ 			path = "OPN-ChallengeTests";
+ 			sourceTree = "<group>";
+@@ -205,8 +217,6 @@
+ 		739555FF2BEFF8E2004AC74E /* OPN-ChallengeUITests */ = {
+ 			isa = PBXGroup;
+ 			children = (
+-				739556002BEFF8E2004AC74E /* OPN_ChallengeUITests.swift */,
+-				739556022BEFF8E2004AC74E /* OPN_ChallengeUITestsLaunchTests.swift */,
+ 			);
+ 			path = "OPN-ChallengeUITests";
+ 			sourceTree = "<group>";
+@@ -214,7 +224,6 @@
+ 		7395560F2BEFFBEA004AC74E /* HomeProduct */ = {
+ 			isa = PBXGroup;
+ 			children = (
+-				7395562F2BF018D7004AC74E /* ProductCell */,
+ 				739556102BEFFC1B004AC74E /* HomeProductPresenter.swift */,
+ 				739556122BEFFC1B004AC74E /* HomeProductRouter.swift */,
+ 				739556132BEFFC1B004AC74E /* HomeProductModels.swift */,
+@@ -265,6 +274,7 @@
+ 			isa = PBXGroup;
+ 			children = (
+ 				739556552BF0DF53004AC74E /* CommonView */,
++				73CE6B442BF102BE0052CD8B /* ProductSummary */,
+ 				7395560F2BEFFBEA004AC74E /* HomeProduct */,
+ 			);
+ 			path = Scenes;
+@@ -306,6 +316,7 @@
+ 		739556552BF0DF53004AC74E /* CommonView */ = {
+ 			isa = PBXGroup;
+ 			children = (
++				7395562F2BF018D7004AC74E /* ProductCell */,
+ 				739556562BF0DF5F004AC74E /* BaseXIBView.swift */,
+ 				7395565D2BF0DF5F004AC74E /* UILoadingFullView */,
+ 			);
+@@ -325,6 +336,45 @@
+ 			path = UILoadingFullView;
+ 			sourceTree = "<group>";
+ 		};
++		739556652BF0F352004AC74E /* HomeProduct */ = {
++			isa = PBXGroup;
++			children = (
++				739556692BF0F690004AC74E /* Scenes */,
++				739556662BF0F35C004AC74E /* Stubs */,
++			);
++			path = HomeProduct;
++			sourceTree = "<group>";
++		};
++		739556662BF0F35C004AC74E /* Stubs */ = {
++			isa = PBXGroup;
++			children = (
++				739556672BF0F396004AC74E /* StubHomeProductService.swift */,
++			);
++			path = Stubs;
++			sourceTree = "<group>";
++		};
++		739556692BF0F690004AC74E /* Scenes */ = {
++			isa = PBXGroup;
++			children = (
++				7395566A2BF0F69C004AC74E /* HomeProductInteractorTests.swift */,
++				73CE6B422BF0FF650052CD8B /* HomeProductPresenterTests.swift */,
++			);
++			path = Scenes;
++			sourceTree = "<group>";
++		};
++		73CE6B442BF102BE0052CD8B /* ProductSummary */ = {
++			isa = PBXGroup;
++			children = (
++				73CE6B452BF102D20052CD8B /* ProductSummaryPresenter.swift */,
++				73CE6B472BF102D20052CD8B /* ProductSummaryRouter.swift */,
++				73CE6B482BF102D20052CD8B /* ProductSummaryModels.swift */,
++				73CE6B492BF102D20052CD8B /* ProductSummaryViewController.swift */,
++				73CE6B4A2BF102D20052CD8B /* ProductSummaryInteractor.swift */,
++				73CE6B512BF102EA0052CD8B /* ProductSummary.storyboard */,
++			);
++			path = ProductSummary;
++			sourceTree = "<group>";
++		};
+ 		DA86BAAF8F2830EE47419387 /* Pods */ = {
+ 			isa = PBXGroup;
+ 			children = (
+@@ -457,6 +507,7 @@
+ 			isa = PBXResourcesBuildPhase;
+ 			buildActionMask = 2147483647;
+ 			files = (
++				73CE6B522BF102EA0052CD8B /* ProductSummary.storyboard in Resources */,
+ 				739555E92BEFF8E0004AC74E /* Assets.xcassets in Resources */,
+ 				739555EC2BEFF8E0004AC74E /* Base in Resources */,
+ 				739556322BF018F0004AC74E /* ProductTableViewCell.xib in Resources */,
+@@ -594,6 +645,11 @@
+ 				739556162BEFFC1B004AC74E /* HomeProductPresenter.swift in Sources */,
+ 				739556182BEFFC1B004AC74E /* HomeProductRouter.swift in Sources */,
+ 				739556502BF0CC4B004AC74E /* ServiceConnection.swift in Sources */,
++				73CE6B4B2BF102D20052CD8B /* ProductSummaryPresenter.swift in Sources */,
++				73CE6B4D2BF102D20052CD8B /* ProductSummaryRouter.swift in Sources */,
++				73CE6B4E2BF102D20052CD8B /* ProductSummaryModels.swift in Sources */,
++				73CE6B4F2BF102D20052CD8B /* ProductSummaryViewController.swift in Sources */,
++				73CE6B502BF102D20052CD8B /* ProductSummaryInteractor.swift in Sources */,
+ 				739556192BEFFC1B004AC74E /* HomeProductModels.swift in Sources */,
+ 				7395561E2BF001A2004AC74E /* UIColorExtension.swift in Sources */,
+ 				739556332BF018F0004AC74E /* ProductTableViewCell.swift in Sources */,
+@@ -628,7 +684,9 @@
+ 			isa = PBXSourcesBuildPhase;
+ 			buildActionMask = 2147483647;
+ 			files = (
+-				739555F72BEFF8E2004AC74E /* OPN_ChallengeTests.swift in Sources */,
++				739556682BF0F396004AC74E /* StubHomeProductService.swift in Sources */,
++				7395566B2BF0F69C004AC74E /* HomeProductInteractorTests.swift in Sources */,
++				73CE6B432BF0FF650052CD8B /* HomeProductPresenterTests.swift in Sources */,
+ 			);
+ 			runOnlyForDeploymentPostprocessing = 0;
+ 		};
+@@ -636,8 +694,6 @@
+ 			isa = PBXSourcesBuildPhase;
+ 			buildActionMask = 2147483647;
+ 			files = (
+-				739556032BEFF8E2004AC74E /* OPN_ChallengeUITestsLaunchTests.swift in Sources */,
+-				739556012BEFF8E2004AC74E /* OPN_ChallengeUITests.swift in Sources */,
+ 			);
+ 			runOnlyForDeploymentPostprocessing = 0;
+ 		};
+@@ -865,6 +921,7 @@
+ 				BUNDLE_LOADER = "$(TEST_HOST)";
+ 				CODE_SIGN_STYLE = Automatic;
+ 				CURRENT_PROJECT_VERSION = 1;
++				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+ 				GENERATE_INFOPLIST_FILE = YES;
+ 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+ 				MARKETING_VERSION = 1.0;
+@@ -885,6 +942,7 @@
+ 				BUNDLE_LOADER = "$(TEST_HOST)";
+ 				CODE_SIGN_STYLE = Automatic;
+ 				CURRENT_PROJECT_VERSION = 1;
++				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+ 				GENERATE_INFOPLIST_FILE = YES;
+ 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+ 				MARKETING_VERSION = 1.0;
+@@ -904,6 +962,7 @@
+ 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+ 				CODE_SIGN_STYLE = Automatic;
+ 				CURRENT_PROJECT_VERSION = 1;
++				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+ 				GENERATE_INFOPLIST_FILE = YES;
+ 				MARKETING_VERSION = 1.0;
+ 				PRODUCT_BUNDLE_IDENTIFIER = "phakkharachate.jon.OPN-ChallengeUITests";
+@@ -922,6 +981,7 @@
+ 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+ 				CODE_SIGN_STYLE = Automatic;
+ 				CURRENT_PROJECT_VERSION = 1;
++				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+ 				GENERATE_INFOPLIST_FILE = YES;
+ 				MARKETING_VERSION = 1.0;
+ 				PRODUCT_BUNDLE_IDENTIFIER = "phakkharachate.jon.OPN-ChallengeUITests";
+diff --git a/OPN-Challenge.xcodeproj/xcshareddata/xcschemes/OPN-Challenge.xcscheme b/OPN-Challenge.xcodeproj/xcshareddata/xcschemes/OPN-Challenge.xcscheme
+new file mode 100644
+index 0000000..4ea90cf
+--- /dev/null
++++ b/OPN-Challenge.xcodeproj/xcshareddata/xcschemes/OPN-Challenge.xcscheme
+@@ -0,0 +1,107 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<Scheme
++   LastUpgradeVersion = "1530"
++   version = "1.7">
++   <BuildAction
++      parallelizeBuildables = "YES"
++      buildImplicitDependencies = "YES"
++      buildArchitectures = "Automatic">
++      <BuildActionEntries>
++         <BuildActionEntry
++            buildForTesting = "YES"
++            buildForRunning = "YES"
++            buildForProfiling = "YES"
++            buildForArchiving = "YES"
++            buildForAnalyzing = "YES">
++            <BuildableReference
++               BuildableIdentifier = "primary"
++               BlueprintIdentifier = "739555DB2BEFF8DA004AC74E"
++               BuildableName = "OPN-Challenge.app"
++               BlueprintName = "OPN-Challenge"
++               ReferencedContainer = "container:OPN-Challenge.xcodeproj">
++            </BuildableReference>
++         </BuildActionEntry>
++      </BuildActionEntries>
++   </BuildAction>
++   <TestAction
++      buildConfiguration = "Debug"
++      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
++      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
++      shouldUseLaunchSchemeArgsEnv = "YES">
++      <TestPlans>
++         <TestPlanReference
++            reference = "container:../OPN-Challenge.xctestplan"
++            default = "YES">
++         </TestPlanReference>
++      </TestPlans>
++      <Testables>
++         <TestableReference
++            skipped = "NO"
++            parallelizable = "YES">
++            <BuildableReference
++               BuildableIdentifier = "primary"
++               BlueprintIdentifier = "739555F12BEFF8E2004AC74E"
++               BuildableName = "OPN-ChallengeTests.xctest"
++               BlueprintName = "OPN-ChallengeTests"
++               ReferencedContainer = "container:OPN-Challenge.xcodeproj">
++            </BuildableReference>
++         </TestableReference>
++         <TestableReference
++            skipped = "YES"
++            parallelizable = "YES">
++            <BuildableReference
++               BuildableIdentifier = "primary"
++               BlueprintIdentifier = "739555FB2BEFF8E2004AC74E"
++               BuildableName = "OPN-ChallengeUITests.xctest"
++               BlueprintName = "OPN-ChallengeUITests"
++               ReferencedContainer = "container:OPN-Challenge.xcodeproj">
++            </BuildableReference>
++         </TestableReference>
++      </Testables>
++   </TestAction>
++   <LaunchAction
++      buildConfiguration = "Debug"
++      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
++      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
++      launchStyle = "0"
++      useCustomWorkingDirectory = "NO"
++      ignoresPersistentStateOnLaunch = "NO"
++      debugDocumentVersioning = "YES"
++      debugServiceExtension = "internal"
++      allowLocationSimulation = "YES">
++      <BuildableProductRunnable
++         runnableDebuggingMode = "0">
++         <BuildableReference
++            BuildableIdentifier = "primary"
++            BlueprintIdentifier = "739555DB2BEFF8DA004AC74E"
++            BuildableName = "OPN-Challenge.app"
++            BlueprintName = "OPN-Challenge"
++            ReferencedContainer = "container:OPN-Challenge.xcodeproj">
++         </BuildableReference>
++      </BuildableProductRunnable>
++   </LaunchAction>
++   <ProfileAction
++      buildConfiguration = "Release"
++      shouldUseLaunchSchemeArgsEnv = "YES"
++      savedToolIdentifier = ""
++      useCustomWorkingDirectory = "NO"
++      debugDocumentVersioning = "YES">
++      <BuildableProductRunnable
++         runnableDebuggingMode = "0">
++         <BuildableReference
++            BuildableIdentifier = "primary"
++            BlueprintIdentifier = "739555DB2BEFF8DA004AC74E"
++            BuildableName = "OPN-Challenge.app"
++            BlueprintName = "OPN-Challenge"
++            ReferencedContainer = "container:OPN-Challenge.xcodeproj">
++         </BuildableReference>
++      </BuildableProductRunnable>
++   </ProfileAction>
++   <AnalyzeAction
++      buildConfiguration = "Debug">
++   </AnalyzeAction>
++   <ArchiveAction
++      buildConfiguration = "Release"
++      revealArchiveInOrganizer = "YES">
++   </ArchiveAction>
++</Scheme>
+diff --git a/OPN-Challenge.xcodeproj/xcshareddata/xcschemes/OPN-ChallengeTests.xcscheme b/OPN-Challenge.xcodeproj/xcshareddata/xcschemes/OPN-ChallengeTests.xcscheme
+new file mode 100644
+index 0000000..a08fb9a
+--- /dev/null
++++ b/OPN-Challenge.xcodeproj/xcshareddata/xcschemes/OPN-ChallengeTests.xcscheme
+@@ -0,0 +1,55 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<Scheme
++   LastUpgradeVersion = "1530"
++   version = "1.7">
++   <BuildAction
++      parallelizeBuildables = "YES"
++      buildImplicitDependencies = "YES"
++      buildArchitectures = "Automatic">
++   </BuildAction>
++   <TestAction
++      buildConfiguration = "Debug"
++      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
++      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
++      shouldUseLaunchSchemeArgsEnv = "YES"
++      shouldAutocreateTestPlan = "YES">
++      <Testables>
++         <TestableReference
++            skipped = "NO"
++            parallelizable = "YES">
++            <BuildableReference
++               BuildableIdentifier = "primary"
++               BlueprintIdentifier = "739555F12BEFF8E2004AC74E"
++               BuildableName = "OPN-ChallengeTests.xctest"
++               BlueprintName = "OPN-ChallengeTests"
++               ReferencedContainer = "container:OPN-Challenge.xcodeproj">
++            </BuildableReference>
++         </TestableReference>
++      </Testables>
++   </TestAction>
++   <LaunchAction
++      buildConfiguration = "Debug"
++      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
++      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
++      launchStyle = "0"
++      useCustomWorkingDirectory = "NO"
++      ignoresPersistentStateOnLaunch = "NO"
++      debugDocumentVersioning = "YES"
++      debugServiceExtension = "internal"
++      allowLocationSimulation = "YES">
++   </LaunchAction>
++   <ProfileAction
++      buildConfiguration = "Release"
++      shouldUseLaunchSchemeArgsEnv = "YES"
++      savedToolIdentifier = ""
++      useCustomWorkingDirectory = "NO"
++      debugDocumentVersioning = "YES">
++   </ProfileAction>
++   <AnalyzeAction
++      buildConfiguration = "Debug">
++   </AnalyzeAction>
++   <ArchiveAction
++      buildConfiguration = "Release"
++      revealArchiveInOrganizer = "YES">
++   </ArchiveAction>
++</Scheme>
+diff --git a/OPN-Challenge.xcodeproj/xcuserdata/a667209.xcuserdatad/xcschemes/xcschememanagement.plist b/OPN-Challenge.xcodeproj/xcuserdata/a667209.xcuserdatad/xcschemes/xcschememanagement.plist
+index c52a3b9..3cc3a95 100644
+--- a/OPN-Challenge.xcodeproj/xcuserdata/a667209.xcuserdatad/xcschemes/xcschememanagement.plist
++++ b/OPN-Challenge.xcodeproj/xcuserdata/a667209.xcuserdatad/xcschemes/xcschememanagement.plist
+@@ -9,6 +9,29 @@
+ 			<key>orderHint</key>
+ 			<integer>7</integer>
+ 		</dict>
++		<key>OPN-ChallengeTests.xcscheme_^#shared#^_</key>
++		<dict>
++			<key>orderHint</key>
++			<integer>8</integer>
++		</dict>
++	</dict>
++	<key>SuppressBuildableAutocreation</key>
++	<dict>
++		<key>739555DB2BEFF8DA004AC74E</key>
++		<dict>
++			<key>primary</key>
++			<true/>
++		</dict>
++		<key>739555F12BEFF8E2004AC74E</key>
++		<dict>
++			<key>primary</key>
++			<true/>
++		</dict>
++		<key>739555FB2BEFF8E2004AC74E</key>
++		<dict>
++			<key>primary</key>
++			<true/>
++		</dict>
+ 	</dict>
+ </dict>
+ </plist>
+diff --git a/OPN-Challenge.xcworkspace/contents.xcworkspacedata b/OPN-Challenge.xcworkspace/contents.xcworkspacedata
+index be8b320..8990828 100644
+--- a/OPN-Challenge.xcworkspace/contents.xcworkspacedata
++++ b/OPN-Challenge.xcworkspace/contents.xcworkspacedata
+@@ -7,4 +7,7 @@
+    <FileRef
+       location = "group:Pods/Pods.xcodeproj">
+    </FileRef>
++   <FileRef
++      location = "group:../OPN-Challenge.xctestplan">
++   </FileRef>
+ </Workspace>
+diff --git a/OPN-Challenge/Scenes/HomeProduct/ProductCell/ProductTableViewCell.swift b/OPN-Challenge/Scenes/CommonView/ProductCell/ProductTableViewCell.swift
+similarity index 100%
+rename from OPN-Challenge/Scenes/HomeProduct/ProductCell/ProductTableViewCell.swift
+rename to OPN-Challenge/Scenes/CommonView/ProductCell/ProductTableViewCell.swift
+diff --git a/OPN-Challenge/Scenes/HomeProduct/ProductCell/ProductTableViewCell.xib b/OPN-Challenge/Scenes/CommonView/ProductCell/ProductTableViewCell.xib
+similarity index 100%
+rename from OPN-Challenge/Scenes/HomeProduct/ProductCell/ProductTableViewCell.xib
+rename to OPN-Challenge/Scenes/CommonView/ProductCell/ProductTableViewCell.xib
+diff --git a/OPN-Challenge/Scenes/HomeProduct/Base.lproj/HomeProduct.storyboard b/OPN-Challenge/Scenes/HomeProduct/Base.lproj/HomeProduct.storyboard
+index c8b2e3b..f000b68 100644
+--- a/OPN-Challenge/Scenes/HomeProduct/Base.lproj/HomeProduct.storyboard
++++ b/OPN-Challenge/Scenes/HomeProduct/Base.lproj/HomeProduct.storyboard
+@@ -91,6 +91,13 @@
+                                     <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" dataMode="prototypes" style="plain" separatorStyle="none" allowsSelection="NO" rowHeight="130" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="vgt-ze-udJ">
+                                         <rect key="frame" x="0.0" y="115" width="393" height="552"/>
+                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
++                                        <label key="tableFooterView" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No product found" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="AqE-2l-V54">
++                                            <rect key="frame" x="0.0" y="0.0" width="393" height="44"/>
++                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
++                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
++                                            <nil key="textColor"/>
++                                            <nil key="highlightedColor"/>
++                                        </label>
+                                     </tableView>
+                                 </subviews>
+                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+@@ -236,6 +243,7 @@
+                         <outlet property="businessHoursLabel" destination="lMP-nf-EEq" id="e2l-AP-i2x"/>
+                         <outlet property="contentView" destination="LIc-4J-wGZ" id="qQb-TZ-83z"/>
+                         <outlet property="headerView" destination="Q2v-mN-N1M" id="hz7-65-fFc"/>
++                        <outlet property="noProductLabel" destination="AqE-2l-V54" id="aJQ-b9-gWE"/>
+                         <outlet property="orderButton" destination="6rR-0n-5G6" id="Mbs-nW-C0J"/>
+                         <outlet property="orderButtonStackView" destination="uHO-RU-aog" id="KeE-YX-6TK"/>
+                         <outlet property="orderTotalPriceLabel" destination="Iqz-G3-Iuj" id="uad-X7-snc"/>
+diff --git a/OPN-Challenge/Scenes/HomeProduct/HomeProductInteractor.swift b/OPN-Challenge/Scenes/HomeProduct/HomeProductInteractor.swift
+index 1d007d8..cd071d9 100644
+--- a/OPN-Challenge/Scenes/HomeProduct/HomeProductInteractor.swift
++++ b/OPN-Challenge/Scenes/HomeProduct/HomeProductInteractor.swift
+@@ -3,24 +3,27 @@ import UIKit
+ protocol HomeProductBusinessLogic {
+     func updateCart(request: HomeProduct.ProductCart.Request)
+     func getStoreInfoInquiry(request: HomeProduct.StoreInfoInquiry.Request)
++    func getProductsInquiry(request: HomeProduct.ProductsInquiry.Request)
+ }
+ 
+ protocol HomeProductDataStore {
+-    //var name: String { get set }
+ }
+ 
+ class HomeProductInteractor: HomeProductBusinessLogic, HomeProductDataStore {
+     var presenter: HomeProductPresentationLogic?
++    let serviceConnection: ServiceConnection
+     
+-    // MARK: Do something
++    init(serviceConnection: ServiceConnection = ServiceConnection()) {
++        self.serviceConnection = serviceConnection
++    }
+     
+     func updateCart(request: HomeProduct.ProductCart.Request) {
+         let response = HomeProduct.ProductCart.Response(productList: request.productList, totalPrice: request.totalPrice, totalProduct: request.totalProduct)
+-        presenter?.presentProductList(response: response)
++        presenter?.presentProductCart(response: response)
+     }
+     
+     func getStoreInfoInquiry(request: HomeProduct.StoreInfoInquiry.Request) {
+-        ServiceConnection().storeInfoService(completionHandler: { [weak self] result in
++        serviceConnection.storeInfoService(completionHandler: { [weak self] result in
+             self?.presenter?.presentStoreInfo(
+                 response: HomeProduct.StoreInfoInquiry.Response(storeResponse: result)
+             )
+@@ -30,4 +33,16 @@ class HomeProductInteractor: HomeProductBusinessLogic, HomeProductDataStore {
+             )
+         })
+     }
++    
++    func getProductsInquiry(request: HomeProduct.ProductsInquiry.Request) {
++        serviceConnection.productsService(completionHandler: { [weak self] result in
++            self?.presenter?.presentProducts(
++                response: HomeProduct.ProductsInquiry.Response(productsResponse: result)
++            )
++        }, errorHandler: { [weak self] error in
++            self?.presenter?.presentError(
++                response: HomeProduct.HomeProductError.Response(serviceError: error, customAction: request.customAction)
++            )
++        })
++    }
+ }
+diff --git a/OPN-Challenge/Scenes/HomeProduct/HomeProductModels.swift b/OPN-Challenge/Scenes/HomeProduct/HomeProductModels.swift
+index fdb1ac1..b14e650 100644
+--- a/OPN-Challenge/Scenes/HomeProduct/HomeProductModels.swift
++++ b/OPN-Challenge/Scenes/HomeProduct/HomeProductModels.swift
+@@ -33,6 +33,19 @@ enum HomeProduct {
+         }
+     }
+     
++    enum ProductsInquiry{
++        struct Request {
++            let customAction: (() -> Void)?
++        }
++        struct Response {
++            let productsResponse: [ProductsResponseModel]
++        }
++        struct ViewModel {
++            let products: [Product]
++        }
++    }
++
++    
+     enum HomeProductError {
+         struct Request {
+         }
+diff --git a/OPN-Challenge/Scenes/HomeProduct/HomeProductPresenter.swift b/OPN-Challenge/Scenes/HomeProduct/HomeProductPresenter.swift
+index f8a34d3..a2de239 100644
+--- a/OPN-Challenge/Scenes/HomeProduct/HomeProductPresenter.swift
++++ b/OPN-Challenge/Scenes/HomeProduct/HomeProductPresenter.swift
+@@ -1,8 +1,9 @@
+ import UIKit
+ 
+ protocol HomeProductPresentationLogic {
+-    func presentProductList(response: HomeProduct.ProductCart.Response)
++    func presentProductCart(response: HomeProduct.ProductCart.Response)
+     func presentStoreInfo(response: HomeProduct.StoreInfoInquiry.Response)
++    func presentProducts(response: HomeProduct.ProductsInquiry.Response)
+     func presentError(response: HomeProduct.HomeProductError.Response)
+ }
+ 
+@@ -11,9 +12,9 @@ class HomeProductPresenter: HomeProductPresentationLogic {
+     
+     // MARK: Do something
+     
+-    func presentProductList(response: HomeProduct.ProductCart.Response) {
++    func presentProductCart(response: HomeProduct.ProductCart.Response) {
+         let viewModel = HomeProduct.ProductCart.ViewModel(productList: response.productList, totalPrice: response.totalPrice, totalProduct: response.totalProduct)
+-        viewController?.displayProductList(viewModel: viewModel)
++        viewController?.displayProductCart(viewModel: viewModel)
+     }
+     
+     func presentStoreInfo(response: HomeProduct.StoreInfoInquiry.Response) {
+@@ -29,6 +30,12 @@ class HomeProductPresenter: HomeProductPresentationLogic {
+         viewController?.displayStoreInfo(viewModel: viewModel)
+     }
+     
++    func presentProducts(response: HomeProduct.ProductsInquiry.Response) {
++        let mappedProducts = mapProducts(productResponse: response.productsResponse) ?? []
++        let viewModel = HomeProduct.ProductsInquiry.ViewModel(products: mappedProducts)
++        viewController?.displayProducts(viewModel: viewModel)
++    }
++    
+     func presentError(response: HomeProduct.HomeProductError.Response) {
+         let viewModel = HomeProduct.HomeProductError.ViewModel(serviceError: response.serviceError, customAction: response.customAction)
+         viewController?.displayError(viewModel: viewModel)
+@@ -41,4 +48,19 @@ class HomeProductPresenter: HomeProductPresentationLogic {
+     func formatStoreRating(rate: Float) -> String {
+         return String(format: "%.1f", rate)
+     }
++    
++    func mapProducts(productResponse: [ProductsResponseModel]) -> [HomeProduct.Product]? {
++        return productResponse.compactMap{ product -> HomeProduct.Product? in
++            if let imageUrl = URL(string: product.imageUrl ?? ""), let name = product.name, let price = product.price {
++                return HomeProduct.Product(
++                    name: name,
++                    price: price,
++                    imageUrl: imageUrl,
++                    amount: 0
++                )
++            } else {
++                return nil
++            }
++        }
++    }
+ }
+diff --git a/OPN-Challenge/Scenes/HomeProduct/HomeProductViewController.swift b/OPN-Challenge/Scenes/HomeProduct/HomeProductViewController.swift
+index 956dce9..76ddba7 100644
+--- a/OPN-Challenge/Scenes/HomeProduct/HomeProductViewController.swift
++++ b/OPN-Challenge/Scenes/HomeProduct/HomeProductViewController.swift
+@@ -1,8 +1,9 @@
+ import UIKit
+ 
+ protocol HomeProductDisplayLogic: AnyObject {
+-    func displayProductList(viewModel: HomeProduct.ProductCart.ViewModel)
++    func displayProductCart(viewModel: HomeProduct.ProductCart.ViewModel)
+     func displayStoreInfo(viewModel: HomeProduct.StoreInfoInquiry.ViewModel)
++    func displayProducts(viewModel: HomeProduct.ProductsInquiry.ViewModel)
+     func displayError(viewModel: HomeProduct.HomeProductError.ViewModel)
+ }
+ 
+@@ -19,10 +20,11 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
+     @IBOutlet private weak var orderTotalPriceLabel: UILabel!
+     @IBOutlet private weak var orderButtonStackView: UIStackView!
+     @IBOutlet private weak var orderButton: UIButton!
++    @IBOutlet private weak var noProductLabel: UILabel!
+     
+     public var uiLoadingFullView = UILoadingFullViewViewController()
+     
+-    var productCart: [HomeProduct.Product] = [HomeProduct.Product.init(name: "Latte", price: 50, imageUrl: URL(string: "https://www.nespresso.com/ncp/res/uploads/recipes/nespresso-recipes-Latte-Art-Tulip.jpg")!, amount: 0), HomeProduct.Product.init(name: "Dark Tiramisu Mocha", price: 75, imageUrl: URL(string: "https://www.nespresso.com/shared_res/mos/free_html/sg/b2b/b2ccoffeerecipes/listing-image/image/dark-tiramisu-mocha.jpg")!, amount: 0)]
++    var productCart: [HomeProduct.Product] = []
+     var totalPrice = 0
+     var totalProduct = 0
+     
+@@ -63,7 +65,9 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
+     override func viewDidLoad() {
+         super.viewDidLoad()
+         setupView()
++        router?.showFullViewLoading(destination: uiLoadingFullView)
+         fetchInitialStoreInfo()
++        fetchInitialProducts()
+     }
+     
+     private func setupView() {
+@@ -98,6 +102,7 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
+             shadowOffset: CGSize(width: 0, height: -4),
+             masksToBounds: false
+         )
++        noProductLabel.isHidden = true
+     }
+     
+     func updateCart(productList: [HomeProduct.Product], updatedPrice: Int, updatedTotalProduct: Int) {
+@@ -105,7 +110,7 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
+         interactor?.updateCart(request: request)
+     }
+     
+-    func displayProductList (viewModel: HomeProduct.ProductCart.ViewModel) {
++    func displayProductCart(viewModel: HomeProduct.ProductCart.ViewModel) {
+         productCart = viewModel.productList
+         totalPrice = viewModel.totalPrice
+         totalProduct = viewModel.totalProduct
+@@ -121,15 +126,39 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
+         uiLoadingFullView.interactor?.showLoading(request: UILoadingFullView.Loading.Request(show: false))
+     }
+     
++    func displayProducts(viewModel: HomeProduct.ProductsInquiry.ViewModel) {
++        if viewModel.products.isEmpty {
++            noProductLabel.isHidden = false
++        } else {
++            productCart = viewModel.products
++            productTableView.reloadData()
++        }
++        
++        uiLoadingFullView.interactor?.showLoading(request: UILoadingFullView.Loading.Request(show: false))
++    }
++    
+     func displayError(viewModel: HomeProduct.HomeProductError.ViewModel) {
+         let serviceError = viewModel.serviceError
+         let customAction = viewModel.customAction
+         uiLoadingFullView.interactor?.showError(request: UILoadingFullView.Error.Request(show: true, serviceError: serviceError, customAction: customAction))
+     }
+     
+-    private func fetchInitialStoreInfo() {
++    private func showLoadingAndFetchAgain(fetchAction: (() -> Void)?) {
++        guard let action = fetchAction else { return }
+         router?.showFullViewLoading(destination: uiLoadingFullView)
+-        interactor?.getStoreInfoInquiry(request: HomeProduct.StoreInfoInquiry.Request(customAction: fetchInitialStoreInfo))
++        action()
++    }
++    
++    private func fetchInitialStoreInfo() {
++        interactor?.getStoreInfoInquiry(request: HomeProduct.StoreInfoInquiry.Request(customAction: { [weak self] in
++            self?.showLoadingAndFetchAgain(fetchAction: self?.fetchInitialStoreInfo)
++        }))
++    }
++    
++    private func fetchInitialProducts() {
++        interactor?.getProductsInquiry(request: HomeProduct.ProductsInquiry.Request(customAction: { [weak self] in
++            self?.showLoadingAndFetchAgain(fetchAction: self?.fetchInitialProducts)
++        }))
+     }
+     
+     private func updateBottomView(isShow: Bool) {
+diff --git a/OPN-Challenge/Scenes/ProductSummary/ProductSummary.storyboard b/OPN-Challenge/Scenes/ProductSummary/ProductSummary.storyboard
+new file mode 100644
+index 0000000..1510c70
+--- /dev/null
++++ b/OPN-Challenge/Scenes/ProductSummary/ProductSummary.storyboard
+@@ -0,0 +1,79 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
++    <device id="retina6_12" orientation="portrait" appearance="light"/>
++    <dependencies>
++        <deployment identifier="iOS"/>
++        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
++        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
++        <capability name="System colors in document resources" minToolsVersion="11.0"/>
++        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
++    </dependencies>
++    <scenes>
++        <!--View Controller-->
++        <scene sceneID="s0d-6b-0kx">
++            <objects>
++                <viewController id="Y6W-OH-hqX" sceneMemberID="viewController">
++                    <view key="view" contentMode="scaleToFill" id="5EZ-qb-Rvc">
++                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
++                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
++                        <subviews>
++                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="chevron.left.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="Nxz-o4-7Jr">
++                                <rect key="frame" x="16" y="66.666666666666657" width="40" height="38.666666666666671"/>
++                                <color key="tintColor" red="0.55156713719999995" green="0.34558042880000001" blue="0.64526998999999996" alpha="1" colorSpace="custom" customColorSpace="adobeRGB1998"/>
++                                <constraints>
++                                    <constraint firstAttribute="width" constant="40" id="0q7-Hg-zKi"/>
++                                    <constraint firstAttribute="height" constant="40" id="eO6-x7-bQb"/>
++                                </constraints>
++                            </imageView>
++                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Store name - Order" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Pvr-4Y-pB8">
++                                <rect key="frame" x="16" y="75" width="361" height="21"/>
++                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="18"/>
++                                <nil key="textColor"/>
++                                <nil key="highlightedColor"/>
++                            </label>
++                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ova-NG-NaQ">
++                                <rect key="frame" x="0.0" y="288" width="393" height="5"/>
++                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
++                                <color key="backgroundColor" white="0.88943218240093225" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++                            </view>
++                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Nea-WK-lnh">
++                                <rect key="frame" x="0.0" y="513" width="393" height="5"/>
++                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
++                                <color key="backgroundColor" white="0.88943218239999999" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++                            </view>
++                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Delivery Address" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XAu-iw-aXW">
++                                <rect key="frame" x="24" y="134" width="109" height="17"/>
++                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
++                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
++                                <nil key="textColor"/>
++                                <nil key="highlightedColor"/>
++                            </label>
++                            <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="RKV-IP-JB0">
++                                <rect key="frame" x="0.0" y="307" width="393" height="187"/>
++                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
++                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
++                            </tableView>
++                        </subviews>
++                        <viewLayoutGuide key="safeArea" id="vDu-zF-Fre"/>
++                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
++                        <constraints>
++                            <constraint firstItem="Nxz-o4-7Jr" firstAttribute="centerY" secondItem="Pvr-4Y-pB8" secondAttribute="centerY" id="1Fm-zD-6fe"/>
++                            <constraint firstItem="Pvr-4Y-pB8" firstAttribute="centerX" secondItem="5EZ-qb-Rvc" secondAttribute="centerX" id="QEd-RE-6id"/>
++                            <constraint firstItem="Pvr-4Y-pB8" firstAttribute="top" secondItem="vDu-zF-Fre" secondAttribute="top" constant="16" id="cK3-MJ-rLi"/>
++                            <constraint firstItem="Nxz-o4-7Jr" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="16" id="gqA-Mz-gkH"/>
++                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="Pvr-4Y-pB8" secondAttribute="trailing" constant="16" id="wrj-fI-BEi"/>
++                        </constraints>
++                    </view>
++                </viewController>
++                <placeholder placeholderIdentifier="IBFirstResponder" id="Ief-a0-LHa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
++            </objects>
++            <point key="canvasLocation" x="110.68702290076335" y="-2.1126760563380285"/>
++        </scene>
++    </scenes>
++    <resources>
++        <image name="chevron.left.circle.fill" catalog="system" width="128" height="123"/>
++        <systemColor name="systemBackgroundColor">
++            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++        </systemColor>
++    </resources>
++</document>
+diff --git a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryInteractor.swift b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryInteractor.swift
+new file mode 100644
+index 0000000..6f2d5d1
+--- /dev/null
++++ b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryInteractor.swift
+@@ -0,0 +1,41 @@
++//
++//  ProductSummaryInteractor.swift
++//  OPN-Challenge
++//
++//  Created by A667209 A667209 on 12/5/2567 BE.
++//  Copyright (c) 2567 BE ___ORGANIZATIONNAME___. All rights reserved.
++//
++//  This file was generated by the Clean Swift Xcode Templates so
++//  you can apply clean architecture to your iOS and Mac projects,
++//  see http://clean-swift.com
++//
++
++import UIKit
++
++protocol ProductSummaryBusinessLogic
++{
++  func doSomething(request: ProductSummary.Something.Request)
++}
++
++protocol ProductSummaryDataStore
++{
++  //var name: String { get set }
++}
++
++class ProductSummaryInteractor: ProductSummaryBusinessLogic, ProductSummaryDataStore
++{
++  var presenter: ProductSummaryPresentationLogic?
++  var worker: ProductSummaryWorker?
++  //var name: String = ""
++  
++  // MARK: Do something
++  
++  func doSomething(request: ProductSummary.Something.Request)
++  {
++    worker = ProductSummaryWorker()
++    worker?.doSomeWork()
++    
++    let response = ProductSummary.Something.Response()
++    presenter?.presentSomething(response: response)
++  }
++}
+diff --git a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryModels.swift b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryModels.swift
+new file mode 100644
+index 0000000..1ef2fb6
+--- /dev/null
++++ b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryModels.swift
+@@ -0,0 +1,31 @@
++//
++//  ProductSummaryModels.swift
++//  OPN-Challenge
++//
++//  Created by A667209 A667209 on 12/5/2567 BE.
++//  Copyright (c) 2567 BE ___ORGANIZATIONNAME___. All rights reserved.
++//
++//  This file was generated by the Clean Swift Xcode Templates so
++//  you can apply clean architecture to your iOS and Mac projects,
++//  see http://clean-swift.com
++//
++
++import UIKit
++
++enum ProductSummary
++{
++  // MARK: Use cases
++  
++  enum Something
++  {
++    struct Request
++    {
++    }
++    struct Response
++    {
++    }
++    struct ViewModel
++    {
++    }
++  }
++}
+diff --git a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryPresenter.swift b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryPresenter.swift
+new file mode 100644
+index 0000000..b504612
+--- /dev/null
++++ b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryPresenter.swift
+@@ -0,0 +1,31 @@
++//
++//  ProductSummaryPresenter.swift
++//  OPN-Challenge
++//
++//  Created by A667209 A667209 on 12/5/2567 BE.
++//  Copyright (c) 2567 BE ___ORGANIZATIONNAME___. All rights reserved.
++//
++//  This file was generated by the Clean Swift Xcode Templates so
++//  you can apply clean architecture to your iOS and Mac projects,
++//  see http://clean-swift.com
++//
++
++import UIKit
++
++protocol ProductSummaryPresentationLogic
++{
++  func presentSomething(response: ProductSummary.Something.Response)
++}
++
++class ProductSummaryPresenter: ProductSummaryPresentationLogic
++{
++  weak var viewController: ProductSummaryDisplayLogic?
++  
++  // MARK: Do something
++  
++  func presentSomething(response: ProductSummary.Something.Response)
++  {
++    let viewModel = ProductSummary.Something.ViewModel()
++    viewController?.displaySomething(viewModel: viewModel)
++  }
++}
+diff --git a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryRouter.swift b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryRouter.swift
+new file mode 100644
+index 0000000..22585ad
+--- /dev/null
++++ b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryRouter.swift
+@@ -0,0 +1,60 @@
++//
++//  ProductSummaryRouter.swift
++//  OPN-Challenge
++//
++//  Created by A667209 A667209 on 12/5/2567 BE.
++//  Copyright (c) 2567 BE ___ORGANIZATIONNAME___. All rights reserved.
++//
++//  This file was generated by the Clean Swift Xcode Templates so
++//  you can apply clean architecture to your iOS and Mac projects,
++//  see http://clean-swift.com
++//
++
++import UIKit
++
++@objc protocol ProductSummaryRoutingLogic
++{
++  //func routeToSomewhere(segue: UIStoryboardSegue?)
++}
++
++protocol ProductSummaryDataPassing
++{
++  var dataStore: ProductSummaryDataStore? { get }
++}
++
++class ProductSummaryRouter: NSObject, ProductSummaryRoutingLogic, ProductSummaryDataPassing
++{
++  weak var viewController: ProductSummaryViewController?
++  var dataStore: ProductSummaryDataStore?
++  
++  // MARK: Routing
++  
++  //func routeToSomewhere(segue: UIStoryboardSegue?)
++  //{
++  //  if let segue = segue {
++  //    let destinationVC = segue.destination as! SomewhereViewController
++  //    var destinationDS = destinationVC.router!.dataStore!
++  //    passDataToSomewhere(source: dataStore!, destination: &destinationDS)
++  //  } else {
++  //    let storyboard = UIStoryboard(name: "Main", bundle: nil)
++  //    let destinationVC = storyboard.instantiateViewController(withIdentifier: "SomewhereViewController") as! SomewhereViewController
++  //    var destinationDS = destinationVC.router!.dataStore!
++  //    passDataToSomewhere(source: dataStore!, destination: &destinationDS)
++  //    navigateToSomewhere(source: viewController!, destination: destinationVC)
++  //  }
++  //}
++
++  // MARK: Navigation
++  
++  //func navigateToSomewhere(source: ProductSummaryViewController, destination: SomewhereViewController)
++  //{
++  //  source.show(destination, sender: nil)
++  //}
++  
++  // MARK: Passing data
++  
++  //func passDataToSomewhere(source: ProductSummaryDataStore, destination: inout SomewhereDataStore)
++  //{
++  //  destination.name = source.name
++  //}
++}
+diff --git a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryViewController.swift b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryViewController.swift
+new file mode 100644
+index 0000000..4fca1ed
+--- /dev/null
++++ b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryViewController.swift
+@@ -0,0 +1,89 @@
++//
++//  ProductSummaryViewController.swift
++//  OPN-Challenge
++//
++//  Created by A667209 A667209 on 12/5/2567 BE.
++//  Copyright (c) 2567 BE ___ORGANIZATIONNAME___. All rights reserved.
++//
++//  This file was generated by the Clean Swift Xcode Templates so
++//  you can apply clean architecture to your iOS and Mac projects,
++//  see http://clean-swift.com
++//
++
++import UIKit
++
++protocol ProductSummaryDisplayLogic: class
++{
++  func displaySomething(viewModel: ProductSummary.Something.ViewModel)
++}
++
++class ProductSummaryViewController: UIViewController, ProductSummaryDisplayLogic
++{
++  var interactor: ProductSummaryBusinessLogic?
++  var router: (NSObjectProtocol & ProductSummaryRoutingLogic & ProductSummaryDataPassing)?
++
++  // MARK: Object lifecycle
++  
++  override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?)
++  {
++    super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
++    setup()
++  }
++  
++  required init?(coder aDecoder: NSCoder)
++  {
++    super.init(coder: aDecoder)
++    setup()
++  }
++  
++  // MARK: Setup
++  
++  private func setup()
++  {
++    let viewController = self
++    let interactor = ProductSummaryInteractor()
++    let presenter = ProductSummaryPresenter()
++    let router = ProductSummaryRouter()
++    viewController.interactor = interactor
++    viewController.router = router
++    interactor.presenter = presenter
++    presenter.viewController = viewController
++    router.viewController = viewController
++    router.dataStore = interactor
++  }
++  
++  // MARK: Routing
++  
++  override func prepare(for segue: UIStoryboardSegue, sender: Any?)
++  {
++    if let scene = segue.identifier {
++      let selector = NSSelectorFromString("routeTo\(scene)WithSegue:")
++      if let router = router, router.responds(to: selector) {
++        router.perform(selector, with: segue)
++      }
++    }
++  }
++  
++  // MARK: View lifecycle
++  
++  override func viewDidLoad()
++  {
++    super.viewDidLoad()
++    doSomething()
++  }
++  
++  // MARK: Do something
++  
++  //@IBOutlet weak var nameTextField: UITextField!
++  
++  func doSomething()
++  {
++    let request = ProductSummary.Something.Request()
++    interactor?.doSomething(request: request)
++  }
++  
++  func displaySomething(viewModel: ProductSummary.Something.ViewModel)
++  {
++    //nameTextField.text = viewModel.name
++  }
++}
+diff --git a/OPN-ChallengeTests/HomeProduct/Scenes/HomeProductInteractorTests.swift b/OPN-ChallengeTests/HomeProduct/Scenes/HomeProductInteractorTests.swift
+new file mode 100644
+index 0000000..d763889
+--- /dev/null
++++ b/OPN-ChallengeTests/HomeProduct/Scenes/HomeProductInteractorTests.swift
+@@ -0,0 +1,94 @@
++@testable import OPN_Challenge
++import XCTest
++
++class HomeProductInteractorTests: XCTestCase {
++    var sut: HomeProductInteractor?
++    
++    override func setUp() {
++        super.setUp()
++        sut = HomeProductInteractor()
++    }
++    
++    override func tearDown() {
++        sut = nil
++        super.tearDown()
++    }
++    
++    func test_updateCart() {
++        let spy = SpyHomeProductPresenter()
++        let stub = StubHomeProductService(result: .success)
++        sut = HomeProductInteractor(serviceConnection: stub)
++        sut?.presenter = spy
++        sut?.updateCart(
++            request: HomeProduct.ProductCart.Request(
++                productList: [],
++                totalPrice: 0,
++                totalProduct: 0
++            )
++        )
++        XCTAssertTrue(spy.presentProductCartCalled)
++    }
++    
++    func test_presentStoreInfo_success() {
++        let spy = SpyHomeProductPresenter()
++        let stub = StubHomeProductService(result: .success)
++        sut = HomeProductInteractor(serviceConnection: stub)
++        sut?.presenter = spy
++        sut?.getStoreInfoInquiry(request: .init(customAction: nil))
++        XCTAssertTrue(spy.presentStoreInfoCalled)
++    }
++    
++    func test_presentStoreInfo_error() {
++        let spy = SpyHomeProductPresenter()
++        let stub = StubHomeProductService(result: .error)
++        sut = HomeProductInteractor(serviceConnection: stub)
++        sut?.presenter = spy
++        sut?.getStoreInfoInquiry(request: .init(customAction: nil))
++        XCTAssertTrue(spy.presentErrorCalled)
++    }
++    
++    func test_presentProducts_success() {
++        let spy = SpyHomeProductPresenter()
++        let stub = StubHomeProductService(result: .success)
++        sut = HomeProductInteractor(serviceConnection: stub)
++        sut?.presenter = spy
++        sut?.getProductsInquiry(request: .init(customAction: nil))
++        XCTAssertTrue(spy.presentProductsCalled)
++    }
++    
++    func test_presentProducts_error() {
++        let spy = SpyHomeProductPresenter()
++        let stub = StubHomeProductService(result: .error)
++        sut = HomeProductInteractor(serviceConnection: stub)
++        sut?.presenter = spy
++        sut?.getProductsInquiry(request: .init(customAction: nil))
++        XCTAssertTrue(spy.presentErrorCalled)
++    }
++
++    
++}
++
++extension HomeProductInteractorTests {
++    class SpyHomeProductPresenter: HomeProductPresentationLogic {
++        var presentProductCartCalled = false
++        var presentStoreInfoCalled = false
++        var presentProductsCalled = false
++        var presentErrorCalled = false
++        
++        func presentProductCart(response: OPN_Challenge.HomeProduct.ProductCart.Response) {
++            presentProductCartCalled = true
++        }
++        
++        func presentStoreInfo(response: OPN_Challenge.HomeProduct.StoreInfoInquiry.Response) {
++            presentStoreInfoCalled = true
++        }
++        
++        func presentProducts(response: OPN_Challenge.HomeProduct.ProductsInquiry.Response) {
++            presentProductsCalled = true
++        }
++        
++        func presentError(response: OPN_Challenge.HomeProduct.HomeProductError.Response) {
++            presentErrorCalled = true
++        }
++    }
++}
+diff --git a/OPN-ChallengeTests/HomeProduct/Scenes/HomeProductPresenterTests.swift b/OPN-ChallengeTests/HomeProduct/Scenes/HomeProductPresenterTests.swift
+new file mode 100644
+index 0000000..4d0a4f0
+--- /dev/null
++++ b/OPN-ChallengeTests/HomeProduct/Scenes/HomeProductPresenterTests.swift
+@@ -0,0 +1,71 @@
++@testable import OPN_Challenge
++import XCTest
++
++class HomeProductPresenterTests: XCTestCase {
++    var sut: HomeProductPresenter?
++    
++    override func setUp() {
++        super.setUp()
++        sut = HomeProductPresenter()
++    }
++    
++    override func tearDown() {
++        sut = nil
++        super.tearDown()
++    }
++    
++    func test_presentProductCart() {
++        let spy = SpyHomeProductDisplay()
++        sut?.viewController = spy
++        sut?.presentProductCart(response: HomeProduct.ProductCart.Response(productList: [], totalPrice: 0, totalProduct: 0))
++        XCTAssertTrue(spy.displayProductCartCalled)
++    }
++    
++    func test_presentStoreInfo() {
++        let spy = SpyHomeProductDisplay()
++        sut?.viewController = spy
++        sut?.presentStoreInfo(response: HomeProduct.StoreInfoInquiry.Response(storeResponse: StoreInfoResponseModel()))
++        XCTAssertTrue(spy.displayStoreInfoCalled)
++    }
++    
++    func test_presentProducts() {
++        let spy = SpyHomeProductDisplay()
++        sut?.viewController = spy
++        sut?.presentProducts(response: HomeProduct.ProductsInquiry.Response(productsResponse: []))
++        XCTAssertTrue(spy.displayProductsCalled)
++    }
++    
++    func test_presentError() {
++        let spy = SpyHomeProductDisplay()
++        sut?.viewController = spy
++        sut?.presentError(response: HomeProduct.HomeProductError.Response(serviceError: APIError(error: BaseServiceError(name: "MOCK", header: "MOCK", message: "MOCK")), customAction: nil))
++        XCTAssertTrue(spy.displayErrorCalled)
++    }
++    
++}
++
++extension HomeProductPresenterTests {
++    class SpyHomeProductDisplay: HomeProductDisplayLogic {
++        var displayProductCartCalled = false
++        var displayStoreInfoCalled = false
++        var displayProductsCalled = false
++        var displayErrorCalled = false
++        
++        func displayProductCart(viewModel: OPN_Challenge.HomeProduct.ProductCart.ViewModel) {
++            displayProductCartCalled = true
++        }
++        
++        func displayStoreInfo(viewModel: OPN_Challenge.HomeProduct.StoreInfoInquiry.ViewModel) {
++            displayStoreInfoCalled = true
++        }
++        
++        func displayProducts(viewModel: OPN_Challenge.HomeProduct.ProductsInquiry.ViewModel) {
++            displayProductsCalled = true
++        }
++        
++        func displayError(viewModel: OPN_Challenge.HomeProduct.HomeProductError.ViewModel) {
++            displayErrorCalled = true
++        }
++        
++    }
++}
+diff --git a/OPN-ChallengeTests/HomeProduct/Stubs/StubHomeProductService.swift b/OPN-ChallengeTests/HomeProduct/Stubs/StubHomeProductService.swift
+new file mode 100644
+index 0000000..206f53e
+--- /dev/null
++++ b/OPN-ChallengeTests/HomeProduct/Stubs/StubHomeProductService.swift
+@@ -0,0 +1,33 @@
++import Moya
++@testable import OPN_Challenge
++
++class StubHomeProductService: ServiceConnection {
++    enum Result {
++        case success, error
++    }
++    
++    private let result: Result
++    
++    init(result: Result) {
++        self.result = result
++        super.init()
++    }
++    
++    override func storeInfoService(completionHandler: @escaping (StoreInfoResponseModel) -> Void, errorHandler: @escaping ((any ServiceError)?) -> Void) {
++        switch result {
++        case .success:
++            completionHandler(StoreInfoResponseModel(name: "TEST", rating: 5.0, openingTime: "15:01:01.772Z", closingTime: "19:45:51.365Z"))
++        case .error:
++            errorHandler(APIError(error: BaseServiceError(name: "MOCK", header: "MOCK", message: "MOCK")))
++        }
++    }
++    
++    override func productsService(completionHandler: @escaping (([ProductsResponseModel]) -> Void), errorHandler: @escaping ((any ServiceError)?) -> Void) {
++        switch result {
++        case .success:
++            completionHandler([ProductsResponseModel(name: "TEST", price: 50, imageUrl: "imageURL")])
++        case .error:
++            errorHandler(APIError(error: BaseServiceError(name: "MOCK", header: "MOCK", message: "MOCK")))
++        }
++    }
++}
+diff --git a/OPN-ChallengeTests/OPN_ChallengeTests.swift b/OPN-ChallengeTests/OPN_ChallengeTests.swift
+deleted file mode 100644
+index 91ffb56..0000000
+--- a/OPN-ChallengeTests/OPN_ChallengeTests.swift
++++ /dev/null
+@@ -1,36 +0,0 @@
+-//
+-//  OPN_ChallengeTests.swift
+-//  OPN-ChallengeTests
+-//
+-//  Created by A667209 A667209 on 12/5/2567 BE.
+-//
+-
+-import XCTest
+-@testable import OPN_Challenge
+-
+-final class OPN_ChallengeTests: XCTestCase {
+-
+-    override func setUpWithError() throws {
+-        // Put setup code here. This method is called before the invocation of each test method in the class.
+-    }
+-
+-    override func tearDownWithError() throws {
+-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+-    }
+-
+-    func testExample() throws {
+-        // This is an example of a functional test case.
+-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+-        // Any test you write for XCTest can be annotated as throws and async.
+-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
+-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
+-    }
+-
+-    func testPerformanceExample() throws {
+-        // This is an example of a performance test case.
+-        self.measure {
+-            // Put the code you want to measure the time of here.
+-        }
+-    }
+-
+-}
+diff --git a/OPN-ChallengeUITests/OPN_ChallengeUITests.swift b/OPN-ChallengeUITests/OPN_ChallengeUITests.swift
+deleted file mode 100644
+index 581aac4..0000000
+--- a/OPN-ChallengeUITests/OPN_ChallengeUITests.swift
++++ /dev/null
+@@ -1,41 +0,0 @@
+-//
+-//  OPN_ChallengeUITests.swift
+-//  OPN-ChallengeUITests
+-//
+-//  Created by A667209 A667209 on 12/5/2567 BE.
+-//
+-
+-import XCTest
+-
+-final class OPN_ChallengeUITests: XCTestCase {
+-
+-    override func setUpWithError() throws {
+-        // Put setup code here. This method is called before the invocation of each test method in the class.
+-
+-        // In UI tests it is usually best to stop immediately when a failure occurs.
+-        continueAfterFailure = false
+-
+-        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
+-    }
+-
+-    override func tearDownWithError() throws {
+-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+-    }
+-
+-    func testExample() throws {
+-        // UI tests must launch the application that they test.
+-        let app = XCUIApplication()
+-        app.launch()
+-
+-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+-    }
+-
+-    func testLaunchPerformance() throws {
+-        if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
+-            // This measures how long it takes to launch your application.
+-            measure(metrics: [XCTApplicationLaunchMetric()]) {
+-                XCUIApplication().launch()
+-            }
+-        }
+-    }
+-}
+diff --git a/OPN-ChallengeUITests/OPN_ChallengeUITestsLaunchTests.swift b/OPN-ChallengeUITests/OPN_ChallengeUITestsLaunchTests.swift
+deleted file mode 100644
+index 8b1eadf..0000000
+--- a/OPN-ChallengeUITests/OPN_ChallengeUITestsLaunchTests.swift
++++ /dev/null
+@@ -1,32 +0,0 @@
+-//
+-//  OPN_ChallengeUITestsLaunchTests.swift
+-//  OPN-ChallengeUITests
+-//
+-//  Created by A667209 A667209 on 12/5/2567 BE.
+-//
+-
+-import XCTest
+-
+-final class OPN_ChallengeUITestsLaunchTests: XCTestCase {
+-
+-    override class var runsForEachTargetApplicationUIConfiguration: Bool {
+-        true
+-    }
+-
+-    override func setUpWithError() throws {
+-        continueAfterFailure = false
+-    }
+-
+-    func testLaunch() throws {
+-        let app = XCUIApplication()
+-        app.launch()
+-
+-        // Insert steps here to perform after app launch but before taking a screenshot,
+-        // such as logging into a test account or navigating somewhere in the app
+-
+-        let attachment = XCTAttachment(screenshot: app.screenshot())
+-        attachment.name = "Launch Screen"
+-        attachment.lifetime = .keepAlways
+-        add(attachment)
+-    }
+-}
+-- 
+2.39.3 (Apple Git-146)
+

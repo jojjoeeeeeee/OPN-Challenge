@@ -1,0 +1,838 @@
+From f73451e858f9a886940c5b40ede23f53262e2f73 Mon Sep 17 00:00:00 2001
+From: "phakkharachate.j" <phakkharachate.j@arise.tech>
+Date: Mon, 13 May 2024 05:49:26 +0700
+Subject: [PATCH 7/8] [TCxOPN] added OrderSuccess Scene, flow & added context
+ remember between scene logic & added HomeProduct UnitTest TestCases
+
+---
+ OPN-Challenge.xcodeproj/project.pbxproj       |  32 ++++
+ .../HomeProduct/HomeProductInteractor.swift   |  15 ++
+ .../HomeProduct/HomeProductModels.swift       |  14 ++
+ .../HomeProduct/HomeProductPresenter.swift    |   5 +
+ .../HomeProductViewController.swift           |  36 +++-
+ .../OrderSuccess/OrderSuccess.storyboard      | 161 ++++++++++++++++++
+ .../OrderSuccess/OrderSuccessInteractor.swift |  12 ++
+ .../OrderSuccess/OrderSuccessModels.swift     |   3 +
+ .../OrderSuccess/OrderSuccessPresenter.swift  |   7 +
+ .../OrderSuccess/OrderSuccessRouter.swift     |  32 ++++
+ .../OrderSuccessViewController.swift          |  71 ++++++++
+ .../ProductSummary/ProductSummaryRouter.swift |  23 ++-
+ .../ProductSummaryViewController.swift        |  38 ++++-
+ OPN-Challenge/Service/BaseService.swift       |   2 +-
+ OPN-Challenge/Utilities/ImageUtils.swift      |   2 +-
+ .../Scenes/HomeProductInteractorTests.swift   |  21 +++
+ .../Scenes/HomeProductPresenterTests.swift    |  10 ++
+ 17 files changed, 469 insertions(+), 15 deletions(-)
+ create mode 100644 OPN-Challenge/Scenes/OrderSuccess/OrderSuccess.storyboard
+ create mode 100644 OPN-Challenge/Scenes/OrderSuccess/OrderSuccessInteractor.swift
+ create mode 100644 OPN-Challenge/Scenes/OrderSuccess/OrderSuccessModels.swift
+ create mode 100644 OPN-Challenge/Scenes/OrderSuccess/OrderSuccessPresenter.swift
+ create mode 100644 OPN-Challenge/Scenes/OrderSuccess/OrderSuccessRouter.swift
+ create mode 100644 OPN-Challenge/Scenes/OrderSuccess/OrderSuccessViewController.swift
+
+diff --git a/OPN-Challenge.xcodeproj/project.pbxproj b/OPN-Challenge.xcodeproj/project.pbxproj
+index 3b333ed..0936651 100644
+--- a/OPN-Challenge.xcodeproj/project.pbxproj
++++ b/OPN-Challenge.xcodeproj/project.pbxproj
+@@ -59,6 +59,12 @@
+ 		73CE6B5D2BF15D430052CD8B /* StubProductSummaryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B5C2BF15D430052CD8B /* StubProductSummaryService.swift */; };
+ 		73CE6B5F2BF15D500052CD8B /* ProductSummaryInteractorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B5E2BF15D500052CD8B /* ProductSummaryInteractorTests.swift */; };
+ 		73CE6B612BF15D560052CD8B /* ProductSummaryPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B602BF15D560052CD8B /* ProductSummaryPresenterTests.swift */; };
++		73CE6B692BF164C60052CD8B /* OrderSuccessPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B632BF164C60052CD8B /* OrderSuccessPresenter.swift */; };
++		73CE6B6B2BF164C60052CD8B /* OrderSuccessRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B652BF164C60052CD8B /* OrderSuccessRouter.swift */; };
++		73CE6B6C2BF164C60052CD8B /* OrderSuccessModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B662BF164C60052CD8B /* OrderSuccessModels.swift */; };
++		73CE6B6D2BF164C60052CD8B /* OrderSuccessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B672BF164C60052CD8B /* OrderSuccessViewController.swift */; };
++		73CE6B6E2BF164C60052CD8B /* OrderSuccessInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B682BF164C60052CD8B /* OrderSuccessInteractor.swift */; };
++		73CE6B702BF165630052CD8B /* OrderSuccess.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 73CE6B6F2BF165630052CD8B /* OrderSuccess.storyboard */; };
+ 		AA06D3D5FD48A457D3189C5C /* Pods_OPN_ChallengeTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBC011E77B1AF7ADBC527B7E /* Pods_OPN_ChallengeTests.framework */; };
+ 		B6DEC6E51521EC1B2633083C /* Pods_OPN_Challenge_OPN_ChallengeUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F457EF9EFD3978A42D1B43EB /* Pods_OPN_Challenge_OPN_ChallengeUITests.framework */; };
+ 		DFCEF3341560DBA2A56575C0 /* Pods_OPN_Challenge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B18C9219862D4F67521B275C /* Pods_OPN_Challenge.framework */; };
+@@ -142,6 +148,12 @@
+ 		73CE6B5C2BF15D430052CD8B /* StubProductSummaryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StubProductSummaryService.swift; sourceTree = "<group>"; };
+ 		73CE6B5E2BF15D500052CD8B /* ProductSummaryInteractorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductSummaryInteractorTests.swift; sourceTree = "<group>"; };
+ 		73CE6B602BF15D560052CD8B /* ProductSummaryPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductSummaryPresenterTests.swift; sourceTree = "<group>"; };
++		73CE6B632BF164C60052CD8B /* OrderSuccessPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderSuccessPresenter.swift; sourceTree = "<group>"; };
++		73CE6B652BF164C60052CD8B /* OrderSuccessRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderSuccessRouter.swift; sourceTree = "<group>"; };
++		73CE6B662BF164C60052CD8B /* OrderSuccessModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderSuccessModels.swift; sourceTree = "<group>"; };
++		73CE6B672BF164C60052CD8B /* OrderSuccessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderSuccessViewController.swift; sourceTree = "<group>"; };
++		73CE6B682BF164C60052CD8B /* OrderSuccessInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderSuccessInteractor.swift; sourceTree = "<group>"; };
++		73CE6B6F2BF165630052CD8B /* OrderSuccess.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = OrderSuccess.storyboard; sourceTree = "<group>"; };
+ 		7D4AB8114A17238EF43803E6 /* Pods-OPN-Challenge.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OPN-Challenge.release.xcconfig"; path = "Target Support Files/Pods-OPN-Challenge/Pods-OPN-Challenge.release.xcconfig"; sourceTree = "<group>"; };
+ 		B18C9219862D4F67521B275C /* Pods_OPN_Challenge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OPN_Challenge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+ 		C453A3A53A15AE7491B28818 /* Pods-OPN-ChallengeTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OPN-ChallengeTests.debug.xcconfig"; path = "Target Support Files/Pods-OPN-ChallengeTests/Pods-OPN-ChallengeTests.debug.xcconfig"; sourceTree = "<group>"; };
+@@ -288,6 +300,7 @@
+ 			isa = PBXGroup;
+ 			children = (
+ 				739556552BF0DF53004AC74E /* CommonView */,
++				73CE6B622BF164AD0052CD8B /* OrderSuccess */,
+ 				73CE6B442BF102BE0052CD8B /* ProductSummary */,
+ 				7395560F2BEFFBEA004AC74E /* HomeProduct */,
+ 			);
+@@ -417,6 +430,19 @@
+ 			path = Scenes;
+ 			sourceTree = "<group>";
+ 		};
++		73CE6B622BF164AD0052CD8B /* OrderSuccess */ = {
++			isa = PBXGroup;
++			children = (
++				73CE6B632BF164C60052CD8B /* OrderSuccessPresenter.swift */,
++				73CE6B652BF164C60052CD8B /* OrderSuccessRouter.swift */,
++				73CE6B662BF164C60052CD8B /* OrderSuccessModels.swift */,
++				73CE6B672BF164C60052CD8B /* OrderSuccessViewController.swift */,
++				73CE6B682BF164C60052CD8B /* OrderSuccessInteractor.swift */,
++				73CE6B6F2BF165630052CD8B /* OrderSuccess.storyboard */,
++			);
++			path = OrderSuccess;
++			sourceTree = "<group>";
++		};
+ 		DA86BAAF8F2830EE47419387 /* Pods */ = {
+ 			isa = PBXGroup;
+ 			children = (
+@@ -552,6 +578,7 @@
+ 				73CE6B522BF102EA0052CD8B /* ProductSummary.storyboard in Resources */,
+ 				739555E92BEFF8E0004AC74E /* Assets.xcassets in Resources */,
+ 				739555EC2BEFF8E0004AC74E /* Base in Resources */,
++				73CE6B702BF165630052CD8B /* OrderSuccess.storyboard in Resources */,
+ 				739556322BF018F0004AC74E /* ProductTableViewCell.xib in Resources */,
+ 				739555E72BEFF8DA004AC74E /* Base in Resources */,
+ 				7395565F2BF0DF5F004AC74E /* UILoadingFullView.xib in Resources */,
+@@ -722,6 +749,11 @@
+ 				739556602BF0DF5F004AC74E /* UILoadingFullViewInteractor.swift in Sources */,
+ 				739556372BF028B6004AC74E /* ImageUtils.swift in Sources */,
+ 				739556412BF0C81D004AC74E /* Environment.swift in Sources */,
++				73CE6B692BF164C60052CD8B /* OrderSuccessPresenter.swift in Sources */,
++				73CE6B6B2BF164C60052CD8B /* OrderSuccessRouter.swift in Sources */,
++				73CE6B6C2BF164C60052CD8B /* OrderSuccessModels.swift in Sources */,
++				73CE6B6D2BF164C60052CD8B /* OrderSuccessViewController.swift in Sources */,
++				73CE6B6E2BF164C60052CD8B /* OrderSuccessInteractor.swift in Sources */,
+ 			);
+ 			runOnlyForDeploymentPostprocessing = 0;
+ 		};
+diff --git a/OPN-Challenge/Scenes/HomeProduct/HomeProductInteractor.swift b/OPN-Challenge/Scenes/HomeProduct/HomeProductInteractor.swift
+index 90c4f24..b71b32c 100644
+--- a/OPN-Challenge/Scenes/HomeProduct/HomeProductInteractor.swift
++++ b/OPN-Challenge/Scenes/HomeProduct/HomeProductInteractor.swift
+@@ -2,12 +2,17 @@ protocol HomeProductBusinessLogic {
+     func updateCart(request: HomeProduct.ProductCart.Request)
+     func getStoreInfoInquiry(request: HomeProduct.StoreInfoInquiry.Request)
+     func getProductsInquiry(request: HomeProduct.ProductsInquiry.Request)
++    func handleCallBack(request: HomeProduct.HomeProductCallBackFlow.Request)
+ }
+ 
+ protocol HomeProductDataStore {
++    var callBack: HomeProduct.HomeProductCallBack? { get set }
++    var productCartContext: HomeProduct.ProductCartContext? { get set }
+ }
+ 
+ class HomeProductInteractor: HomeProductBusinessLogic, HomeProductDataStore {
++    var productCartContext: HomeProduct.ProductCartContext?
++    var callBack: HomeProduct.HomeProductCallBack?
+     var presenter: HomeProductPresentationLogic?
+     let serviceConnection: ServiceConnection
+     
+@@ -43,4 +48,14 @@ class HomeProductInteractor: HomeProductBusinessLogic, HomeProductDataStore {
+             )
+         })
+     }
++    
++    func handleCallBack(request: HomeProduct.HomeProductCallBackFlow.Request) {
++        switch request.callBack {
++        case .orderSuccess:
++            presenter?.presentBeginFetchFlow(response: HomeProduct.HomeProductCallBackFlow.Response())
++        default:
++            break
++        }
++        callBack = nil
++    }
+ }
+diff --git a/OPN-Challenge/Scenes/HomeProduct/HomeProductModels.swift b/OPN-Challenge/Scenes/HomeProduct/HomeProductModels.swift
+index 15e6210..96f058a 100644
+--- a/OPN-Challenge/Scenes/HomeProduct/HomeProductModels.swift
++++ b/OPN-Challenge/Scenes/HomeProduct/HomeProductModels.swift
+@@ -78,4 +78,18 @@ enum HomeProduct {
+         let totalProduct: Int
+         let delivery_address: String?
+     }
++    
++    enum HomeProductCallBackFlow {
++        struct Request {
++            let callBack: HomeProductCallBack?
++        }
++        struct Response {
++        }
++        struct ViewModel {
++        }
++    }
++    
++    enum HomeProductCallBack {
++        case orderSuccess
++    }
+ }
+diff --git a/OPN-Challenge/Scenes/HomeProduct/HomeProductPresenter.swift b/OPN-Challenge/Scenes/HomeProduct/HomeProductPresenter.swift
+index ebc7b84..5f4dd59 100644
+--- a/OPN-Challenge/Scenes/HomeProduct/HomeProductPresenter.swift
++++ b/OPN-Challenge/Scenes/HomeProduct/HomeProductPresenter.swift
+@@ -5,6 +5,7 @@ protocol HomeProductPresentationLogic {
+     func presentStoreInfo(response: HomeProduct.StoreInfoInquiry.Response)
+     func presentProducts(response: HomeProduct.ProductsInquiry.Response)
+     func presentError(response: HomeProduct.HomeProductError.Response)
++    func presentBeginFetchFlow(response: HomeProduct.HomeProductCallBackFlow.Response)
+ }
+ 
+ class HomeProductPresenter: HomeProductPresentationLogic {
+@@ -61,4 +62,8 @@ class HomeProductPresenter: HomeProductPresentationLogic {
+             }
+         }
+     }
++    
++    func presentBeginFetchFlow(response: HomeProduct.HomeProductCallBackFlow.Response) {
++        viewController?.beginFetchFlow(viewModel: HomeProduct.HomeProductCallBackFlow.ViewModel())
++    }
+ }
+diff --git a/OPN-Challenge/Scenes/HomeProduct/HomeProductViewController.swift b/OPN-Challenge/Scenes/HomeProduct/HomeProductViewController.swift
+index 735a288..f17ef23 100644
+--- a/OPN-Challenge/Scenes/HomeProduct/HomeProductViewController.swift
++++ b/OPN-Challenge/Scenes/HomeProduct/HomeProductViewController.swift
+@@ -5,6 +5,7 @@ protocol HomeProductDisplayLogic: AnyObject {
+     func displayStoreInfo(viewModel: HomeProduct.StoreInfoInquiry.ViewModel)
+     func displayProducts(viewModel: HomeProduct.ProductsInquiry.ViewModel)
+     func displayError(viewModel: HomeProduct.HomeProductError.ViewModel)
++    func beginFetchFlow(viewModel: HomeProduct.HomeProductCallBackFlow.ViewModel)
+ }
+ 
+ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
+@@ -59,11 +60,36 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
+     
+     override func viewDidLoad() {
+         super.viewDidLoad()
+-        router?.showFullViewLoading(destination: uiLoadingFullView)
+         setupView()
++        beginFetchFlow(viewModel: HomeProduct.HomeProductCallBackFlow.ViewModel())
++    }
++    
++    override func viewWillAppear(_ animated: Bool) {
++        super.viewWillAppear(animated)
++        let callBack = router?.dataStore?.callBack
++        interactor?.handleCallBack(request: HomeProduct.HomeProductCallBackFlow.Request(callBack: callBack))
++    }
++    
++    func beginFetchFlow(viewModel: HomeProduct.HomeProductCallBackFlow.ViewModel) {
++        productCart = []
++        totalPrice = 0
++        totalProduct = 0
++        enableNextButton(false)
++        productTableView.reloadData()
++        showLoading()
+         fetchInitialProducts()
+     }
+     
++    func showLoading() {
++        router?.showFullViewLoading(destination: uiLoadingFullView)
++    }
++    
++    func hideLoading() {
++        DispatchQueue.main.async { [weak self] in
++            self?.uiLoadingFullView.interactor?.showLoading(request: UILoadingFullView.Loading.Request(show: false))
++        }
++    }
++    
+     private func setupView() {
+         headerView.backgroundColor = .glass
+         headerView.roundCorner(cornerRadius: 8)
+@@ -117,9 +143,7 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
+         storeNameLabel.text = storeInfo.name
+         businessHoursLabel.text = storeInfo.businessHours
+         rateLabel.text = storeInfo.rating
+-        DispatchQueue.main.async { [weak self] in
+-            self?.uiLoadingFullView.interactor?.showLoading(request: UILoadingFullView.Loading.Request(show: false))
+-        }
++        hideLoading()
+     }
+     
+     func displayProducts(viewModel: HomeProduct.ProductsInquiry.ViewModel) {
+@@ -140,7 +164,7 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
+     
+     private func showLoadingAndFetchAgain(fetchAction: (() -> Void)?) {
+         guard let action = fetchAction else { return }
+-        router?.showFullViewLoading(destination: uiLoadingFullView)
++        showLoading()
+         action()
+     }
+     
+@@ -188,7 +212,7 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
+                 productList: productCart,
+                 totalPrice: totalPrice,
+                 totalProduct: totalProduct,
+-                delivery_address: nil
++                delivery_address: router?.dataStore?.productCartContext?.delivery_address ?? nil
+             )
+         )
+     }
+diff --git a/OPN-Challenge/Scenes/OrderSuccess/OrderSuccess.storyboard b/OPN-Challenge/Scenes/OrderSuccess/OrderSuccess.storyboard
+new file mode 100644
+index 0000000..e38a1f5
+--- /dev/null
++++ b/OPN-Challenge/Scenes/OrderSuccess/OrderSuccess.storyboard
+@@ -0,0 +1,161 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
++    <device id="retina6_12" orientation="portrait" appearance="light"/>
++    <dependencies>
++        <deployment identifier="iOS"/>
++        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
++        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
++        <capability name="System colors in document resources" minToolsVersion="11.0"/>
++        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
++    </dependencies>
++    <scenes>
++        <!--Order Success View Controller-->
++        <scene sceneID="s0d-6b-0kx">
++            <objects>
++                <viewController storyboardIdentifier="OrderSuccess" id="Y6W-OH-hqX" customClass="OrderSuccessViewController" customModule="OPN_Challenge" customModuleProvider="target" sceneMemberID="viewController">
++                    <view key="view" contentMode="scaleToFill" id="5EZ-qb-Rvc">
++                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
++                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
++                        <subviews>
++                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="checkmark.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="SO0-gd-xvM">
++                                <rect key="frame" x="149" y="283.66666666666669" width="95" height="93.666666666666686"/>
++                                <color key="tintColor" red="0.55156713719999995" green="0.34558042880000001" blue="0.64526998999999996" alpha="1" colorSpace="custom" customColorSpace="adobeRGB1998"/>
++                                <constraints>
++                                    <constraint firstAttribute="width" constant="95" id="eev-xU-6id"/>
++                                    <constraint firstAttribute="height" constant="95" id="rlj-lK-uF8"/>
++                                </constraints>
++                            </imageView>
++                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="aE9-Z8-9t8">
++                                <rect key="frame" x="16" y="401.66666666666669" width="361" height="49"/>
++                                <subviews>
++                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Congratulation!" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8wP-Zv-9jb">
++                                        <rect key="frame" x="0.0" y="0.0" width="361" height="21.666666666666668"/>
++                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
++                                        <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++                                        <nil key="highlightedColor"/>
++                                    </label>
++                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Your order has been placed." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RhA-PM-3js">
++                                        <rect key="frame" x="0.0" y="29.666666666666629" width="361" height="19.333333333333329"/>
++                                        <fontDescription key="fontDescription" type="system" pointSize="16"/>
++                                        <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++                                        <nil key="highlightedColor"/>
++                                    </label>
++                                </subviews>
++                            </stackView>
++                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Yed-Mo-rLn" userLabel="Bottom View">
++                                <rect key="frame" x="0.0" y="738" width="393" height="114"/>
++                                <subviews>
++                                    <stackView opaque="NO" contentMode="scaleToFill" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="b4w-jT-Vl5">
++                                        <rect key="frame" x="16" y="16" width="361" height="48"/>
++                                        <subviews>
++                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="EhB-7b-lKN">
++                                                <rect key="frame" x="0.0" y="0.0" width="0.0" height="48"/>
++                                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++                                                <constraints>
++                                                    <constraint firstAttribute="width" id="e8V-Rt-TR9"/>
++                                                </constraints>
++                                            </view>
++                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" text="Done" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="apZ-Ta-9dP">
++                                                <rect key="frame" x="16" y="0.0" width="329" height="48"/>
++                                                <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
++                                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++                                                <nil key="highlightedColor"/>
++                                            </label>
++                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="quj-bE-81f">
++                                                <rect key="frame" x="361" y="0.0" width="0.0" height="48"/>
++                                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++                                                <constraints>
++                                                    <constraint firstAttribute="width" id="Clq-q5-OAE"/>
++                                                </constraints>
++                                            </view>
++                                        </subviews>
++                                        <color key="backgroundColor" red="0.55156713719999995" green="0.34558042880000001" blue="0.64526998999999996" alpha="1" colorSpace="custom" customColorSpace="adobeRGB1998"/>
++                                        <constraints>
++                                            <constraint firstAttribute="height" constant="48" id="tER-ij-8Ah"/>
++                                        </constraints>
++                                        <userDefinedRuntimeAttributes>
++                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
++                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isHiddenWhenSkeletonIsActive" value="YES"/>
++                                        </userDefinedRuntimeAttributes>
++                                    </stackView>
++                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="s26-14-1ah" userLabel="Next Button">
++                                        <rect key="frame" x="16" y="16" width="361" height="48"/>
++                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++                                        <constraints>
++                                            <constraint firstAttribute="height" constant="48" id="Er6-Vl-GlT"/>
++                                        </constraints>
++                                        <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="18"/>
++                                        <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++                                        <state key="normal">
++                                            <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++                                        </state>
++                                        <userDefinedRuntimeAttributes>
++                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
++                                                <real key="value" value="8"/>
++                                            </userDefinedRuntimeAttribute>
++                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
++                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isHiddenWhenSkeletonIsActive" value="YES"/>
++                                        </userDefinedRuntimeAttributes>
++                                        <connections>
++                                            <action selector="onTappedDone:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="b41-SA-drA"/>
++                                        </connections>
++                                    </button>
++                                </subviews>
++                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++                                <constraints>
++                                    <constraint firstAttribute="trailing" secondItem="s26-14-1ah" secondAttribute="trailing" constant="16" id="30u-PD-x3l"/>
++                                    <constraint firstItem="s26-14-1ah" firstAttribute="leading" secondItem="Yed-Mo-rLn" secondAttribute="leading" constant="16" id="4Nl-3N-rsW"/>
++                                    <constraint firstItem="b4w-jT-Vl5" firstAttribute="leading" secondItem="Yed-Mo-rLn" secondAttribute="leading" constant="16" id="4gQ-3w-IZu"/>
++                                    <constraint firstItem="b4w-jT-Vl5" firstAttribute="top" secondItem="Yed-Mo-rLn" secondAttribute="top" constant="16" id="66K-Kw-VKS"/>
++                                    <constraint firstAttribute="trailing" secondItem="b4w-jT-Vl5" secondAttribute="trailing" constant="16" id="hLs-rv-fXu"/>
++                                    <constraint firstItem="s26-14-1ah" firstAttribute="centerY" secondItem="b4w-jT-Vl5" secondAttribute="centerY" id="iq0-cS-tMu"/>
++                                </constraints>
++                                <userDefinedRuntimeAttributes>
++                                    <userDefinedRuntimeAttribute type="color" keyPath="hShadowColor">
++                                        <color key="value" red="0.0" green="0.0" blue="0.0" alpha="0.1035820578" colorSpace="custom" customColorSpace="sRGB"/>
++                                    </userDefinedRuntimeAttribute>
++                                    <userDefinedRuntimeAttribute type="number" keyPath="hShadowOpacity">
++                                        <real key="value" value="1"/>
++                                    </userDefinedRuntimeAttribute>
++                                    <userDefinedRuntimeAttribute type="number" keyPath="hShadowRadius">
++                                        <real key="value" value="12"/>
++                                    </userDefinedRuntimeAttribute>
++                                    <userDefinedRuntimeAttribute type="size" keyPath="hShadowOffset">
++                                        <size key="value" width="0.0" height="-4"/>
++                                    </userDefinedRuntimeAttribute>
++                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
++                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isHiddenWhenSkeletonIsActive" value="YES"/>
++                                </userDefinedRuntimeAttributes>
++                            </view>
++                        </subviews>
++                        <viewLayoutGuide key="safeArea" id="vDu-zF-Fre"/>
++                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
++                        <constraints>
++                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="Yed-Mo-rLn" secondAttribute="trailing" id="7EI-i3-faJ"/>
++                            <constraint firstItem="aE9-Z8-9t8" firstAttribute="leading" secondItem="5EZ-qb-Rvc" secondAttribute="leading" constant="16" id="7VM-rc-x4C"/>
++                            <constraint firstItem="Yed-Mo-rLn" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="Ftw-31-Ve0"/>
++                            <constraint firstItem="aE9-Z8-9t8" firstAttribute="centerY" secondItem="5EZ-qb-Rvc" secondAttribute="centerY" id="K9h-Vz-aa4"/>
++                            <constraint firstAttribute="bottom" secondItem="Yed-Mo-rLn" secondAttribute="bottom" id="Nh1-CU-QLf"/>
++                            <constraint firstAttribute="trailing" secondItem="aE9-Z8-9t8" secondAttribute="trailing" constant="16" id="V9u-ia-xkF"/>
++                            <constraint firstItem="aE9-Z8-9t8" firstAttribute="top" secondItem="SO0-gd-xvM" secondAttribute="bottom" constant="24" id="ZH9-j8-0oB"/>
++                            <constraint firstItem="SO0-gd-xvM" firstAttribute="centerX" secondItem="vDu-zF-Fre" secondAttribute="centerX" id="b6S-yV-gML"/>
++                            <constraint firstItem="vDu-zF-Fre" firstAttribute="bottom" secondItem="b4w-jT-Vl5" secondAttribute="bottom" constant="16" id="tqP-tN-fG5"/>
++                        </constraints>
++                    </view>
++                    <connections>
++                        <outlet property="bottomStackView" destination="b4w-jT-Vl5" id="mep-E7-TKy"/>
++                        <outlet property="bottomView" destination="Yed-Mo-rLn" id="z1e-f9-dlZ"/>
++                    </connections>
++                </viewController>
++                <placeholder placeholderIdentifier="IBFirstResponder" id="Ief-a0-LHa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
++            </objects>
++            <point key="canvasLocation" x="-5.343511450381679" y="3.5211267605633805"/>
++        </scene>
++    </scenes>
++    <resources>
++        <image name="checkmark.circle.fill" catalog="system" width="128" height="123"/>
++        <systemColor name="systemBackgroundColor">
++            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++        </systemColor>
++    </resources>
++</document>
+diff --git a/OPN-Challenge/Scenes/OrderSuccess/OrderSuccessInteractor.swift b/OPN-Challenge/Scenes/OrderSuccess/OrderSuccessInteractor.swift
+new file mode 100644
+index 0000000..97c1485
+--- /dev/null
++++ b/OPN-Challenge/Scenes/OrderSuccess/OrderSuccessInteractor.swift
+@@ -0,0 +1,12 @@
++import UIKit
++
++protocol OrderSuccessBusinessLogic {
++}
++
++protocol OrderSuccessDataStore{
++}
++
++class OrderSuccessInteractor: OrderSuccessBusinessLogic, OrderSuccessDataStore {
++    var presenter: OrderSuccessPresentationLogic?
++    
++}
+diff --git a/OPN-Challenge/Scenes/OrderSuccess/OrderSuccessModels.swift b/OPN-Challenge/Scenes/OrderSuccess/OrderSuccessModels.swift
+new file mode 100644
+index 0000000..2d714ec
+--- /dev/null
++++ b/OPN-Challenge/Scenes/OrderSuccess/OrderSuccessModels.swift
+@@ -0,0 +1,3 @@
++enum OrderSuccess{
++
++}
+diff --git a/OPN-Challenge/Scenes/OrderSuccess/OrderSuccessPresenter.swift b/OPN-Challenge/Scenes/OrderSuccess/OrderSuccessPresenter.swift
+new file mode 100644
+index 0000000..5f57d64
+--- /dev/null
++++ b/OPN-Challenge/Scenes/OrderSuccess/OrderSuccessPresenter.swift
+@@ -0,0 +1,7 @@
++protocol OrderSuccessPresentationLogic {
++}
++
++class OrderSuccessPresenter: OrderSuccessPresentationLogic {
++    weak var viewController: OrderSuccessDisplayLogic?
++    
++}
+diff --git a/OPN-Challenge/Scenes/OrderSuccess/OrderSuccessRouter.swift b/OPN-Challenge/Scenes/OrderSuccess/OrderSuccessRouter.swift
+new file mode 100644
+index 0000000..62d22c4
+--- /dev/null
++++ b/OPN-Challenge/Scenes/OrderSuccess/OrderSuccessRouter.swift
+@@ -0,0 +1,32 @@
++protocol OrderSuccessRoutingLogic {
++    func routeToHome()
++}
++
++protocol OrderSuccessDataPassing {
++    var dataStore: OrderSuccessDataStore? { get }
++}
++
++class OrderSuccessRouter: OrderSuccessRoutingLogic, OrderSuccessDataPassing {
++    weak var viewController: OrderSuccessViewController?
++    var dataStore: OrderSuccessDataStore?
++    
++    func routeToHome() {
++        guard let navigationController = viewController?.navigationController else {
++            viewController?.dismiss(animated: true)
++            return
++        }
++        
++        for element in navigationController.viewControllers {
++            if element.isKind(of: HomeProductViewController.self) {
++                if let vc = element as? HomeProductViewController,
++                    var vcDataStore = vc.router?.dataStore
++                {
++                    vcDataStore.callBack = .orderSuccess
++                    vcDataStore.productCartContext = nil
++                    navigationController.popToViewController(vc, animated: true)
++                    break
++                }
++            }
++        }
++    }
++}
+diff --git a/OPN-Challenge/Scenes/OrderSuccess/OrderSuccessViewController.swift b/OPN-Challenge/Scenes/OrderSuccess/OrderSuccessViewController.swift
+new file mode 100644
+index 0000000..c43b01d
+--- /dev/null
++++ b/OPN-Challenge/Scenes/OrderSuccess/OrderSuccessViewController.swift
+@@ -0,0 +1,71 @@
++import UIKit
++
++protocol OrderSuccessDisplayLogic: AnyObject {
++    
++}
++
++class OrderSuccessViewController: UIViewController, OrderSuccessDisplayLogic {
++    var interactor: OrderSuccessBusinessLogic?
++    var router: (OrderSuccessRoutingLogic & OrderSuccessDataPassing)?
++    
++    @IBOutlet private weak var bottomStackView: UIStackView!
++    @IBOutlet private weak var bottomView: UIView!
++    
++    public static func initStoryboard() -> OrderSuccessViewController? {
++        let storyboard = UIStoryboard(name: "OrderSuccess", bundle: .main)
++        return storyboard.instantiateViewController(withIdentifier: "OrderSuccess") as? OrderSuccessViewController
++    }
++    
++    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?)
++    {
++        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
++        setup()
++    }
++    
++    required init?(coder aDecoder: NSCoder) {
++        super.init(coder: aDecoder)
++        setup()
++    }
++    
++    // MARK: Setup
++    
++    private func setup()
++    {
++        let viewController = self
++        let interactor = OrderSuccessInteractor()
++        let presenter = OrderSuccessPresenter()
++        let router = OrderSuccessRouter()
++        viewController.interactor = interactor
++        viewController.router = router
++        interactor.presenter = presenter
++        presenter.viewController = viewController
++        router.viewController = viewController
++        router.dataStore = interactor
++    }
++
++    override func viewDidLoad() {
++        super.viewDidLoad()
++        setupView()
++    }
++    
++    private func setupView() {
++        navigationController?.navigationBar.isHidden = true
++        navigationController?.interactivePopGestureRecognizer?.isEnabled = false
++        
++        bottomStackView.backgroundColor = .primary
++        bottomStackView.roundCorner(cornerRadius: 8)
++        
++        bottomView.roundCornerTop(cornerRadius: 8)
++        bottomView.addShadow(
++            withCornerRadius: 12,
++            shadowRadius: 12,
++            shadowOffset: CGSize(width: 0, height: -4),
++            masksToBounds: false
++        )
++        
++    }
++    
++    @IBAction func onTappedDone(_ sender: Any) {
++        router?.routeToHome()
++    }
++}
+diff --git a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryRouter.swift b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryRouter.swift
+index 4ebc181..26b3120 100644
+--- a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryRouter.swift
++++ b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryRouter.swift
+@@ -1,6 +1,6 @@
+ protocol ProductSummaryRoutingLogic {
+     func showFullViewLoading(destination: UILoadingFullViewViewController)
+-    func routeBack()
++    func routeBack(productCartContext: HomeProduct.ProductCartContext)
+     func routeToOrderSuccess()
+ }
+ 
+@@ -16,11 +16,28 @@ class ProductSummaryRouter: ProductSummaryRoutingLogic, ProductSummaryDataPassin
+         viewController?.present(destination, animated: true)
+     }
+ 
+-    func routeBack() {
++    func routeBack(productCartContext: HomeProduct.ProductCartContext) {
++        guard let navigationController = viewController?.navigationController else {
++            viewController?.dismiss(animated: true)
++            return
++        }
++        
++        for element in navigationController.viewControllers {
++            if element.isKind(of: HomeProductViewController.self) {
++                if let vc = element as? HomeProductViewController,
++                   var vcDataStore = vc.router?.dataStore
++                {
++                    vcDataStore.productCartContext = productCartContext
++                    navigationController.popToViewController(vc, animated: true)
++                    break
++                }
++            }
++        }
+         viewController?.navigationController?.popViewController(animated: true)
+     }
+     
+     func routeToOrderSuccess() {
+-        
++        guard let vc = OrderSuccessViewController.initStoryboard() else { return }
++        viewController?.navigationController?.pushViewController(vc, animated: true)
+     }
+ }
+diff --git a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryViewController.swift b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryViewController.swift
+index 0d97904..ddb7738 100644
+--- a/OPN-Challenge/Scenes/ProductSummary/ProductSummaryViewController.swift
++++ b/OPN-Challenge/Scenes/ProductSummary/ProductSummaryViewController.swift
+@@ -57,11 +57,16 @@ class ProductSummaryViewController: UIViewController, ProductSummaryDisplayLogic
+     override func viewDidLoad() {
+         super.viewDidLoad()
+         setupView()
++    }
++    
++    override func viewWillAppear(_ animated: Bool) {
++        setupTextView()
+         initialDataFromProductCartContext()
+     }
+     
+     private func setupView() {
+         navigationController?.navigationBar.isHidden = true
++        navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+         
+         let onTapBackGesture = UITapGestureRecognizer(target: self, action: #selector(onTapBack))
+         backButtonImageView.isUserInteractionEnabled = true
+@@ -89,14 +94,17 @@ class ProductSummaryViewController: UIViewController, ProductSummaryDisplayLogic
+         addressTextView.roundCorner(cornerRadius: 8)
+         addressTextView.layer.borderWidth = 1
+         addressTextView.layer.borderColor = UIColor.lightGreyPrimary.cgColor
+-        addressTextView.text = "Please fill in address..."
+-        addressTextView.textColor = UIColor.lightGreySecondary
+-        enableNextButton(false)
+         
+         let tapGestureDismissKeyboard = UITapGestureRecognizer(target: self, action: #selector(onTapDismissKeyboard))
+         view.addGestureRecognizer(tapGestureDismissKeyboard)
+     }
+     
++    private func setupTextView() {
++        addressTextView.text = "Please fill in address..."
++        addressTextView.textColor = UIColor.lightGreySecondary
++        enableNextButton(false)
++    }
++    
+     private func initialDataFromProductCartContext() {
+         guard let context = router?.dataStore?.productCartContext else { return }
+         interactor?.getProductCartContext(request: ProductSummary.ProductCart.Request(context: context))
+@@ -107,7 +115,22 @@ class ProductSummaryViewController: UIViewController, ProductSummaryDisplayLogic
+     }
+     
+     @objc private func onTapBack() {
+-        router?.routeBack()
++        guard let context = router?.dataStore?.productCartContext else { return }
++        router?.routeBack(
++            productCartContext: HomeProduct.ProductCartContext(
++                store: context.store,
++                productList: context.productList,
++                totalPrice: context.totalPrice,
++                totalProduct: context.totalProduct,
++                delivery_address: addressTextView.text != "Please fill in address..." ? addressTextView.text : nil
++            )
++        )
++    }
++    
++    func hideLoading() {
++        DispatchQueue.main.async { [weak self] in
++            self?.uiLoadingFullView.interactor?.showLoading(request: UILoadingFullView.Loading.Request(show: false))
++        }
+     }
+     
+     func enableNextButton(_ isEnable: Bool) {
+@@ -118,6 +141,7 @@ class ProductSummaryViewController: UIViewController, ProductSummaryDisplayLogic
+     func displayProductCartContext(viewModel: ProductSummary.ProductCart.ViewModel) {
+         let store = viewModel.store
+         let productList = viewModel.productList
++        let address = viewModel.delivery_address
+         
+         screenTitleLabel.text = "\(store.name) - Order"
+         productCart = productList
+@@ -127,6 +151,11 @@ class ProductSummaryViewController: UIViewController, ProductSummaryDisplayLogic
+         totalPriceLabel.text = "฿\(totalPrice)"
+         bottomTotalPriceLabel.text = "฿\(totalPrice)"
+         productListTableView.reloadData()
++        if address != nil {
++            addressTextView.text = address
++            addressTextView.textColor = UIColor.black
++            enableNextButton(true)
++        }
+     }
+     
+     func displayError(viewModel: ProductSummary.ProductSummaryError.ViewModel) {
+@@ -135,6 +164,7 @@ class ProductSummaryViewController: UIViewController, ProductSummaryDisplayLogic
+     }
+     
+     func displayOrderSuccess(viewModel: ProductSummary.OrderInquiry.ViewModel) {
++        hideLoading()
+         router?.routeToOrderSuccess()
+     }
+     
+diff --git a/OPN-Challenge/Service/BaseService.swift b/OPN-Challenge/Service/BaseService.swift
+index 47598e0..3d74be2 100644
+--- a/OPN-Challenge/Service/BaseService.swift
++++ b/OPN-Challenge/Service/BaseService.swift
+@@ -51,7 +51,7 @@ extension BaseService {
+     }
+     
+     func fetchPostOrder(request: PostOrderRequestModel, completionHandler: @escaping ((OrderResponseModel) -> Void), errorHandler: @escaping (APIError) -> Void) {
+-        guard let parameters = try? JSONFormatter.shared.convertToDictionary(value: request.products) else { return }
++        guard let parameters = try? JSONFormatter.shared.convertToDictionary(value: request) else { return }
+         provider.request(
+             BaseAPI.postOrder(parameters: parameters),
+             completion: { response in
+diff --git a/OPN-Challenge/Utilities/ImageUtils.swift b/OPN-Challenge/Utilities/ImageUtils.swift
+index ee7d86f..b64755a 100644
+--- a/OPN-Challenge/Utilities/ImageUtils.swift
++++ b/OPN-Challenge/Utilities/ImageUtils.swift
+@@ -25,7 +25,7 @@ class ImageUtils {
+                 switch result {
+                 case .success(let image):
+                     completionHandler?(image.image)
+-                case .failure(let error):
++                case .failure:
+                     imageView.image = placeholder
+                 }
+             })
+diff --git a/OPN-ChallengeTests/HomeProduct/Scenes/HomeProductInteractorTests.swift b/OPN-ChallengeTests/HomeProduct/Scenes/HomeProductInteractorTests.swift
+index 88f3768..fd4bb8b 100644
+--- a/OPN-ChallengeTests/HomeProduct/Scenes/HomeProductInteractorTests.swift
++++ b/OPN-ChallengeTests/HomeProduct/Scenes/HomeProductInteractorTests.swift
+@@ -65,7 +65,23 @@ class HomeProductInteractorTests: XCTestCase {
+         XCTAssertTrue(spy.presentErrorCalled)
+     }
+ 
++    func test_handleCallBack_orderSuccess() {
++        let spy = SpyHomeProductPresenter()
++        let stub = StubHomeProductService(result: .error)
++        sut = HomeProductInteractor(serviceConnection: stub)
++        sut?.presenter = spy
++        sut?.handleCallBack(request: HomeProduct.HomeProductCallBackFlow.Request(callBack: .orderSuccess))
++        XCTAssertTrue(spy.presentBeginFetchFlowCalled)
++    }
+     
++    func test_handleCallBack_none() {
++        let spy = SpyHomeProductPresenter()
++        let stub = StubHomeProductService(result: .error)
++        sut = HomeProductInteractor(serviceConnection: stub)
++        sut?.presenter = spy
++        sut?.handleCallBack(request: HomeProduct.HomeProductCallBackFlow.Request(callBack: nil))
++        XCTAssertFalse(spy.presentBeginFetchFlowCalled)
++    }
+ }
+ 
+ extension HomeProductInteractorTests {
+@@ -74,6 +90,7 @@ extension HomeProductInteractorTests {
+         var presentStoreInfoCalled = false
+         var presentProductsCalled = false
+         var presentErrorCalled = false
++        var presentBeginFetchFlowCalled = false
+         
+         func presentProductCart(response: OPN_Challenge.HomeProduct.ProductCart.Response) {
+             presentProductCartCalled = true
+@@ -90,5 +107,9 @@ extension HomeProductInteractorTests {
+         func presentError(response: OPN_Challenge.HomeProduct.HomeProductError.Response) {
+             presentErrorCalled = true
+         }
++        
++        func presentBeginFetchFlow(response: HomeProduct.HomeProductCallBackFlow.Response) {
++            presentBeginFetchFlowCalled = true
++        }
+     }
+ }
+diff --git a/OPN-ChallengeTests/HomeProduct/Scenes/HomeProductPresenterTests.swift b/OPN-ChallengeTests/HomeProduct/Scenes/HomeProductPresenterTests.swift
+index b6012cd..3f15a54 100644
+--- a/OPN-ChallengeTests/HomeProduct/Scenes/HomeProductPresenterTests.swift
++++ b/OPN-ChallengeTests/HomeProduct/Scenes/HomeProductPresenterTests.swift
+@@ -53,6 +53,12 @@ class HomeProductPresenterTests: XCTestCase {
+         XCTAssertTrue(spy.displayErrorCalled)
+     }
+     
++    func test_presentBeginFetchFlow() {
++        let spy = SpyHomeProductDisplay()
++        sut?.viewController = spy
++        sut?.presentBeginFetchFlow(response: HomeProduct.HomeProductCallBackFlow.Response())
++        XCTAssertTrue(spy.beginFetchFlowCalled)
++    }
+ }
+ 
+ extension HomeProductPresenterTests {
+@@ -61,6 +67,7 @@ extension HomeProductPresenterTests {
+         var displayStoreInfoCalled = false
+         var displayProductsCalled = false
+         var displayErrorCalled = false
++        var beginFetchFlowCalled = false
+         
+         func displayProductCart(viewModel: OPN_Challenge.HomeProduct.ProductCart.ViewModel) {
+             displayProductCartCalled = true
+@@ -78,5 +85,8 @@ extension HomeProductPresenterTests {
+             displayErrorCalled = true
+         }
+         
++        func beginFetchFlow(viewModel: OPN_Challenge.HomeProduct.HomeProductCallBackFlow.ViewModel) {
++            beginFetchFlowCalled = true
++        }
+     }
+ }
+-- 
+2.39.3 (Apple Git-146)
+

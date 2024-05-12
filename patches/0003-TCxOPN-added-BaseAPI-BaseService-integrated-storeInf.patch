@@ -1,0 +1,2445 @@
+From af9467d631128bc7bbf547d5521977136dfb10c6 Mon Sep 17 00:00:00 2001
+From: "phakkharachate.j" <phakkharachate.j@arise.tech>
+Date: Sun, 12 May 2024 19:10:28 +0700
+Subject: [PATCH 3/8] [TCxOPN] added BaseAPI, BaseService & integrated
+ storeInfo with Postman Mock API & added error, loading view
+
+---
+ OPN-Challenge.xcodeproj/project.pbxproj       | 108 ++++++++++++++++++
+ .../error.imageset/Contents.json              |  22 ++++
+ .../error.imageset/error 1.png                | Bin 0 -> 18110 bytes
+ .../Assets.xcassets/error.imageset/error.png  | Bin 0 -> 18110 bytes
+ .../loading_ellipse.imageset/Contents.json    |  22 ++++
+ .../loading_ellipse_1.png                     | Bin 0 -> 12506 bytes
+ .../loading_ellipse_2.png                     | Bin 0 -> 12506 bytes
+ .../Scenes/CommonView/BaseXIBView.swift       |  25 ++++
+ .../UILoadingFullView/UILoadingFullView.xib   | 108 ++++++++++++++++++
+ .../UILoadingFullViewInteractor.swift         |  19 +++
+ .../UILoadingFullViewModels.swift             |  31 +++++
+ .../UILoadingFullViewPresenter.swift          |  17 +++
+ .../UILoadingFullViewRouter.swift             |  16 +++
+ .../UILoadingFullViewViewController.swift     |  98 ++++++++++++++++
+ .../Base.lproj/HomeProduct.storyboard         |   2 +-
+ .../HomeProduct/HomeProductInteractor.swift   |  13 +++
+ .../HomeProduct/HomeProductModels.swift       |  49 ++++++--
+ .../HomeProduct/HomeProductPresenter.swift    |  28 +++++
+ .../HomeProduct/HomeProductRouter.swift       |  11 +-
+ .../HomeProductViewController.swift           |  30 ++++-
+ OPN-Challenge/Service/BaseAPI/BaseAPI.swift   |  43 +++++++
+ .../Service/BaseAPI/Environment.swift         |  11 ++
+ OPN-Challenge/Service/BaseService.swift       |  52 +++++++++
+ .../Service/Model/BaseErrorModel.swift        |  12 ++
+ .../Service/Model/RequestModel.swift          |  10 ++
+ .../Service/Model/ResponseModel.swift         |  12 ++
+ .../Service/Model/ServiceError.swift          |  19 +++
+ .../Service/NetworkRequestRetrier.swift       |  30 +++++
+ OPN-Challenge/Service/ResponseHandler.swift   |  73 ++++++++++++
+ OPN-Challenge/Service/ServiceConnection.swift |  33 ++++++
+ 30 files changed, 875 insertions(+), 19 deletions(-)
+ create mode 100644 OPN-Challenge/Assets.xcassets/error.imageset/Contents.json
+ create mode 100644 OPN-Challenge/Assets.xcassets/error.imageset/error 1.png
+ create mode 100644 OPN-Challenge/Assets.xcassets/error.imageset/error.png
+ create mode 100644 OPN-Challenge/Assets.xcassets/loading_ellipse.imageset/Contents.json
+ create mode 100644 OPN-Challenge/Assets.xcassets/loading_ellipse.imageset/loading_ellipse_1.png
+ create mode 100644 OPN-Challenge/Assets.xcassets/loading_ellipse.imageset/loading_ellipse_2.png
+ create mode 100644 OPN-Challenge/Scenes/CommonView/BaseXIBView.swift
+ create mode 100644 OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullView.xib
+ create mode 100644 OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewInteractor.swift
+ create mode 100644 OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewModels.swift
+ create mode 100644 OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewPresenter.swift
+ create mode 100644 OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewRouter.swift
+ create mode 100644 OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewViewController.swift
+ create mode 100644 OPN-Challenge/Service/BaseAPI/BaseAPI.swift
+ create mode 100644 OPN-Challenge/Service/BaseAPI/Environment.swift
+ create mode 100644 OPN-Challenge/Service/BaseService.swift
+ create mode 100644 OPN-Challenge/Service/Model/BaseErrorModel.swift
+ create mode 100644 OPN-Challenge/Service/Model/RequestModel.swift
+ create mode 100644 OPN-Challenge/Service/Model/ResponseModel.swift
+ create mode 100644 OPN-Challenge/Service/Model/ServiceError.swift
+ create mode 100644 OPN-Challenge/Service/NetworkRequestRetrier.swift
+ create mode 100644 OPN-Challenge/Service/ResponseHandler.swift
+ create mode 100644 OPN-Challenge/Service/ServiceConnection.swift
+
+diff --git a/OPN-Challenge.xcodeproj/project.pbxproj b/OPN-Challenge.xcodeproj/project.pbxproj
+index 9881e7a..2984821 100644
+--- a/OPN-Challenge.xcodeproj/project.pbxproj
++++ b/OPN-Challenge.xcodeproj/project.pbxproj
+@@ -30,6 +30,23 @@
+ 		739556352BF01931004AC74E /* HomeProductViewController+TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739556342BF01931004AC74E /* HomeProductViewController+TableView.swift */; };
+ 		739556372BF028B6004AC74E /* ImageUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739556362BF028B6004AC74E /* ImageUtils.swift */; };
+ 		7395563A2BF028F8004AC74E /* KingfisherImageResoure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739556392BF028F8004AC74E /* KingfisherImageResoure.swift */; };
++		7395563F2BF0C7F8004AC74E /* BaseAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7395563E2BF0C7F8004AC74E /* BaseAPI.swift */; };
++		739556412BF0C81D004AC74E /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739556402BF0C81D004AC74E /* Environment.swift */; };
++		739556432BF0CA3F004AC74E /* BaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739556422BF0CA3F004AC74E /* BaseService.swift */; };
++		739556452BF0CA5B004AC74E /* NetworkRequestRetrier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739556442BF0CA5B004AC74E /* NetworkRequestRetrier.swift */; };
++		739556472BF0CA8F004AC74E /* ResponseHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739556462BF0CA8F004AC74E /* ResponseHandler.swift */; };
++		7395564A2BF0CABB004AC74E /* BaseErrorModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739556492BF0CABB004AC74E /* BaseErrorModel.swift */; };
++		7395564C2BF0CAE7004AC74E /* ServiceError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7395564B2BF0CAE7004AC74E /* ServiceError.swift */; };
++		7395564E2BF0CB14004AC74E /* ResponseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7395564D2BF0CB14004AC74E /* ResponseModel.swift */; };
++		739556502BF0CC4B004AC74E /* ServiceConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7395564F2BF0CC4B004AC74E /* ServiceConnection.swift */; };
++		739556522BF0CC7A004AC74E /* RequestModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739556512BF0CC7A004AC74E /* RequestModel.swift */; };
++		7395565E2BF0DF5F004AC74E /* BaseXIBView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739556562BF0DF5F004AC74E /* BaseXIBView.swift */; };
++		7395565F2BF0DF5F004AC74E /* UILoadingFullView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 739556572BF0DF5F004AC74E /* UILoadingFullView.xib */; };
++		739556602BF0DF5F004AC74E /* UILoadingFullViewInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739556582BF0DF5F004AC74E /* UILoadingFullViewInteractor.swift */; };
++		739556612BF0DF5F004AC74E /* UILoadingFullViewModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739556592BF0DF5F004AC74E /* UILoadingFullViewModels.swift */; };
++		739556622BF0DF5F004AC74E /* UILoadingFullViewPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7395565A2BF0DF5F004AC74E /* UILoadingFullViewPresenter.swift */; };
++		739556632BF0DF5F004AC74E /* UILoadingFullViewRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7395565B2BF0DF5F004AC74E /* UILoadingFullViewRouter.swift */; };
++		739556642BF0DF5F004AC74E /* UILoadingFullViewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7395565C2BF0DF5F004AC74E /* UILoadingFullViewViewController.swift */; };
+ 		AA06D3D5FD48A457D3189C5C /* Pods_OPN_ChallengeTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBC011E77B1AF7ADBC527B7E /* Pods_OPN_ChallengeTests.framework */; };
+ 		B6DEC6E51521EC1B2633083C /* Pods_OPN_Challenge_OPN_ChallengeUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F457EF9EFD3978A42D1B43EB /* Pods_OPN_Challenge_OPN_ChallengeUITests.framework */; };
+ 		DFCEF3341560DBA2A56575C0 /* Pods_OPN_Challenge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B18C9219862D4F67521B275C /* Pods_OPN_Challenge.framework */; };
+@@ -84,6 +101,23 @@
+ 		739556342BF01931004AC74E /* HomeProductViewController+TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HomeProductViewController+TableView.swift"; sourceTree = "<group>"; };
+ 		739556362BF028B6004AC74E /* ImageUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageUtils.swift; sourceTree = "<group>"; };
+ 		739556392BF028F8004AC74E /* KingfisherImageResoure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KingfisherImageResoure.swift; sourceTree = "<group>"; };
++		7395563E2BF0C7F8004AC74E /* BaseAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseAPI.swift; sourceTree = "<group>"; };
++		739556402BF0C81D004AC74E /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
++		739556422BF0CA3F004AC74E /* BaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseService.swift; sourceTree = "<group>"; };
++		739556442BF0CA5B004AC74E /* NetworkRequestRetrier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkRequestRetrier.swift; sourceTree = "<group>"; };
++		739556462BF0CA8F004AC74E /* ResponseHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseHandler.swift; sourceTree = "<group>"; };
++		739556492BF0CABB004AC74E /* BaseErrorModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseErrorModel.swift; sourceTree = "<group>"; };
++		7395564B2BF0CAE7004AC74E /* ServiceError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceError.swift; sourceTree = "<group>"; };
++		7395564D2BF0CB14004AC74E /* ResponseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseModel.swift; sourceTree = "<group>"; };
++		7395564F2BF0CC4B004AC74E /* ServiceConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceConnection.swift; sourceTree = "<group>"; };
++		739556512BF0CC7A004AC74E /* RequestModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestModel.swift; sourceTree = "<group>"; };
++		739556562BF0DF5F004AC74E /* BaseXIBView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseXIBView.swift; sourceTree = "<group>"; };
++		739556572BF0DF5F004AC74E /* UILoadingFullView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UILoadingFullView.xib; sourceTree = "<group>"; };
++		739556582BF0DF5F004AC74E /* UILoadingFullViewInteractor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILoadingFullViewInteractor.swift; sourceTree = "<group>"; };
++		739556592BF0DF5F004AC74E /* UILoadingFullViewModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILoadingFullViewModels.swift; sourceTree = "<group>"; };
++		7395565A2BF0DF5F004AC74E /* UILoadingFullViewPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILoadingFullViewPresenter.swift; sourceTree = "<group>"; };
++		7395565B2BF0DF5F004AC74E /* UILoadingFullViewRouter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILoadingFullViewRouter.swift; sourceTree = "<group>"; };
++		7395565C2BF0DF5F004AC74E /* UILoadingFullViewViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILoadingFullViewViewController.swift; sourceTree = "<group>"; };
+ 		7D4AB8114A17238EF43803E6 /* Pods-OPN-Challenge.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OPN-Challenge.release.xcconfig"; path = "Target Support Files/Pods-OPN-Challenge/Pods-OPN-Challenge.release.xcconfig"; sourceTree = "<group>"; };
+ 		B18C9219862D4F67521B275C /* Pods_OPN_Challenge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OPN_Challenge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+ 		C453A3A53A15AE7491B28818 /* Pods-OPN-ChallengeTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OPN-ChallengeTests.debug.xcconfig"; path = "Target Support Files/Pods-OPN-ChallengeTests/Pods-OPN-ChallengeTests.debug.xcconfig"; sourceTree = "<group>"; };
+@@ -144,6 +178,7 @@
+ 		739555DE2BEFF8DA004AC74E /* OPN-Challenge */ = {
+ 			isa = PBXGroup;
+ 			children = (
++				7395563C2BF0C7C9004AC74E /* Service */,
+ 				7395563B2BF02F3F004AC74E /* Scenes */,
+ 				739556382BF028EC004AC74E /* Common */,
+ 				7395561F2BF001A6004AC74E /* Extensions */,
+@@ -229,11 +264,67 @@
+ 		7395563B2BF02F3F004AC74E /* Scenes */ = {
+ 			isa = PBXGroup;
+ 			children = (
++				739556552BF0DF53004AC74E /* CommonView */,
+ 				7395560F2BEFFBEA004AC74E /* HomeProduct */,
+ 			);
+ 			path = Scenes;
+ 			sourceTree = "<group>";
+ 		};
++		7395563C2BF0C7C9004AC74E /* Service */ = {
++			isa = PBXGroup;
++			children = (
++				739556482BF0CAB6004AC74E /* Model */,
++				7395563D2BF0C7DE004AC74E /* BaseAPI */,
++				739556422BF0CA3F004AC74E /* BaseService.swift */,
++				739556442BF0CA5B004AC74E /* NetworkRequestRetrier.swift */,
++				739556462BF0CA8F004AC74E /* ResponseHandler.swift */,
++				7395564F2BF0CC4B004AC74E /* ServiceConnection.swift */,
++			);
++			path = Service;
++			sourceTree = "<group>";
++		};
++		7395563D2BF0C7DE004AC74E /* BaseAPI */ = {
++			isa = PBXGroup;
++			children = (
++				7395563E2BF0C7F8004AC74E /* BaseAPI.swift */,
++				739556402BF0C81D004AC74E /* Environment.swift */,
++			);
++			path = BaseAPI;
++			sourceTree = "<group>";
++		};
++		739556482BF0CAB6004AC74E /* Model */ = {
++			isa = PBXGroup;
++			children = (
++				739556492BF0CABB004AC74E /* BaseErrorModel.swift */,
++				7395564B2BF0CAE7004AC74E /* ServiceError.swift */,
++				7395564D2BF0CB14004AC74E /* ResponseModel.swift */,
++				739556512BF0CC7A004AC74E /* RequestModel.swift */,
++			);
++			path = Model;
++			sourceTree = "<group>";
++		};
++		739556552BF0DF53004AC74E /* CommonView */ = {
++			isa = PBXGroup;
++			children = (
++				739556562BF0DF5F004AC74E /* BaseXIBView.swift */,
++				7395565D2BF0DF5F004AC74E /* UILoadingFullView */,
++			);
++			path = CommonView;
++			sourceTree = "<group>";
++		};
++		7395565D2BF0DF5F004AC74E /* UILoadingFullView */ = {
++			isa = PBXGroup;
++			children = (
++				739556572BF0DF5F004AC74E /* UILoadingFullView.xib */,
++				739556582BF0DF5F004AC74E /* UILoadingFullViewInteractor.swift */,
++				739556592BF0DF5F004AC74E /* UILoadingFullViewModels.swift */,
++				7395565A2BF0DF5F004AC74E /* UILoadingFullViewPresenter.swift */,
++				7395565B2BF0DF5F004AC74E /* UILoadingFullViewRouter.swift */,
++				7395565C2BF0DF5F004AC74E /* UILoadingFullViewViewController.swift */,
++			);
++			path = UILoadingFullView;
++			sourceTree = "<group>";
++		};
+ 		DA86BAAF8F2830EE47419387 /* Pods */ = {
+ 			isa = PBXGroup;
+ 			children = (
+@@ -370,6 +461,7 @@
+ 				739555EC2BEFF8E0004AC74E /* Base in Resources */,
+ 				739556322BF018F0004AC74E /* ProductTableViewCell.xib in Resources */,
+ 				739555E72BEFF8DA004AC74E /* Base in Resources */,
++				7395565F2BF0DF5F004AC74E /* UILoadingFullView.xib in Resources */,
+ 				739556232BF005C5004AC74E /* Main.storyboard in Resources */,
+ 			);
+ 			runOnlyForDeploymentPostprocessing = 0;
+@@ -501,18 +593,34 @@
+ 				739556252BF005D9004AC74E /* ViewController.swift in Sources */,
+ 				739556162BEFFC1B004AC74E /* HomeProductPresenter.swift in Sources */,
+ 				739556182BEFFC1B004AC74E /* HomeProductRouter.swift in Sources */,
++				739556502BF0CC4B004AC74E /* ServiceConnection.swift in Sources */,
+ 				739556192BEFFC1B004AC74E /* HomeProductModels.swift in Sources */,
+ 				7395561E2BF001A2004AC74E /* UIColorExtension.swift in Sources */,
+ 				739556332BF018F0004AC74E /* ProductTableViewCell.swift in Sources */,
++				739556642BF0DF5F004AC74E /* UILoadingFullViewViewController.swift in Sources */,
+ 				739556272BF0129B004AC74E /* DateFormatter.swift in Sources */,
+ 				7395561A2BEFFC1B004AC74E /* HomeProductViewController.swift in Sources */,
++				739556632BF0DF5F004AC74E /* UILoadingFullViewRouter.swift in Sources */,
++				739556432BF0CA3F004AC74E /* BaseService.swift in Sources */,
+ 				7395561B2BEFFC1B004AC74E /* HomeProductInteractor.swift in Sources */,
+ 				7395563A2BF028F8004AC74E /* KingfisherImageResoure.swift in Sources */,
+ 				739556352BF01931004AC74E /* HomeProductViewController+TableView.swift in Sources */,
++				739556622BF0DF5F004AC74E /* UILoadingFullViewPresenter.swift in Sources */,
++				7395564E2BF0CB14004AC74E /* ResponseModel.swift in Sources */,
+ 				739556212BF004EE004AC74E /* UIViewExtension.swift in Sources */,
++				7395565E2BF0DF5F004AC74E /* BaseXIBView.swift in Sources */,
++				739556522BF0CC7A004AC74E /* RequestModel.swift in Sources */,
++				7395564A2BF0CABB004AC74E /* BaseErrorModel.swift in Sources */,
++				739556472BF0CA8F004AC74E /* ResponseHandler.swift in Sources */,
+ 				739555E02BEFF8DA004AC74E /* AppDelegate.swift in Sources */,
++				7395563F2BF0C7F8004AC74E /* BaseAPI.swift in Sources */,
+ 				739555E22BEFF8DA004AC74E /* SceneDelegate.swift in Sources */,
++				739556612BF0DF5F004AC74E /* UILoadingFullViewModels.swift in Sources */,
++				7395564C2BF0CAE7004AC74E /* ServiceError.swift in Sources */,
++				739556452BF0CA5B004AC74E /* NetworkRequestRetrier.swift in Sources */,
++				739556602BF0DF5F004AC74E /* UILoadingFullViewInteractor.swift in Sources */,
+ 				739556372BF028B6004AC74E /* ImageUtils.swift in Sources */,
++				739556412BF0C81D004AC74E /* Environment.swift in Sources */,
+ 			);
+ 			runOnlyForDeploymentPostprocessing = 0;
+ 		};
+diff --git a/OPN-Challenge/Assets.xcassets/error.imageset/Contents.json b/OPN-Challenge/Assets.xcassets/error.imageset/Contents.json
+new file mode 100644
+index 0000000..96942b0
+--- /dev/null
++++ b/OPN-Challenge/Assets.xcassets/error.imageset/Contents.json
+@@ -0,0 +1,22 @@
++{
++  "images" : [
++    {
++      "idiom" : "universal",
++      "scale" : "1x"
++    },
++    {
++      "filename" : "error.png",
++      "idiom" : "universal",
++      "scale" : "2x"
++    },
++    {
++      "filename" : "error 1.png",
++      "idiom" : "universal",
++      "scale" : "3x"
++    }
++  ],
++  "info" : {
++    "author" : "xcode",
++    "version" : 1
++  }
++}
+diff --git a/OPN-Challenge/Assets.xcassets/error.imageset/error 1.png b/OPN-Challenge/Assets.xcassets/error.imageset/error 1.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..9bf3e622023b2b972f8d55c8ccb7d2b069acf893
+GIT binary patch
+literal 18110
+zcmYLx1z40%@c(;9_Ysm3had`)BA|3gs&sdQlz@N;!qG>A3Me5hC8dN?hkybqASm4-
+zNF#mZe~<6)_xt-iKJdQp?CfV}W@l$-XNlH&ph7{)ObS5|g_^384g|r$uW*Q%5d7GE
+z^7{z<!1q>A(<27|0*UR=;F;u+s<Af&QFh?|!&3MtS-?xC$9Ih$>v}jm_Ote~hy48f
+z1f1Pnylt%?*$a4hIc97~F+&gsq^2aV_at+D((mQv!PjD2O9no#-ib0tbA>7ql7y+k
+zxs+-~zw8sy_lv#jne#z><x;taSLY|pq%yK6AZGR2DpU=Q7Zy&fc8!t69-mk(Uu~eE
+zSO4JH_O}q4gtc^KsQhWr(&1$dr&0^~gQmWTfJO@#C#OznBUAjRsnT=DQHk#Ne~_u%
+zJR>xNbxL|;h+Fz{zZjE=l&Cn4AuNnTOdg$5wH_=NBi^z0!(=d+Y9Ln29HQ1{^pRnb
+z6ijQMaAk{H*e+(?=o{K6LM01~!n+);(L};xJMSbA#!IDz95xUK=eBC+i+`F+-rMQ-
+zD5L)HE5)8RaN@PfjYC+*@K;guB7LMV<EOQBkI5k=C4to^oMJo~wBm0?ybiotTH+v~
+zpX#cfWGe%HvCCa40o0^ygb*iZ+G8AmtmOKF4>k(i!zDrxT@zkcnea`?L_Rpa5QLz<
+zUEw10^{q%X&x`Aq|8(qKCWQ#dU}jtn_Cpdr@&hk&8z9a+4(DL0v!04KBMwFB7%~UA
+z(N%_y7Cv@VNdu!!6dyoCnbd=JU5;tayf;r=RJp!I+Ny$Yp(M6X;Hje-wZp)Ju?52`
+z)#__^T1ozAznnSI9lzR04;?k*nV!YI$}(RbqUg&0NFb-A7gDY{7+Cr}q1>+w8(<~K
+z_>~iDGw3=PkyOtJq0!%d?;8!Sy=ggN8I^jdH>|^Sn^2)Qjm*ZexFWo%9Rlqm6N*X`
+z)&HzH?ig564t#-xH3iVwZyONXgm^$7(PN9YMRwVPnSEFC8t9|GKvG-`%B-?os%ICC
+z;iGY?Voc_5K12owVZN3k<5d=>ANm@Y6Mu?@q0q(n<>vp2ZW;?)_^=9$Go{{2>?0u-
+z15(c8^pUdg(H7y?)G?1zamc&AuQ+%&Dd6xj?$bLDW&MIHL$AN*kF5qYo?J%FE?AHJ
+z`r`TN53l=!jX6?)iuz&0Tw;mSS<GFl*lE>n3u>j4M0F+6&;*q-N3NUObb~&{$b_$L
+zhnTX8(9BLSO3~1`tYD+a0MrJBmvwxF=A8m0PL&k->w?uRzl??DeOP1S;oIWH0->2-
+z6j4e_ihtde=j#$i90sXQw4V?^BAQbY<~t2t;q78FgK=;&E0pqyS^Df8Fko4*baSO;
+z9F7<K@=l{in7YX+b<Lyt*22a{E|tb|I38Nxk4ASH+TG-2k+jVky}Y773_o-xgP<e@
+zHlkSCo2z;Z3MsQ-T>X?|jkbQrh1g@QTbzd}E1bn%ILpO*EX_78`TFyx($%d`x_{b6
+z81xwAQ>=l3Fmt?4(=-*sh$pDVNG@0ktNSqN$+UDuqw8F7_NPbqLVq|nItvlY16usq
+z=_#S%<V-Qi&`#Sx*Dmdx9ly%xql8h~!S-iu4BSgr6pA0?1_$S;|H8g+yK``xR%mmf
+zibMLJEHib4MQ8rt&F9Ac?^o{Za#3|^{EO8$lrIEkn)h?QDw|a8gdvJxISOc9A-+B6
+zvM{Od*-~k2&cNZe9tm|a1I~=}G+h;^LQ5J_XAch%Go2)!&tJU`vH*}TS3n4Dr_quT
+z+8~cJljO_v1+>6ONDKFQY#g~hNa*>n!aj&Uv^6Xh2#v}AoK8cX{NY4w&5>)&6}J1m
+zwN=m4%%OHg!RZMApZ9aNirw&w^*jUUJXsj<Eq*kT$nzjs@arN_ZY0haa@(wB*{Cnm
+zFZc!0f_`gcsk6UZ%f5NtWi5a97AK=T^+W%WK2=dke2F9iYj&i=VrsEKxJ)#dxOAlN
+z`OeS@J(k{A3;c@$QGF&`S8!OH{>SvV27SU`WF}mtB-_4tFGYE*eeaP`5<3n`j^{|C
+zpeT4cck(X{M;9|TkRLNee~p4<6WT)qBXI1EF7MCZ)HzcY%Llsroe0DUk8TeNboO`!
+z@G`)RbU8VXBqk$I<G6%Op;L()T|6J*a!MiX*0L>Mt>tAtgW-h??AryhQy%|o)?El4
+zF)ocImc$`^8JOB0w9DbXRK-zycomt~IwG^?C^+b&rG1r?9%JA`ZB745ms^R>{SMVJ
+zlUggViw<jfQcnVaAf!F02KNBQki0LkrsC*zCw<OR*ZeNy|Gx2tpI<*W`0!yxq%9I)
+zt{K{YvU`>CxZeWr29Sgahh_>wTLRx62o)YkyfyFY`TkW_&;uVP>(7@U&H?(UQ~Wq&
+zaF4b86wa#oJx4S-)+wkP)d48#&|BP`r0F>n0F+Z5bYyR3lP)3lLEQ%_--&BW3EG-m
+zrr*#qS7HQHFxfz2jfd_*GVpL^0-S#pKD<>@`do!g9%<l^-Lzz+R_bKK%l}80vnbcq
+zCDD-wkKbeBz+6(TAbdIn)$!wRXO({U(Is2^ab_b{S0cbw%vnmt!O3fIJpWIl;n<EN
+zBe=jpT<PjL<EOFtq*}j2$7&NRJ>7G`uWsk}UlZKPhKZfgjMTOMGLaUcRz5M|*l`<-
+zz`tY&p;gJ`S@*B}FzKNBc<FVzagw4`Z&h6#{r&s*6)o+?V_U~GLKf8hV)QyAs}kvN
+zdRLYSaG{?N0!eZ-&QlSUV^vhxNq4q}lPccaw%ZZ>_IEx+kpVW3nK5#cv6f56%vEvt
+z;YPpdBV*!Y2K=gldDM$JTG_CZmSCkRUnicSV%R>0Xk@;VcxbL7GlAsaxt94|1WtXM
+zg>I{#IVg^!Z@odSZPd46F)yI2r_ifi^CH1_V|~EH{DBi%aFJ)(w>8)dJz22)^z#I8
+zO3!g45^a6&p=Yl26W=)tjfP)+(jJ6wqjEwqN|m_H;Mk#v3afq^@<lh~$J>FHUK}TF
+zoO_uj9jnSdEFjZxKeNBNikht4U$n58t>RF@p%El-A4#-s9b4A%*t|XaU9JZ<HTBCp
+zpdC%HfePcr0g-&ql>C^`k7#+uvT0dwp|CUChVE+Bck!m?qScOrKhtx^r4^jSVD0Pj
+z8w;?(P)$^2M_X!pPycg-b81mNi*Iie)MKE=$Fbsb)BJj{tU=&0lBn;Klg^^@74pf}
+z@%A{#{9!Ghf?I(tyB+`hsv{rbdHJLC>VjLuwEHTRuAj#+dfe`&a#@9fBaRIVYhovc
+zwL>k~p?r>ib>;fQ&CP^p#6RHHb8mu~w;eI$@O#gGfueNvQ5gDGDL)6zPxhAtE!Qne
+zWpsR)8gPM(Wzyt7l~A#@CB?UMi4`n^fCU>~-9lB42u>(otceDFs&D_O0S;7{!3GsJ
+zFxUUgmOV$m{62z>3fp}hynQ)}ASDD$y_Z0`>^ga{x@Rv|I3Lp%7b%AK&wYu_?@!kz
+z(!kSowO->c$RxKC!B6MVrs(QN6%%Svw8DQ<<WR{e6W4tH+BncEsSx8+S2KLqs~V%3
+z)o^T(63j!IcxElzHor8l!=dJ15hxs#C?T^`v!e6(GnDiC%j!^kjGbqus1Tl5LP%27
+z_-PNT%?$HO)cJuedyyC{ZuCr6HM$!iK}wU9givUW`LkA7HdKL%zYAH2-9IiYIbPdI
+zAPT-knj6TwZ<iE#nq&j_>vFh!!{JJK10Aan<Ycvcw3lx`bo36D8I~z!Oxl5*9TIZH
+zqajk5k%P|NM+s9ajE==P*lXgtvfpktE~y)CsOSDVQ(B9ABZI#|?Njjk<(akosEa;B
+zUYMM;8=q>yOB?LBTAuN?!&H<M!PfWA{0<S~<KVc*+Z)cm-tLuDMDB8BP>+r<t&&gd
+zoJAp~_X6#F1%gFA+}!xn)6>5R=B)R%#_W7Qf7)#Ke-0_AQxPTe!J#Mp@VUMVrpa}%
+z0i%I@L!DIAF5bfqEg+NT(tMkIf4xs}@vuDU^Le3XsC4AK8GVYp(UUFJX)S-(2HJ}L
+z63d{HR$+FqZlU3dpurG5N?J)*{>c%daZk6xyuoWd7<1OQN2|}E^z?7w$Bmp8(OzwH
+zB7(7QFYCC<YHA_qu=V-i>I0EgWkJ}28}zlTqDV;_Vz_%hV13|{3r)}JFkjFD6V_bW
+z;oN3?B8V$Z&66*RfFcnlm-~m$aO0ERpD}D(YH-AP@Em){y9mT^T(1#dYPr!tWoa2Q
+z_+c=ojCe}>o6^-BtyjcXf|^%2PvT&5$%TBwKdPzyb)lltiZ9jysz`RrI<Iy1R6$FN
+zvIfTOL@)uke{Cy+#ilqgtUWaHD>PG`!e=-nXkNSjKu!v^p4~~sNfOwdFx*o8cyC2f
+zZ&=}sqj4^g(07CidkNqRgS9GtH+VPB!_BF|;aR<6BK00q6>peYVaAZ&$KF44hpqfg
+z@{cZB{b6})E~@s9!(n~HSru}K&A8#=<g89t8i(**AAXDHa+f$ZjT>z4EBNpifR!Uj
+zhekG~&u}xZfgEEEZC!{i^kpAj@r)Xq2`yqS-JWlFN}zDTMZivCEh;bv_7+S@)~$@{
+z@2T&M{3@#c=tAsIIYTs3%S{3_y}fU;%d^tB?NsaX_E^g<;3>Sh!qB0qYaW>`1buWG
+z{dUWd1bL1+>-$Cv$z_T^EmGTIgtvjUwad{xt!L(gdYvuws2f;E?{maK2woZ?64Q!6
+z1g>j#^r|}Iy0<5dE8Q#+XcJ_F%vu*M$s<u5FM7}gH$P@9opl8-9N2lg$`0xu!thY-
+zBPSZ45eU7@`-(F3QOF=ZZg!O(XeMXB+}tmYUDAOKd<VQm!FT3Y5d@d%JD{1Qx^naS
+z1Xg`nzomckaU}EbW0Y)~5I#N$5EDIq6oD`#k>lnvTt2TnXvwQ|e$bS~+!>0@(Ibb+
+zw_3{<B$Eiu$!eR2tCK^Q#;UOlLijJkkaCW=9*!DZD`dc0UMd9XSrso@wj#7BBO!Co
+z5h~{{6f&4;$XcEpvS%*&-$vq~(b4m$-0No)gZjm-kXEEkMleiK?lvR*@$>4P#7Cf^
+z#te@&4z^aF&i{S;xu5ozfB7BpY7QT1B%#tmPigEHGoBpDH@7naa@Zd$;;j#L*pch6
+z>C=iU!iv4N*QzMUY@lm8g*_M)GUqZmEGR|u%bS|DM{GHHa-@S*9E2!NiNO;xM)<eS
+zh#4Fzm?(k6;DJ8F>?J}JwZ!EAeqsQhLb%&+-ax~w7~OB3!y{2%LimUBriN>5l*hTK
+zm<W3#1YRp*!u@}MXqD{DHiSJl&Ma@B<Yee+Ya97g8vBR^ua#r0-gk2G?v9`p@iihv
+z6fa;r%i*3Zi2OPIiV5=l*;2b&SDn9tS=awxl3`#O3U=@{D=IJ+M!ElcZ-{&US2k1%
+z2TF4Ae}`x>Q^ih-#EX1Z<f_bpsTYD;WqUAIMPI8KWgT9wh={f$W<cDQi^w3Q25Vq0
+z6_jNz?H9*7Ig_zyS*4+Sh54b2URo|wBvcQy5Md%0MG$cZdhEM5A>5GbUV$+=SGl_W
+zI~?6z^e#0L+3F1Nhd)(X;0L2Kal%7QXUIZI_h=>K*~=QpDTMJQBHDw{qzlGg)+d&F
+zhO-4)gs7q3-t41hEJK`IvC0i*ee=jjMtG)Gp^YXmm;NaDtsB=K!>mS2YaKn@r=RLu
+ziWD}y%p*n$1>Fk+=)WMeq7yo8EmiFwp;zvp0~Kw&k|GHrR#@iW>$~)&(j2H?zq08%
+z5!dWHO5$^Cu=G1~|KFoKuCD7^=8<m~7?d|fNqTyEmU`bvOIr3`61aB~m{%jj)M|(K
+zmFv1)7Cv)0-5|sfagQX&RJGrwJ&3*aj<wC?WOSKH=1ImAHL)x2t7*@_dj~5?CT$0J
+z$**bJ82Co4=<r@jhqRo|M$Y`|+@k$tM&hLXCQ0^Ws9^o7`1=1C2VTEh(Gk@TBv$33
+zN%kvG&yS$%R1dL*E>n=%l8xV`p-CD!yF78We{DhK{2tw#Bo`Qi#WUNYa3d}&4Ef9-
+z=^qPx(Moym5OcREkCDte<OobM&4&oo5R-9~+g8l_$O(}MdF~hW)?@ziziTVn=8=mX
+zisNFK^Js*SV=tb=smvxjKgDeog*Oyv5`jxUNuqhIXFeNgw4XF?9GUbM9_tn0jJ08B
+z6tm-h-W$F7R7OP7(tLk-cxWiEq$HHerskB%$TJ9QsTr1JN%!IXK}kg(O-OJU)$j=!
+zIWiDKQ}wBt*7QzYslXLTh7`8Mv*CnZ{BTZ)6vPwio>ws8cvR&4%I`$L)3~VffNf||
+zwsUHB=Pc_BgitlLvfF3qlppu_5h62bdT)p5h{3Dz=~Hc8^N5d{niG!ijUOLy>!(rU
+z6D{<N6fJ~HCyKeQvLUyOAzrpdBchonrr$h*9u8f<ubcR~`3ZLVjbV^T?P>Jk1Xwn8
+z%~gIXF~4mq&DP%^?z9p9Jv5YRDd$D-^Xw6BC?#QWzbymm_g=0je7iKF38Nc7A#=T6
+z9W?K-d$jut7D+vFuJ@+eExLZFCHDBu)7i(W!iKxz)`fM$k4mVcD?V+hhzI#?Oh~?z
+zcF6`tuD;K{{beOzpFz7q&Nl`4Ecsb0t3)bAIT?=<0eP2lR#VSu-M;yV;nbr&p+Aho
+zCx(50e>^9vXjvAzM9}5-uM<q?VlKk)Q&aOO0s;Z(<$rLdqL3V&kQV**5U^6shBz{;
+zc%io;xt6E1i5~a3Xh`~|vd5!NGiL@*(QrH7xI=LOAVH1*#qCikUG#j>a;9?~Wj2*Y
+z^z|8kM$c?NgT>cS@pH=Wb^2+#qA(>6&z?qubzO$w1B}$|>?GiNolgC)a@JN1dm3q3
+z!R2=HzSR3Xt~u2n8%Qo>98Z1Hse;TAPcbkLH8|37mfD@rc!DX^_qm=Taf|lWxv%zI
+zr1@kMSWgi8_r6=phY&+OvGmhJX=|sxS6@)Cue&AH-IV=Kr+`{nN44msJ3{JJwT(mv
+zvL7Hf(?-2C9bx1nttk=9qi>1sBg65l-Xm1Wy1Oj&1<#;sqUUXuA4YFvQo>5>@#=hC
+zs{Pi<OdA8XmX^*U-^e|))7h{lvz;}h6=z%6O}V`m)uoMj9;=<-fVOdFh0+<C|9ubX
+z!L-IBavn-@q}4yZ-SpNh7kfb9-B{55eyiyP5(QLv`D(S~)3TPLhBzB%7U(D=cshwk
+zaFP^e;XzbW<JXod_2$-dl=wNkQvv0w%$4$|ik-8Q1Z)0@qYkqo5|e8WIR*Lrb8837
+z!(=_))92S8KlTam63mJyz%oeCz=3|dZbewjw*>!g@rC91_p@NuR!<k+pKCpyr0n{$
+z^CWnO-f)u|AL(*Na47=S8?{QQ?%-MX>n?SFl*4Qx?=+R=PhO~LYbB#y;F#)e{W_}2
+z-g=TK1G|+?9bSWFc*zPE>5}PH3sw?%v3(Uw^R-yOR$>ev#b99^81TNnXsw9<6Ac_V
+zCpYQl1hYyISy=ZRvz#7%G?^y$-x0ia8^1=D3B#50g-u{cN$K>e+}GgJ2K1~GHDvMB
+zw%g-HcT0?HnHe$c0c+_Cow>>Trdyv=eMcyzKx*1g&;WA)6ET+A^N?^oW7mC5?Bu3w
+zF2WtWaaUUjUvADNh>d>X7^?F8wTNwuXFsluyyGZi^18>NzkhK;9fE2+R@-9sSbmNU
+z;u$M{{Hsw|?c08}sop=<An~1kNKdfV-3SP{zU|D)C<5#q$aSK|KS=C_%wV0{nwYf|
+z^9tXqC~4HMaailVVgP^nljE#|>XLH2XC=E;)*M+qxo$2D2AFzkm#OK$87h>=Od01@
+zkrXhnauxj0d-V@YPaB~YY2uoa!av>jczwoNukw=PvDDS%HWu|I2Xxp7i;5*g2~A*!
+zIl|>cZ8({uIc(CaTv@P95oR)d*}EDYi<UJ8zdE8Z8fMtU5X`6L*}wEMo0eIJ6-!q>
+z><romKfBmd@E-OJ?>kyWY*G~x8B=Y4J)7(Jtvnb(zVQ7LDn3K3Z@L<bhx%>BZN+h&
+z`~4>=Fuxw}?dOWWR=AU4zavPU5v(RtO@oVo%3aTt)CaHddgz;XBm^=*Vs4|`dO#dL
+z#ea4Z738w69C%COYuS&SeBZVv#^r!2RzlGVn%{137an3t1#CGi2~hF;{C#%MyZhoE
+zCsoMei;CdmU(N`=n|_0=ujoasAXxd6HC0b^WbhnQt5|0;psMP^Kd)VReblRq{xZQs
+z<9je(QE|`8uBY{^7d24AIrL?J$Brkoa8yf{p4`0A#Q?LKU+mFL8^Fa+q0xXkvdZ&F
+zAhB2=jMUYUQXs8ICoq^<&f-s+wfr}{)~~6lj_;Rui@sw|q;Ns2>shaaV;>Q6EpA1`
+zNm6nzWDNd3lW*>du-wTIReR`5LX=M0X;d2mK@KQi8BNACyG-er6H+8?nwQt17SwAG
+zidcI(LQ4fp1r&^-Yks4_*T`W{ZFl^7(+-XljWr9n4!Q!_^V&u~A-R_=3O1%hC6FG;
+zeS?X*#-YzI#yYB=it8YUM=W^hvbZ&MX_dYYlPK|rfZTKzo@v5?&5}>z6h+kiYnpoW
+zGyc%X$iTL%SjwHz@@y?e_-@<cX66&FFxvFRGJ&wjr0Fe}TjEn*+3CkR!U6`jZ*={F
+zs+@OHizZ!h!QxY^9ls%hfJq|fva^p&6x`E|^q$}6vpc-qTHiJ{HS?sjp{h1t#!~Bh
+zdndY%HT_w>cW3z!I1NVlNqo<=u`ct}=Lgk3rQdU?jmiY05NvE`L7P0N!THJ4;>$!=
+zN*s)mcwknx8s9%yh=H&b3bxttn=)=ZCy_c>3dX((=9oGS7Z+bOhr6CxdTiWHN&aXc
+zX1KYs=Vnd?v6z~?>EU`&A$Uv`fo!!LImtR0Rnz3mJCeVtSF`(#kGg)SG2q1-{Y<ta
+zOk`=}S=aSFMBP$*s2RmY)9+j_cpCi^ZB)m<y5Em?D)tt`A2~@b;{r-^LHo?>=38i+
+z6Q(GPb@69}6{|LQKa(VBk|yf97IcV6QJx{Qpd$0)hg>&2&UhMpPIc6rZ3jA(f9rL!
+zezFkDxU0gVC|5mlGU++HAp7W+x?<fRnajU>9qR{K&5s;tt4{24j(r>}HKw+n7$xyt
+znB$JF%)>K+Iyc+x3dwfSEUXKI0)&B4CH73S0$V1_kM99O6d5%T6w#0gE1kmJ@%~(q
+zhALEnNqgM!mfp5FugcjB@R95U_S(bW=crSno7GaGd*gfCo5r=Zk-d+sLQ-PEevd{p
+z<wocSJo@h1eOW@(PhH<+UiJ&oXMlazguO3MNLAtO;%jE6UvPr{dYpCBW;VTLnbW2n
+z)YnfiPaKDZ0VD0Z9UuetTd?Pw#t}a<ijWP9@Qz=V?Q~b-Hfx`v_B&DaeRxw6j3Zux
+zP|!IEabG0CZQroF9s-TtOP=|Hb#Bs&4@_x{YNtj|>y2(idd_#YZ*6<G$b4Dcd=oub
+zemJ%udDwK0y6JKdetQMM_)iV}<z8IbI-!?o$ZuwjPw*uFLGI@n1&8k?WS%8v)ITcF
+zl|KK*;#csz`x8ZN?TA~O1b>S#39@QslA_DBmoOFd@%8IJgz^(bC<D`2acAqQ%%-f}
+z!!p!c;n~wSG&<{5w#Tuf((CS%IdlBD#pq=9@p}(}0wq5WK`~e7D4~}Rm;_>8(!|?#
+zN(4<-Ws`vUFziWdX}!Zk8l}v*K}l9xtc%(DHfLG%yxEd{WVIpSxGJ~sek|grmg)RA
+zpZ2F$Q9aY<o;PD@zsi<3kaKSLVj6GXC|(mdJ>m11NWQoK>{%7tFgtv#`PrfmQ(iLK
+zWtehY1%LEp((m&^00<SXnVGTD>lr{#W>du7uirSPDh!s)X&*+muDcyoxe`@j8xuir
+zpzyucTArH-#b6n*BUxg%E%{|v6cYsrQt}Z#;|2&=9M^+nLF5yWqR}3zP73ukH!P5K
+zx3pwvIA;b?!7PYZAf#BZ$1c_Jvc5SXb%`!jdrQx9EIlhk-_-J0S!~n~<2KIi=QSM(
+zQLU1U`2uN*gOCATC;4j`WR3_>i;Ih;dc3!%>&o9#Q5*^5KRIm*&B4J7SZcct7Bi*s
+z+fp}*izD4TT`YbqdF`c4y=$yzU@?*82$z-N{JX1&ipf1z2W<V`CSZxa5`zUbZ=K6m
+z#b=Nzvta_A_2e_3$B9suI_vUpipGGa)w#8k3`i@}#PnzS=GnBZi<_*9BZm_eR6ENX
+zO1qvq7D$G#l#k|g+I?r!EQ4IUJa~PwemyH~bUdcTyW~zpjQm+$t1)`&Lk4p_o4S(*
+zB<S==Sk*C-fPw|m@tw9TaBJMoZ&<kr^Ec)6D0x;KBj5-hIcdIC-Ec|w;dw4jk(KjR
+zRVx}P7Is}5jWc`0eVfZ_ldJnti7YFtRi?UE3U=LPEr>(>#OgRx9{BtA%^v#4aAaT(
+zfYkCRh+18x2#T{vnKDpM@EHw<i5BYjH1XDgDE|7h&hToZyD3Nho$@l#i~jxaC?mt3
+zE6ZfpRPc?|z~rx33dq-G+danWst5Kh7LUCg|BxRaNO|)kN$kjp;x}~sUDry!WcFuw
+zynOLL!Om~!=#q(wJv$+L=bp1pZ8cwsYQY4U@L@w3iLM;$LY907q+x=ahRtWOW&(zW
+z8+SDZgRkb`MH1nKlmF^CqR24AXqKG#;*2=ppDH1bXpf;eq5nNbZN2pa-I<?;N$!Wi
+zUE_CquL-lDq8Xs5X2Q!`DjY4bjS<h;&ABR~+dltqEdYaF-?f8S*?v#<Cvxep@9j_X
+zmX$o7Y;Jxs{U<CW(%Nb=lHRE9fc=~=(ozAK0W-te7i(E-+LDa8uGvb?$wyb$-uJ;t
+za{iIeREdWO^V~LJ$G(A$VEFxve)7OuKTgu0i)Po)r3~vgY`n2>b#nHz=WZ1uZyKJ<
+zes-Q)ObPV-5LmariVxF5?#M{KHTxl#*Ff%4gOV~Hku>4j+_wqF?aHuzmTc2rhM>G(
+zi#JC-3@kLU4aY}S8)5W}Z<j}IQT*y?psLF$5(mFe7VrYGmw|(?SsGSp3T*Q^RYEYN
+z`l@vy1C@o@*ox>L#;-{0(GPfeWY10p2{yeyd~P<?*nFN_FyP$OydiD3ZE)8Vu0U+Z
+z&*D)T(03q<-RxRLv@TYHykK~&@h!Ifpq)&QGrapP)QsMtvEm%rB_T);fxTE6ddQW}
+zFWP%g?`xggyMW*;Lmm@wjl2R5j&PJc9!M{Q)^0w7#)|^ZuKfEyjI_58HLE84o4%<i
+z;g6hKaE$#03!-LklHgZO!9Qd&ftSR@D<A%F@D8|bscZjyS=69Bn4NFfL(Wl?eOt_m
+z@hbVRa0CF$_?DzyDER~Toq(gN?a6qfy^Ukl!aWZs_b60Cg}c=5aN5YprP-?NN70)i
+zL`<{&&Zk{QRs#pkpBS)V*W8SLs$`2t`|+&VE$0U{+l-2tjNSP;FqGRs*LO)l&UXF@
+zar>upCEUKLYe(?P>&12@y=&yh*2h#-0mGZ0f1S@rT9UgS-AXc9n!T@<tA;i_MW`~|
+z68hVI3FRu|ml|+OyO2~DKkLXj`TN;Jrnaw3x7T>|Y~pz&{N^x5oTO{-cFn~7?{|HV
+zWu>=+TFX3|Zz0oq68!3UOJC~dhmW2NN`koVka0Lk*cV%x&LW-_!O4Ts6{3^A(FLI%
+zdzkd|y-?R*hL9WBGI8Jt0=!2w|1OkLX?xE*UC|Q1-_xv?g7XRAubd+BpzS*Ifo^%7
+zvWazQ1AE+_b};uDQzdLOZ#CL0Jzik9_iJ!6gRa^mwP&wAh#b_{@TJLiWrTKJFN}l)
+zj*r`aL|@*gRZc!S{Y|g+p?>W61>ENHkF~zYW7@CZ1u+u~QBmhw%Q4b8&qoDTmr+2i
+z&iVEbt#20xh?!|DS>272l5gb~Ju#-b?NV?PHnDS%NOpA^&l#L<UVANEd%zI0saeX1
+zdbXt19!fqkcde3-(~+W<wN*O!{MA5JLVHl#jp_XTGlOivPn{@NQ0A|05QXX3#5om;
+zRS`-%J^iz$26}by-IlH;u#?dW2-aC|_#8>VROc2vC$6R$fvBpD?U~j*v#-YraR<Z6
+zJ_K&2#}H=d-}t03+1yR_kYgcU^6ahk=)TdV!6eDCdiVBo>0ODZFP`3)CFfNfc_p)`
+zKWLw1Gti6V9oL^^{rgm{zqwl+zlDQAIg#<uG!k`r_Yt&Q)F>Fyna+Srd4QZ8rs%%q
+z_~*g&x|%9qQ3Lrl%yw1xq5H%sZ<6jMnJ&Wu&z@FG<~sf>il@c{D#1G-^}DaTXfS0%
+zycOb{pIRyq63AIUD{yNZ;>R4Ey;(5KP7aRUG(C(!7Jlp0O{Vp|2#FuE%ADPo+02%)
+zD;!5?VrJLx-((3H@}HV|adNM<ZI}!rRPeHe6?X3mODQg+T<pDec(+u8BfGo&i1Kpg
+zU+MRIvUbFUtX+cN9F(90^uU-ZE;-s7@YXu_^8`2v*k<CJj5PXwe`@00yrA6b>C{B5
+zDCbxC4o5r`GTh4Wr<SIOu^uk{x;2zM&)_{nMZtSIb)LhE4Q&)xtAGqF@KKfW%;Bv|
+zuvSFd%m=kwzh2y%>t~?9bdfJ^^4@YvI4;aBJipE08PF`r(B}%B{qt{K@m)Hi!$0MN
+zB9Ysre7SQeAi={3Z|bKTFKEEuzUhqIS#&O5c{VV*>Wd+~Ax*E!7qrcRoeX;a$u|#)
+zJVe^xe|(@ngljWlPs|dz@R^S}<fSU++3ixXbDn$o0|$8&u1EY^2fC;meQ$oE@qe6H
+zM>;cRfv%GGHnE0N7cFlV21%bc>+}z>1W^V2d#vXpi=UsFNc>m^??x8MyXKcXXC?Sv
+z4?Be7{9tPp4Rp*Vh2PH<uZN>b#|Uftu2a40-pf2vDNM%76d0ZnD=#SP-ETm6tu1%m
+z^$n9Ak=J=m^fV1_dOjBXP4?5b<IwBG`-zN^|L9T10LAA|7n$}<ae=Aa2K<4SS(^$+
+zS>qvo?nKb5LCN;wF#?DC(pA?97Vd=XK9%!YO6BGDjg{*fh5|KwuJ5Y3gTzZD<QO00
+zrfUu-2u~Tq=c^^Drh_sz?|UV6^eX@OCSBG*c~tPG<s}bLw<A20_U1<_4W$<GA&JFT
+zwkG+>PL(U_f3HY)bFuNyB4r;~6F-XV)*PZqKG$b~tdy?=K8)6UQoANg7m51zy3N2G
+zPTj9sN)8F#+Yv0~L+)MV*F{nnQ1>~vn`>Z@C*O|bn^T?dtJ3Gm;3!1ULq$Iglp#HL
+z$Ac1XFTNUbx-nJSkY1%zyCh2!iP~P^0>xHXi@vCNRDN<79xopW9|nY)5y+g!-GSvR
+zG-$Lkhomey^g1%#C0zR-UP%c)D3t;G!$M~@O}z^+2EmMw%(I!0tZJk1KA}Cdzy+iy
+zoBQ{4aNoDM44CkO-O{Ti^#*CK21#xi-iSoay<4B8mC^%Za9Be?4<w!*u_im!sOU>u
+z&kW-Qf3YEEH13U&k9oBsf<{MP?HP_|4Hl%2KhwF(Z=ExKvCC8*O3uh>z~{`%eMkR6
+zhed`Oa$tXUn3&hEYI66kJpD`DX^&7-iaAlSKnMu&;C*<lJa81EE#dAwW~U`@X27Q}
+zn2Q{y7*PA{4i6tqvSznqh&-r^yd1o{tC81llvYnb@L~fjrPjoZW|kF%YPU^%n3R+x
+z5m|qGWGKj~p>Tw66Yr4^n|;N-pBKAwp^sl!RW5oX+SZ&CwL>8<*e%TN%>CniKypLZ
+zC><Oowes+fc-<fmL#CqxJH$4wpG<=#1M0}r&%PDjJ^GfLbmh&tDkEH`H<fUxXkQnE
+z<o&+emxLwv9?lxJ6QYb&9++C{8hR7d!($kBFLWF@(Y_hPMmR02v_Pa_Cb^Z?4(d83
+z&br#&%PUGv7A)?5rmnL;&lSQCEa0(>q7r$bpC+%A%QJ<zd9#oFB#Rn!&p5ge-EZ`6
+zJS#6Wr00AdbT6_w`2iW1H}z0S$vr9Qa3cX@{M)Z^^n+tje*ehzHlZhMRtV|tM;qA0
+zaAb}pkdKF}Bq*y<qBGg1nmc^FlYlYZP2}deEPYygG?spo;&bw6yuI@U_NfcVy8#c|
+zuXn}X8MH@e|3#OhJ1UshvR~E++}`P0P8|CEJ1E{U{m63^BS8*3J@cD1L>^Ylac;jn
+z<@dbjv1)Z*un^xppD442aamb$CqCxE`?zMw90}!c4~8?0KfuW>BBDdE<J}s2)KRB>
+z*1hy+3%i?x2E!8uLHbYU-v|3M!cheLH><eoi-3V$+v;FZb*Q+!q51NesQ-RkJ4V-3
+zm!$#GYJdJs2p>9c-se;Ori_F7s2Okk#C0|qqge9ygPJvN3(-p)KwRa9S6`kP`>sEy
+zfsT{(jTqx$+^fl9kpcF1hwa_gBseP40OGE3>JytkW=6{KD>~?F5++t7JhAg4WwF@y
+z1gR{pzeo^hvszQZo_%7T*xgT2jTJ7{Kysdz6A9^FPBXPwW02T?@;)aL0(<!gX?(kP
+zjP6HE_9GA1^FW^iseu&9f3<B49PVGY{B!7t1&L)(7t8mXIz^RbaImxbfsO{A5{(FM
+z+O3&<^JO-lL1Ao`Tv4=Uj5o*m-jit-(RYnMU%lp|RI2+e`1sGIOW`0M-IR`mth`R2
+zW@0*}QPOL(=A=x75VMkGc$4anA2J3T1ZDwumoJ0O(V#UkL~cDFH+dc!w!+Z9_z(j1
+zATr7dT>&8@e{38)Ot~4n_AV9L5?k#UCL(jDJ66Op>zAGti;p1&uF%x5;z4c)BINU4
+zo@Ohzcmx)Y_|%JV-LsR!*hib)@npo8h2w<9ZW4#n;mQ4NCXZ(6`1iUqtErf$@)|2{
+z$8ZizdjiMw{r3+e`3@9TfArE6*=!)<LVjoww$I-2ZbC=geP)#JTOUr!7)Cgu-_KX|
+zp1X&J!pIhqxA#2lIc69k1$p=(*hgF0$|U(e_@O-2!}9bf=4nv>+_+Bnlt+MnUvd@p
+zm|d}TtF%Xy(#0%B&1W-TcqpNvOH3)5zzQ!3#s4`lN1PDV`WOC_EZTy&M#1J1`Mb#Y
+z6tuD>%R|>nQ>oy)*y~{Luo{L$DJL}@AMt^@5cvYy&Nui*?`R$GVQL!QZunMiHeL}6
+zZVo?<4iU{uue|EcRMtSune~JXg7yG>OHFc^Xy)a2=K8~O1+?5SNQ(ieVDBqJPEmOK
+zISf^d{|ye!JR|<QVY@>GRwm{+I#5rmP4bcuYHdXPoJ{Mm?QuPm|BR566tVIy-~?ZY
+zpw?3$aQ1tEa}qwN8B?E)g`kf(zG3l5luX-ANU3n^J_Kb_0b8DJMaYeV;-HjPLm2c(
+z0E{P!Oc8>OxPddLIZ$;v5U~k|ezL<KK71GyA(DMmS6)Pw*s>*(5!_|uPqsY87Kz#_
+z-DJ)34@aVkC0c?i9^Ou**tq}pUl&<0fGjK{Cb9b_Wb^>rNE=<VqJTd6k;VrR6jtCD
+zh!{)la|UlyNmk&8PnA?XWN#KqF4i$8PR<6&cc_)*X2PL?kIy>V5q`sT?jJ!VXPURq
+zQ%>i$_uEpm2=^k=vVCiJA_PUx0SvnK4*xf0BhA+Ea4N@Zb$_EvSXM)L+kJTUGE<g+
+z93M<6>=)++OG<VxZmT~5>^X(CldI2F@ytkwrEyH;Ga!h(h302k?@a9<559LXCkcG8
+z+|G3<Pu}SgggQ$>jg75P8N%NLyIsdr|3ZJHLAXy)avX83gGJ$o%nDk=W%Z$ZaAo0r
+zU-wlVb4uq>Dl*aw&Q_%YIcA==X%S^(V$U?yOYG6eTLt{qOFQTeo4^Nh68EV^d`CQg
+zJqZ50H=Mn=6mk7`joTaPz5PnJ??Ym(Np~hFiNyiJy<giZIrE8{N?$d5xC?9YOI?u9
+zUOV9H`|N=s2+9a2DclDM{^+Qf>?*8oA%OR^sIBz$rYx(Rb)h{}wLWpT)FsDiMg?DS
+zQ`DVE%gC7lS~T-HZK<=5*9CPyM22vM#B9nOtpNc@>Bceh;4Q7Ktt+9qod~(yd~;m;
+zB4D7OI}nJcQnYfpdHT@DzeKWGR!i%`poV8=?ltP?{A-Amq8u(Kl7Z0*oqpAA4z%=i
+z0<Z+fNh3OM-Zc=C61fwFv(@8W+o~aj2HqbSn&U+fDa!rzltjVrS3(@+%AnhiLiiUn
+zRW&5g^r3QIZ=L-;A67aUDMrSpK<A5RN}SZ%z(`(z@1`nDQ6WT-8Z{d^xj4zcQNQvA
+zNm%!1YC6U-e5l}$MX5&4qj`0?k?u;fCwo1zy5<DnppOK)dT_2L4U8`9WQstxWjSzA
+zA8{KP07rzAmN_1EYgkAw&mRxWc0S8KNTF#Lf);f%Fu83CfIbacakZWh=SiM9;2KC5
+zgUPl2)iKBGmjha=ZC}~0O)C=!Ev5mzLs_8UbBwwkuT6vW<Zqd5le6ET4<bb)1F~X#
+zujoUe6lP6KT+aNxH6F|{-Za2T{gXO)tvLG{RrTDvWxJi_EhsuKz6_4m{KdJ?D3OPg
+zDS@$$@V0J|xXsdv5Zo6CLbR!tRD?K5fd1KGng0seCtKz13s}qHC~M~OQWp+pl6pLa
+zPN9f@{DXH9De7eqM|ian=;q6euiW3v_9b|dJJ5xYCkBLuF<;hET1=+4!$4QWc{;%E
+z-|d|T;?Ky-4FD}YA&%bB8<x`}Er+*;QOP*He)|a&yDJsW0M$#po)1;yF(H5;p|~z-
+z&@Jz!KK$^uLvZXo3xSR=X*5Dw(|o~K52c_1L_J=pCWnXy4h68b2_HjFXC+QPy<vGh
+zN_QgsjBqKF|M>*T{f_e@WpIuihkfP_A5pn@Edosh%n$C|zuBM$y8kohD<`M+sS*bt
+z*f|7I-wG;jAk0$-1xEwLg52(|I_CJ=!Zj37aD%XCy|eO1QaKY_V&XT9t&p6_PcaCR
+zyQka-9aftTfJ}eY!j0c$K(ve|M5qAw^M5Y=M!UCx+Vo?P91`I#$)N&*a$I<2?D<yc
+zM*%1d;r)_GOc*ArRKCKDj>&xnecWV--f)sSs)P>BU(|Fa60h`C*(>94|C9m#hdnsx
+z{s*SS=?YM-!}CZ|&KoWbHk7=|9KeZ81nbU8I*9I<0=Aj0>(H}Np#U)D^x|59nm?Y?
+zd&V)vR~VQRCDVRn&EaYP;jV9vr!5Qz&MDk{((2yLykz>p6vXWiKG<0I?y0wkO6m)G
+zI6Z{Ixm{PG0|(-qoEdeL!I1RfjB)A;Cpw1uBM=wWRhnjU7#)`sV{!Z~V6nUg9C$cy
+zzryKr{3^MNey|p>M9SgOXn<{p-n&*1iXKj92iJG9**}<7hX@E1Q5X`Wr5?ai4QGW=
+ziFJ7Qel36xa7C1d{nLOepa40v*eHYwk_#p-jvw4)jaD+zA68hvkA%*t5wUDdd+%R@
+z5yxDL0e6=?h>Y@obeoan<bX{v1Bp})(4<cIRR}uegYEzAqKkw`Nh6`@t}pkb3UDSG
+z&I`OYj82LiwxWi1+)y{`2a*M^1t17`sn6|*oK)nxBu<K@T7(eTtX+G;2!H7xaG<(<
+z9XB6%!3Jx_7b2iiL>&|$WHq>G>Hrq?ODh0N6sqfQmkjV<I4r-vNykqegVkM+5?sr{
+zyn3Pfn`wO8h5vhcP6ItB&ns$L{aOk{sE7BkD)x0_u-9N9h%ZyF?1GgJ$6;0-)yTDl
+z$dFx*gIPhq{r(if|M*rTedrIE{H6GKt&|%YTn*S|h?FK0S|UNVoJDmUOc|OJX>&6|
+zgrC<TQV<R=sfJ9SO#2xA0RCFLkP(UmMuK}!MEtKo=tuyB$;q@&q@LiPJcbA;WLdS?
+zNZ!Sp^xK{<Ii`8pC&5GbpewksQW(O&y*GY^eKC4+U6m1v(Hfx?x{@sRpQ3ZP+)(~2
+zlhK=)vIYbvk0(VHzBf(uo&4`6E`N5wNaSXGThU|CPDf)UW{rO^0&zQj^N2<mA2%TK
+z=$>qN{N|yE(8XgQJVTa%ZF=3_23Vdo@gW#}gu>tH<rJ%nXRDo}E#mdYiR(arqDWj;
+zmyS0#AgVD0i3+_6LW!Pi1s>5&_j(-f@M|C{(Y;1+mbK0eOduT*4#H;A^469zeQUss
+z<PnHOi?qllB*&;2;n$qtj3Cmvz6;-R-)F&*LlJ<S6O>NI;CMqg-cFKk(_b2JNctrJ
+zZ(53+Nl7CW9F&F#ROyo+GFICbj+R~<%Ty&55nY12PYwtnMTj6?0GZRkn{e}i6n%U?
+zOPw0}1=Xa-w$0!zYHSE*`V*`jAtyh7fDp>TG6cmUQBIP<EiQO*px3XJNUJ2=7FG_Q
+z5aRC5&T#5dc{d39qYEN~wTt3X4y4k-O{R)y9I+rW2Yo@D`xVMT;QC!bXer<_ML9oh
+zAT1n2Wqsmn`M9i<)-_@1@B-T~GAH!ER_)LXEp99p5fBk>j|xSQ;-M08YWc_tzkHGV
+zqGKk9WW3KNloSPQ%By#<S8@9PT#lIeuNy5ZXbTB2F&8PKVsZO_6g&~uT7;8sCMk^V
+zKft1d5W6i9VTmaIlM!6n=UNpb6qo?ey`4bh02zQDIhabxa%LwFVwLK{KVg`nUA4{0
+zl4;*HMLhPPDtLJ}`2KzU%Z_gf3b1&sPB82+H{bAmLr-tc`bPwEwBCzcHjD22rdTs~
+zb{xFikrY&VsYI{DvQZpMVF8w^BLyO*BZSJi;=BbuSavUYsesF9T_jf`Aa-2sBt%M1
+z2vKAOj3zEEd419aCA|yyzv6OAE6!+<tx^AtD#Q^I72Ql-m0^ump@m|mmAJRBfB$x6
+za`?3RCQQct4C=$zk^^9DEsyqnR2-D{Z;!uU0ae9%C2hWPZayj58Rv3lBpl_QfaGA}
+zY<@V;z>eW2^D|Q)ex;Q6+w|}5kve8RiKFacpHYXL6ZjyQ=hUTP^XK0kJzl0>(lsa3
+zzD?fV>X?`v^0qo(*!|=QW2BgD_T$zn&7<Ek$2WA%iM6jYLU6lYKN{QnAv`;u*0iPA
+z<nCM-J@4PEg-}MK-w<*OB7`XD&Oxb*V3pS=%Mt%F3()zM(Tmzy1h_xP(c0TA<(ZPw
+z$L%@}RuHm&t4MG{4Lk=MIhUK$PDS28Pvh->J9uA}Sn~cIX0;)15AGo-?9#8wNFKjJ
+zf=Wv}@7s@SYCqSxQSp^^Il*oRFRu(nfs0H|TxKxhXb_JX4~Bhr9dG#Y&6M_uGD?qm
+zndh9<`6CT*P}|akD8!xfZ>yT!<DXd8GH>atn`Uel(~-Y*p4**ww0dlQU(K?}nizN{
+zEGV%>bJIk3rL&p2svX<#Wy`9nJC{~OhnD}&KJhC6MCuTh9uI>3rNZM2_<|uBzw@hZ
+zUD4GvVQB@rT{7|iiD>X3isdH0O4**e@?V87iR8Yi>5Rn>q~0PY)Z;C>m=fB57@=Z2
+z28(pYtP-)eOvcA@WUt^>vZ?`&rZ$;L@8!pQYx&oUSMGGP-}}|E{2@Ug0F-wCnYj}s
+zRSH2#e2ZK(K7-D-n`TooTI!d1UDuEVzV8d0S5=Vm%2?-ctDE;}i~8P#^w;*DEMW4D
+zL}NVf&s!6_DL{tsE^$Uk^>wV^gWm<6%*Tt{`yo13mdNU;8sWR@jU-9=h4#bV-13$n
+z6B+6x8u|6DawL>TBMc>NK3g`G9lL3H>9#{vlGV6xd5wK0AIaGqDAfh-_mL#(r7e^L
+zsWN(3#65@~!-f^s^!EMPE)qc$+cI92@oOWG+b+gUN<>N|3<Y1B;H$ts6L@h7?%}m{
+zt^SYje4*?4J&obTMmz2e`=L%!`$XU#TKvi)74*rBe!YCXirbM05g*P6(HWVMY$dR#
+zpUW{<;QE#V7ve&`B4%VTVCqpQLiKoEx?@c@(ci%8<%g}s;(^@~Gl?N|jqW4OjFhbS
+zd5EYP3DCN~LWUo{HuvJ><8^|5qZ1hi3rAw>k)muN+cHq(`x8U+vww)v+2sR`5M|xJ
+z%RqQ;<PaV6j{Ac^Vdg|H$sC19>yhNr(wjW-Z$5h5U>h%Ocw=Mt!MLW@xt0|)>2I?8
+z)397hmOC?-s7MDkQ`fSs8S9uT?|4u3RR+;P^a5rgGW-K&?_aMm4%S{$Y+uLCieVuL
+z_*MLu?wvS?I&&uy@*=>4BIp(6{^6z$Ijq8#n4?n|(kd3lk8>^fKO#Cn#HQH#Gv=aD
+z{DKHvrV2q?2^C&c#S9DMCtU$Iit22M4^=<mJW#6-IZRKO5Xyrw!t2D(Rd;{*i}QT@
+z-#&6;K=XBuA4qTjYRb6CbTIvN()NK_;(yJ+1=u|Ka8UewaUNg>wrcj^)*G|JD+QG4
+z|M3<9MAqR*{Ez=f#Em18Pf|n~{vQ$W<awN#-o|r@ShIaIxl(~I!firpPg1a>0UjSW
+z)C4!bUkHIWMy%3_Gv(~D#$1z;=vi5gor5(aR+Vetxe|DZADRA6rYY|R99}*WNV^+Q
+zW{@AQLe_=xdMOmo#W>xAmh$RN88%PWEDEBGpO$PBdZFLHa%J<=GC2P-2HQ`w&J>6_
+zwQjltt#^AVX0`W&*K%VaKiKD9Poa(uLX;)2dv5jxeKhvrhZIpnjBqDaaAnH=aE>ad
+zL02Xvh&#J)v!Wq2kC@}(SN7L_E_39Ag=^>wL5W@i!z0ZM@Soc-6Wg&rJZ!dm<zUIh
+zd|EF%^`s}P)P;#u5w*$)|4SQqd_Pu|fx*oGbRjO~*jpwod$CNDgczCcu-1P<B(e0F
+zh}L-UPh9u~+g)J*fb#a{whQKE8a8|UwoBd|2gjA_!_`k_XBxpR^E@tk^g6te5YYP1
+zD4_MrzWaVbC%2(`BkY8Q#grjqq+9ypP9*yDnBC*7Kfq#YT<t&0f&k+Rz&Lx&{mMC>
+zvuXB+?IC<W0|NXw)djpOHWQOSBhH&vE0hKzGM*${VCjJ579zYWRqsV~+^wt8tl<xM
+zU$g$iI7AMLboM2&7DyzX7c@3Kn+~hLdMB&W2xI~QsPM~pP%_-R<praQvM1ctpNnfh
+zj4qzWm!GSYTg#q!7p|)2%oPz5uYk5s6}3#=T(TUTmCM#`9&G~gG2s>5-vwX<YC|Aw
+zaF^FyF0d0{$6ZwWAN~k%7U3Ln0T7A1<vnIa{D@Ui4t;UG^1r4uplJc?e{diidGrN2
+z40pYD%;tg|g}b>n^dGqvj{HCF_&DykZ3fUB95^&IJnX-wZMdteZ8(EPp{&5I;#P11
+z1A2u(ui6~K_#YFHa^8RqozVs0pNu#*%ol7#zu=m7Uf4PX=vDg~2-5-iO&mG%f8@k~
+zJmNol5yf4S%>@@7fPbLCaR)8~khd-YU0<uY06b%hYx?k_=@w2jr2m0GOcJYP<K(RW
+zpE)xoPM-+MEH#9^KHa!8HimR7X?ST9PoETQ{@!cy@nFPH72M_A8uN2?IR|~Q7yUNe
+z9Q3id)t*w}xjpq>75Il}u}Wr6PQeSftvogUUl7#(pq36e7nz)%vIumS#svhedl`nL
+z)XBpa*m3{{aE<%Ye-D5If|FDKzXz09B_+7v{ofFT-7LUCN$G!MQygpJMWauwu-mow
+z%O}grL|(5s4c5{rwj+KbZ`@u@!aF!CT2TmnkYR{Vooos4Y~X!QxGa2%k`@CuQM)9_
+zz-4}=UvKX_yFGLo6K6{Vr)(O+??-QpjgLQ0XRRu;Uf4|0d9U&beeM;F{wCx$_HyXs
+zyD^nCm_kDY1k0>)-5aYcuDH@wV@$=#xqZc*=%cEYM(Nd-rMO97jS>NFG)_=@As{%r
+zLBFX3c-NSaB)!raOly|&VUow`S1%V_%&Rd#wusl`WjYdfLo+lKLnt(Qw<-`j_Lkq=
+zt?a|-k88Lwy;z5sx|t+d1Gg+p^%!VGad%F=x@w$tO?cv%F;w+<m$|*D{ok!{hN6M_
+zb;(aqJ_?&q^dXQ3vr%cG>h(=3x3cH|o-x5Qk@#0jE0Abl7icpf@5Nj<TIR2tAh}3H
+z9A{{*fV(|Q{V9AL){CGq3BNW8Oo{pvdK{MWA!6np#BlK#2Oghi=ouoEfI%s-f$R;|
+z^;KmVU>bP3OT?L%GYhK0_NS1?52kd9b7i9O$wA&1E!6=ob1EyGMT4`5i+1zAa{XR)
+z_9tVj8IfQ`qfUlPF-nMBf3&oV$Aj4%rBK98Bvop6B61g9F51&-260k8V6~hPAjh7<
+z(8^HsVA4F6pT-=A`1;qIFiFJrfZ~3}z*_H@5)@7dM28)%>jfvDi}ojv4SOwK61Fb^
+zQfyaSgvQsRyEx-z%5O-ukvPhPt_N?GoF0H%Y=TN(z&z#LeyxQ&4(Y@3#%dMgP6BY=
+zK}qIP46d4n90xa%;11ZX@!|Bi;2lB^c8%X~<jx#gxRU?|oPb5C(YVtF7F<*2ejNER
+zX*Ry9QbBSXEna^AU$E1qo6qMV95eiYJto63b#UmFswp?o+syxN8y2s+@LG{-WQhl)
+zH52FQ!RNP+M<|O+OZ*oLm{bByd{}qYE?Dn)gI(u=I8Hh}SYcc@?0}gzba-(j08UKM
+z*EmiPxLiKYP0(@h;tCfna0ubbcR|x(sta;|CL9UQV(7FiaQoV4xB(H2Z2xh|sC!&r
+z-sK=-o7Gf-kkj{BSLErH2uye}%)Pm#-KwMn6T?jp^RHrS7Ut&7-%4DVBa?0o`iNI!
+zSL1Pi8U*>TjW5=tx8TKe-Hq`Z2h89^@B=Sf_RZC<c8f>v#kSdS0MIuqTk1-rN3o6f
+zcz2k_>tZP3)kdzSH|QJx9Ol2Z+;n)hzzW8ghj^}&F4)|%02a56%qBN>D^r888n<7m
+zG;gg<BAxBX+eaRzClA}aeKuaL!iIgmlHP56&OY_NR}uRvAQB{+Aho*>lqwXgLjNC;
+CDZSGG
+
+literal 0
+HcmV?d00001
+
+diff --git a/OPN-Challenge/Assets.xcassets/error.imageset/error.png b/OPN-Challenge/Assets.xcassets/error.imageset/error.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..9bf3e622023b2b972f8d55c8ccb7d2b069acf893
+GIT binary patch
+literal 18110
+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
+CDZSGG
+
+literal 0
+HcmV?d00001
+
+diff --git a/OPN-Challenge/Assets.xcassets/loading_ellipse.imageset/Contents.json b/OPN-Challenge/Assets.xcassets/loading_ellipse.imageset/Contents.json
+new file mode 100644
+index 0000000..345753b
+--- /dev/null
++++ b/OPN-Challenge/Assets.xcassets/loading_ellipse.imageset/Contents.json
+@@ -0,0 +1,22 @@
++{
++  "images" : [
++    {
++      "idiom" : "universal",
++      "scale" : "1x"
++    },
++    {
++      "filename" : "loading_ellipse_1.png",
++      "idiom" : "universal",
++      "scale" : "2x"
++    },
++    {
++      "filename" : "loading_ellipse_2.png",
++      "idiom" : "universal",
++      "scale" : "3x"
++    }
++  ],
++  "info" : {
++    "author" : "xcode",
++    "version" : 1
++  }
++}
+diff --git a/OPN-Challenge/Assets.xcassets/loading_ellipse.imageset/loading_ellipse_1.png b/OPN-Challenge/Assets.xcassets/loading_ellipse.imageset/loading_ellipse_1.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..1eadc5117297ec79575a52f74b362e53aa1bfcb9
+GIT binary patch
+literal 12506
+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
+
+literal 0
+HcmV?d00001
+
+diff --git a/OPN-Challenge/Assets.xcassets/loading_ellipse.imageset/loading_ellipse_2.png b/OPN-Challenge/Assets.xcassets/loading_ellipse.imageset/loading_ellipse_2.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..1eadc5117297ec79575a52f74b362e53aa1bfcb9
+GIT binary patch
+literal 12506
+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
+
+literal 0
+HcmV?d00001
+
+diff --git a/OPN-Challenge/Scenes/CommonView/BaseXIBView.swift b/OPN-Challenge/Scenes/CommonView/BaseXIBView.swift
+new file mode 100644
+index 0000000..0f4502a
+--- /dev/null
++++ b/OPN-Challenge/Scenes/CommonView/BaseXIBView.swift
+@@ -0,0 +1,25 @@
++import UIKit
++
++class BaseXIBView: UIView {
++    var view: UIView!
++    
++    override init(frame: CGRect) {
++        super.init(frame: frame)
++        xibSetup()
++    }
++    
++    required init?(coder aDecoder: NSCoder) {
++        super.init(coder: aDecoder)
++        xibSetup()
++    }
++    
++    func xibSetup() {
++        let nib = UINib(nibName: String.init(describing: type(of: self)), bundle: .main)
++        view = nib.instantiate(withOwner: self, options: nil)[0] as? UIView
++        view.frame = bounds
++        view.autoresizingMask = [UIView.AutoresizingMask.flexibleWidth, UIView.AutoresizingMask.flexibleHeight]
++        self.layoutIfNeeded()
++        addSubview(view)
++    }
++
++}
+diff --git a/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullView.xib b/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullView.xib
+new file mode 100644
+index 0000000..a47fd0b
+--- /dev/null
++++ b/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullView.xib
+@@ -0,0 +1,108 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
++    <device id="retina6_12" orientation="portrait" appearance="light"/>
++    <dependencies>
++        <deployment identifier="iOS"/>
++        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
++        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
++        <capability name="System colors in document resources" minToolsVersion="11.0"/>
++        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
++    </dependencies>
++    <objects>
++        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="UILoadingFullViewViewController" customModule="OPN_Challenge" customModuleProvider="target">
++            <connections>
++                <outlet property="errorHeader" destination="dw0-Cc-JXY" id="Mhq-QU-QTG"/>
++                <outlet property="errorMessage" destination="Aub-VH-Q6g" id="1dz-tg-F5P"/>
++                <outlet property="errorName" destination="6H1-mj-l4O" id="Xrv-6O-dct"/>
++                <outlet property="errorViewContainer" destination="MfA-tH-kfB" id="6v3-Gu-w6N"/>
++                <outlet property="loadingView" destination="fDU-Ol-Cfe" id="Bzb-Xp-1Tq"/>
++                <outlet property="view" destination="Onh-oy-5MW" id="nrD-eQ-cYa"/>
++            </connections>
++        </placeholder>
++        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
++        <view contentMode="scaleToFill" id="Onh-oy-5MW">
++            <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
++            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
++            <subviews>
++                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="loading_ellipse" translatesAutoresizingMaskIntoConstraints="NO" id="fDU-Ol-Cfe">
++                    <rect key="frame" x="156.66666666666666" y="376" width="80" height="100"/>
++                    <constraints>
++                        <constraint firstAttribute="height" constant="100" id="5Z3-pb-g39"/>
++                        <constraint firstAttribute="width" constant="80" id="Q1X-7R-wHh"/>
++                    </constraints>
++                </imageView>
++                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MfA-tH-kfB" userLabel="Error View">
++                    <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
++                    <subviews>
++                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="error" translatesAutoresizingMaskIntoConstraints="NO" id="5pS-62-uKP">
++                            <rect key="frame" x="149" y="267.33333333333331" width="95" height="95"/>
++                            <constraints>
++                                <constraint firstAttribute="width" constant="95" id="Z1G-2g-dBS"/>
++                                <constraint firstAttribute="height" constant="95" id="wAT-QS-mtu"/>
++                            </constraints>
++                        </imageView>
++                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="cuz-ks-cYE">
++                            <rect key="frame" x="60" y="378.33333333333331" width="273" height="95.333333333333314"/>
++                            <subviews>
++                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Header" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dw0-Cc-JXY">
++                                    <rect key="frame" x="0.0" y="0.0" width="273" height="21.666666666666668"/>
++                                    <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
++                                    <nil key="textColor"/>
++                                    <nil key="highlightedColor"/>
++                                </label>
++                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Mock error message that have two or more line to display." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Aub-VH-Q6g">
++                                    <rect key="frame" x="0.0" y="29.666666666666689" width="273" height="38.333333333333343"/>
++                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
++                                    <nil key="textColor"/>
++                                    <nil key="highlightedColor"/>
++                                </label>
++                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="[mockErrorName]" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6H1-mj-l4O">
++                                    <rect key="frame" x="0.0" y="76" width="273" height="19.333333333333329"/>
++                                    <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="16"/>
++                                    <nil key="textColor"/>
++                                    <nil key="highlightedColor"/>
++                                </label>
++                            </subviews>
++                        </stackView>
++                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2ma-MB-ual">
++                            <rect key="frame" x="149.66666666666666" y="489.66666666666669" width="93.666666666666657" height="40.333333333333314"/>
++                            <state key="normal" title="Button"/>
++                            <buttonConfiguration key="configuration" style="plain" title="Try again"/>
++                            <connections>
++                                <action selector="onTappedTryAgain:" destination="-1" eventType="touchUpInside" id="7KY-pL-rdz"/>
++                            </connections>
++                        </button>
++                    </subviews>
++                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
++                    <constraints>
++                        <constraint firstItem="cuz-ks-cYE" firstAttribute="top" secondItem="5pS-62-uKP" secondAttribute="bottom" constant="16" id="4Z3-jE-PRI"/>
++                        <constraint firstItem="cuz-ks-cYE" firstAttribute="leading" secondItem="MfA-tH-kfB" secondAttribute="leading" constant="60" id="FrM-VE-0id"/>
++                        <constraint firstItem="cuz-ks-cYE" firstAttribute="centerY" secondItem="MfA-tH-kfB" secondAttribute="centerY" id="SbC-iA-Msc"/>
++                        <constraint firstItem="2ma-MB-ual" firstAttribute="centerX" secondItem="MfA-tH-kfB" secondAttribute="centerX" id="kyu-MM-vrp"/>
++                        <constraint firstAttribute="centerX" secondItem="5pS-62-uKP" secondAttribute="centerX" id="tY4-XY-De3"/>
++                        <constraint firstItem="2ma-MB-ual" firstAttribute="top" secondItem="cuz-ks-cYE" secondAttribute="bottom" constant="16" id="tcP-vX-4Fk"/>
++                        <constraint firstAttribute="trailing" secondItem="cuz-ks-cYE" secondAttribute="trailing" constant="60" id="wtu-bO-fx0"/>
++                    </constraints>
++                </view>
++            </subviews>
++            <viewLayoutGuide key="safeArea" id="cgw-kH-hIr"/>
++            <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++            <constraints>
++                <constraint firstItem="fDU-Ol-Cfe" firstAttribute="centerY" secondItem="Onh-oy-5MW" secondAttribute="centerY" id="6Nc-gg-cOs"/>
++                <constraint firstItem="fDU-Ol-Cfe" firstAttribute="centerX" secondItem="Onh-oy-5MW" secondAttribute="centerX" id="HOF-o5-tIm"/>
++                <constraint firstItem="MfA-tH-kfB" firstAttribute="top" secondItem="Onh-oy-5MW" secondAttribute="top" id="eyj-oP-34i"/>
++                <constraint firstItem="MfA-tH-kfB" firstAttribute="trailing" secondItem="cgw-kH-hIr" secondAttribute="trailing" id="kpR-Ae-ow1"/>
++                <constraint firstItem="MfA-tH-kfB" firstAttribute="leading" secondItem="cgw-kH-hIr" secondAttribute="leading" id="oFf-ML-paT"/>
++                <constraint firstAttribute="bottom" secondItem="MfA-tH-kfB" secondAttribute="bottom" id="y7Q-pb-dnn"/>
++            </constraints>
++            <point key="canvasLocation" x="46.376811594202906" y="20.758928571428569"/>
++        </view>
++    </objects>
++    <resources>
++        <image name="error" width="170.66667175292969" height="170.66667175292969"/>
++        <image name="loading_ellipse" width="69.333335876464844" height="69.333335876464844"/>
++        <systemColor name="systemBackgroundColor">
++            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
++        </systemColor>
++    </resources>
++</document>
+diff --git a/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewInteractor.swift b/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewInteractor.swift
+new file mode 100644
+index 0000000..1efc508
+--- /dev/null
++++ b/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewInteractor.swift
+@@ -0,0 +1,19 @@
++protocol UILoadingFullViewBusinessLogic {
++    func showLoading(request: UILoadingFullView.Loading.Request)
++    func showError(request: UILoadingFullView.Error.Request)
++}
++
++protocol UILoadingFullViewDataStore {
++}
++
++class UILoadingFullViewInteractor: UILoadingFullViewBusinessLogic, UILoadingFullViewDataStore {
++    var presenter: UILoadingFullViewPresentationLogic?
++  
++    func showLoading(request: UILoadingFullView.Loading.Request) {
++        presenter?.presentLoading(response: .init(show: request.show))
++    }
++    
++    func showError(request: UILoadingFullView.Error.Request) {
++        presenter?.presentError(respose: .init(show: request.show, serviceError: request.serviceError, customAction: request.customAction))
++    }
++}
+diff --git a/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewModels.swift b/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewModels.swift
+new file mode 100644
+index 0000000..d8aaa01
+--- /dev/null
++++ b/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewModels.swift
+@@ -0,0 +1,31 @@
++enum UILoadingFullView {
++    enum Loading {
++        struct Request {
++            let show: Bool
++        }
++        struct Response {
++            let show: Bool
++        }
++        struct ViewModel {
++            let show: Bool
++        }
++    }
++    
++    enum Error {
++        struct Request {
++            let show: Bool
++            let serviceError: ServiceError?
++            let customAction: (() -> Void)?
++        }
++        struct Response {
++            let show: Bool
++            let serviceError: ServiceError?
++            let customAction: (() -> Void)?
++        }
++        struct ViewModel {
++            let show: Bool
++            let serviceError: ServiceError?
++            let customAction: (() -> Void)?
++        }
++    }
++}
+diff --git a/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewPresenter.swift b/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewPresenter.swift
+new file mode 100644
+index 0000000..51e294c
+--- /dev/null
++++ b/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewPresenter.swift
+@@ -0,0 +1,17 @@
++protocol UILoadingFullViewPresentationLogic {
++    func presentLoading(response: UILoadingFullView.Loading.Response)
++    func presentError(respose: UILoadingFullView.Error.Response)
++}
++
++class UILoadingFullViewPresenter: UILoadingFullViewPresentationLogic {
++    weak var viewController: UILoadingFullViewDisplayLogic?
++    
++    func presentLoading(response: UILoadingFullView.Loading.Response) {
++        viewController?.displayLoading(viewModel: .init(show: response.show))
++    }
++    
++    func presentError(respose: UILoadingFullView.Error.Response) {
++        viewController?.displayError(viewModel: .init(show: respose.show, serviceError: respose.serviceError, customAction: respose.customAction))
++    }
++    
++}
+diff --git a/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewRouter.swift b/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewRouter.swift
+new file mode 100644
+index 0000000..f1c9b8e
+--- /dev/null
++++ b/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewRouter.swift
+@@ -0,0 +1,16 @@
++protocol UILoadingFullViewRoutingLogic {
++    func close()
++}
++
++protocol UILoadingFullViewDataPassing {
++    var dataStore: UILoadingFullViewDataStore? { get }
++}
++
++class UILoadingFullViewRouter: UILoadingFullViewRoutingLogic, UILoadingFullViewDataPassing {
++    weak var viewController: UILoadingFullViewViewController?
++    var dataStore: UILoadingFullViewDataStore?
++    
++    func close() {
++        viewController?.dismiss(animated: true)
++    }
++}
+diff --git a/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewViewController.swift b/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewViewController.swift
+new file mode 100644
+index 0000000..579e93b
+--- /dev/null
++++ b/OPN-Challenge/Scenes/CommonView/UILoadingFullView/UILoadingFullViewViewController.swift
+@@ -0,0 +1,98 @@
++import UIKit
++
++protocol UILoadingFullViewDisplayLogic: AnyObject {
++    func displayLoading(viewModel: UILoadingFullView.Loading.ViewModel)
++    func displayError(viewModel: UILoadingFullView.Error.ViewModel)
++}
++
++class UILoadingFullViewViewController: UIViewController, UILoadingFullViewDisplayLogic {
++    var interactor: UILoadingFullViewBusinessLogic?
++    var router: (UILoadingFullViewRoutingLogic & UILoadingFullViewDataPassing)?
++    
++    @IBOutlet private weak var errorViewContainer: UIView!
++    @IBOutlet private weak var errorHeader: UILabel!
++    @IBOutlet private weak var errorMessage: UILabel!
++    @IBOutlet private weak var errorName: UILabel!
++    @IBOutlet private weak var loadingView: UIImageView!
++    
++    var customAction: (() -> Void)?
++    
++    init() {
++        super.init(nibName: "UILoadingFullView", bundle: .main)
++        configure(viewController: self)
++    }
++    
++    required init?(coder: NSCoder) {
++        super.init(coder: coder)
++        configure(viewController: self)
++    }
++    
++    override public func awakeFromNib() {
++        super.awakeFromNib()
++        configure(viewController: self)
++    }
++
++    //MARK: Setup
++    func configure(viewController: UILoadingFullViewViewController) {
++        let interactor = UILoadingFullViewInteractor()
++        let presenter = UILoadingFullViewPresenter()
++        let router = UILoadingFullViewRouter()
++        viewController.interactor = interactor
++        viewController.router = router
++        interactor.presenter = presenter
++        presenter.viewController = viewController
++        router.viewController = viewController
++        router.dataStore = interactor
++        modalPresentationStyle = .overFullScreen
++        modalTransitionStyle = .crossDissolve
++    }
++  
++    //MARK: View lifecycle
++    override func viewDidLoad() {
++        super.viewDidLoad()
++        setupView()
++    }
++    
++    
++    override func viewWillAppear(_ animated: Bool) {
++        super.viewWillAppear(animated)
++        view.isHidden = false
++    }
++    
++    private func setupView() {
++        view.backgroundColor = .black.withAlphaComponent(0.7)
++        view.layoutIfNeeded()
++        rotateView(targetView: loadingView)
++        errorViewContainer.isHidden = true
++    }
++    
++    func displayLoading(viewModel: UILoadingFullView.Loading.ViewModel) {
++        errorViewContainer.isHidden = true
++        if (!viewModel.show) {
++            router?.close()
++        }
++    }
++    
++    func displayError(viewModel: UILoadingFullView.Error.ViewModel) {
++        errorViewContainer.isHidden = !viewModel.show
++        errorHeader.text = viewModel.serviceError?.error.header
++        errorMessage.text = viewModel.serviceError?.error.message
++        errorName.text = "[\(viewModel.serviceError?.error.name ?? "")]"
++        customAction = viewModel.customAction
++    }
++    
++    private func rotateView(targetView: UIView, duration: Double = 3) {
++        UIView.animate(withDuration: duration, delay: 0.0, options: .curveLinear, animations: { targetView.transform = targetView.transform.rotated(by: .pi-360)
++        }) { finished in
++            self.rotateView(targetView: targetView, duration: duration)
++        }
++    }
++    
++    @IBAction func onTappedTryAgain(_ sender: Any) {
++        guard let action = customAction else { return }
++        view.isHidden = true
++        errorViewContainer.isHidden = true
++        router?.close()
++        action()
++    }
++}
+diff --git a/OPN-Challenge/Scenes/HomeProduct/Base.lproj/HomeProduct.storyboard b/OPN-Challenge/Scenes/HomeProduct/Base.lproj/HomeProduct.storyboard
+index 3888587..c8b2e3b 100644
+--- a/OPN-Challenge/Scenes/HomeProduct/Base.lproj/HomeProduct.storyboard
++++ b/OPN-Challenge/Scenes/HomeProduct/Base.lproj/HomeProduct.storyboard
+@@ -241,7 +241,7 @@
+                         <outlet property="orderTotalPriceLabel" destination="Iqz-G3-Iuj" id="uad-X7-snc"/>
+                         <outlet property="productTableView" destination="vgt-ze-udJ" id="P0h-8y-2US"/>
+                         <outlet property="rateLabel" destination="VJs-tk-qdH" id="rsZ-P6-t8g"/>
+-                        <outlet property="storeNameLabel" destination="0ny-is-QSm" id="S0X-7G-39t"/>
++                        <outlet property="storeNameLabel" destination="c5S-sz-aiI" id="5on-ut-RQy"/>
+                     </connections>
+                 </viewController>
+                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+diff --git a/OPN-Challenge/Scenes/HomeProduct/HomeProductInteractor.swift b/OPN-Challenge/Scenes/HomeProduct/HomeProductInteractor.swift
+index d4ff9e6..1d007d8 100644
+--- a/OPN-Challenge/Scenes/HomeProduct/HomeProductInteractor.swift
++++ b/OPN-Challenge/Scenes/HomeProduct/HomeProductInteractor.swift
+@@ -2,6 +2,7 @@ import UIKit
+ 
+ protocol HomeProductBusinessLogic {
+     func updateCart(request: HomeProduct.ProductCart.Request)
++    func getStoreInfoInquiry(request: HomeProduct.StoreInfoInquiry.Request)
+ }
+ 
+ protocol HomeProductDataStore {
+@@ -17,4 +18,16 @@ class HomeProductInteractor: HomeProductBusinessLogic, HomeProductDataStore {
+         let response = HomeProduct.ProductCart.Response(productList: request.productList, totalPrice: request.totalPrice, totalProduct: request.totalProduct)
+         presenter?.presentProductList(response: response)
+     }
++    
++    func getStoreInfoInquiry(request: HomeProduct.StoreInfoInquiry.Request) {
++        ServiceConnection().storeInfoService(completionHandler: { [weak self] result in
++            self?.presenter?.presentStoreInfo(
++                response: HomeProduct.StoreInfoInquiry.Response(storeResponse: result)
++            )
++        }, errorHandler: { [weak self] error in
++            self?.presenter?.presentError(
++                response: HomeProduct.HomeProductError.Response(serviceError: error, customAction: request.customAction)
++            )
++        })
++    }
+ }
+diff --git a/OPN-Challenge/Scenes/HomeProduct/HomeProductModels.swift b/OPN-Challenge/Scenes/HomeProduct/HomeProductModels.swift
+index fffcf35..fdb1ac1 100644
+--- a/OPN-Challenge/Scenes/HomeProduct/HomeProductModels.swift
++++ b/OPN-Challenge/Scenes/HomeProduct/HomeProductModels.swift
+@@ -5,19 +5,44 @@ enum HomeProduct {
+     
+     enum ProductCart {
+         struct Request {
+-            var productList: [Product]
+-            var totalPrice: Int
+-            var totalProduct: Int
++            let productList: [Product]
++            let totalPrice: Int
++            let totalProduct: Int
+         }
+         struct Response {
+-            var productList: [Product]
+-            var totalPrice: Int
+-            var totalProduct: Int
++            let productList: [Product]
++            let totalPrice: Int
++            let totalProduct: Int
+         }
+         struct ViewModel {
+-            var productList: [Product]
+-            var totalPrice: Int
+-            var totalProduct: Int
++            let productList: [Product]
++            let totalPrice: Int
++            let totalProduct: Int
++        }
++    }
++    
++    enum StoreInfoInquiry{
++        struct Request {
++            let customAction: (() -> Void)?
++        }
++        struct Response {
++            let storeResponse: StoreInfoResponseModel
++        }
++        struct ViewModel {
++            let storeInfo: StoreInfo
++        }
++    }
++    
++    enum HomeProductError {
++        struct Request {
++        }
++        struct Response {
++            let serviceError: ServiceError?
++            let customAction: (() -> Void)?
++        }
++        struct ViewModel {
++            let serviceError: ServiceError?
++            let customAction: (() -> Void)?
+         }
+     }
+     
+@@ -27,4 +52,10 @@ enum HomeProduct {
+         var imageUrl: URL
+         var amount: Int
+     }
++    
++    public struct StoreInfo {
++        let name: String
++        let rating: String
++        let businessHours: String
++    }
+ }
+diff --git a/OPN-Challenge/Scenes/HomeProduct/HomeProductPresenter.swift b/OPN-Challenge/Scenes/HomeProduct/HomeProductPresenter.swift
+index 8626114..f8a34d3 100644
+--- a/OPN-Challenge/Scenes/HomeProduct/HomeProductPresenter.swift
++++ b/OPN-Challenge/Scenes/HomeProduct/HomeProductPresenter.swift
+@@ -2,6 +2,8 @@ import UIKit
+ 
+ protocol HomeProductPresentationLogic {
+     func presentProductList(response: HomeProduct.ProductCart.Response)
++    func presentStoreInfo(response: HomeProduct.StoreInfoInquiry.Response)
++    func presentError(response: HomeProduct.HomeProductError.Response)
+ }
+ 
+ class HomeProductPresenter: HomeProductPresentationLogic {
+@@ -13,4 +15,30 @@ class HomeProductPresenter: HomeProductPresentationLogic {
+         let viewModel = HomeProduct.ProductCart.ViewModel(productList: response.productList, totalPrice: response.totalPrice, totalProduct: response.totalProduct)
+         viewController?.displayProductList(viewModel: viewModel)
+     }
++    
++    func presentStoreInfo(response: HomeProduct.StoreInfoInquiry.Response) {
++        let formattedTime = "\(formatBusinessTime(dateString: response.storeResponse.openingTime ?? "")) - \(formatBusinessTime(dateString: response.storeResponse.closingTime ?? ""))"
++        let formattedRate = formatStoreRating(rate: response.storeResponse.rating ?? 0.0)
++        let viewModel = HomeProduct.StoreInfoInquiry.ViewModel(
++            storeInfo: HomeProduct.StoreInfo(
++                name: response.storeResponse.name ?? "",
++                rating: formattedRate,
++                businessHours: formattedTime
++            )
++        )
++        viewController?.displayStoreInfo(viewModel: viewModel)
++    }
++    
++    func presentError(response: HomeProduct.HomeProductError.Response) {
++        let viewModel = HomeProduct.HomeProductError.ViewModel(serviceError: response.serviceError, customAction: response.customAction)
++        viewController?.displayError(viewModel: viewModel)
++    }
++    
++    func formatBusinessTime(dateString: String) -> String {
++        return DateFormatComponent().format(dateString: dateString, sourcePattern: .HH_mm_ss_SSSS_Z, destinationPattern: .HH_mm)
++    }
++    
++    func formatStoreRating(rate: Float) -> String {
++        return String(format: "%.1f", rate)
++    }
+ }
+diff --git a/OPN-Challenge/Scenes/HomeProduct/HomeProductRouter.swift b/OPN-Challenge/Scenes/HomeProduct/HomeProductRouter.swift
+index c95853a..5039552 100644
+--- a/OPN-Challenge/Scenes/HomeProduct/HomeProductRouter.swift
++++ b/OPN-Challenge/Scenes/HomeProduct/HomeProductRouter.swift
+@@ -1,16 +1,17 @@
+-import UIKit
+-
+-@objc protocol HomeProductRoutingLogic {
+-    //func routeToSomewhere(segue: UIStoryboardSegue?)
++protocol HomeProductRoutingLogic {
++    func showFullViewLoading(destination: UILoadingFullViewViewController)
+ }
+ 
+ protocol HomeProductDataPassing {
+     var dataStore: HomeProductDataStore? { get }
+ }
+ 
+-class HomeProductRouter: NSObject, HomeProductRoutingLogic, HomeProductDataPassing {
++class HomeProductRouter: HomeProductRoutingLogic, HomeProductDataPassing {
+     weak var viewController: HomeProductViewController?
+     var dataStore: HomeProductDataStore?
+     
+     // MARK: Routing
++    public func showFullViewLoading(destination: UILoadingFullViewViewController) {
++        viewController?.present(destination, animated: true)
++    }
+ }
+diff --git a/OPN-Challenge/Scenes/HomeProduct/HomeProductViewController.swift b/OPN-Challenge/Scenes/HomeProduct/HomeProductViewController.swift
+index aed7d0e..956dce9 100644
+--- a/OPN-Challenge/Scenes/HomeProduct/HomeProductViewController.swift
++++ b/OPN-Challenge/Scenes/HomeProduct/HomeProductViewController.swift
+@@ -2,22 +2,26 @@ import UIKit
+ 
+ protocol HomeProductDisplayLogic: AnyObject {
+     func displayProductList(viewModel: HomeProduct.ProductCart.ViewModel)
++    func displayStoreInfo(viewModel: HomeProduct.StoreInfoInquiry.ViewModel)
++    func displayError(viewModel: HomeProduct.HomeProductError.ViewModel)
+ }
+ 
+ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
+     var interactor: HomeProductBusinessLogic?
+-    var router: (NSObjectProtocol & HomeProductRoutingLogic & HomeProductDataPassing)?
++    var router: (HomeProductRoutingLogic & HomeProductDataPassing)?
+     @IBOutlet private weak var headerView: UIView!
+     @IBOutlet private weak var contentView: UIView!
+     @IBOutlet private weak var rateLabel: UILabel!
+     @IBOutlet private weak var businessHoursLabel: UILabel!
+-    @IBOutlet private weak var storeNameLabel: NSLayoutConstraint!
++    @IBOutlet private weak var storeNameLabel: UILabel!
+     @IBOutlet weak var productTableView: UITableView!
+     @IBOutlet private weak var bottomView: UIView!
+     @IBOutlet private weak var orderTotalPriceLabel: UILabel!
+     @IBOutlet private weak var orderButtonStackView: UIStackView!
+     @IBOutlet private weak var orderButton: UIButton!
+     
++    public var uiLoadingFullView = UILoadingFullViewViewController()
++    
+     var productCart: [HomeProduct.Product] = [HomeProduct.Product.init(name: "Latte", price: 50, imageUrl: URL(string: "https://www.nespresso.com/ncp/res/uploads/recipes/nespresso-recipes-Latte-Art-Tulip.jpg")!, amount: 0), HomeProduct.Product.init(name: "Dark Tiramisu Mocha", price: 75, imageUrl: URL(string: "https://www.nespresso.com/shared_res/mos/free_html/sg/b2b/b2ccoffeerecipes/listing-image/image/dark-tiramisu-mocha.jpg")!, amount: 0)]
+     var totalPrice = 0
+     var totalProduct = 0
+@@ -59,6 +63,7 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
+     override func viewDidLoad() {
+         super.viewDidLoad()
+         setupView()
++        fetchInitialStoreInfo()
+     }
+     
+     private func setupView() {
+@@ -73,8 +78,6 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
+             masksToBounds: false
+         )
+         
+-        businessHoursLabel.text = DateFormatComponent().format(dateString: "15:01:01.772Z", sourcePattern: .HH_mm_ss_SSSS_Z, destinationPattern: .HH_mm)+" - "+DateFormatComponent().format(dateString: "19:45:51.365Z", sourcePattern: .HH_mm_ss_SSSS_Z, destinationPattern: .HH_mm)
+-        
+         productTableView.delegate = self
+         productTableView.dataSource = self
+         
+@@ -110,6 +113,25 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
+         updateBottomView(isShow: totalProduct > 0)
+     }
+     
++    func displayStoreInfo(viewModel: HomeProduct.StoreInfoInquiry.ViewModel) {
++        let storeInfo = viewModel.storeInfo
++        storeNameLabel.text = storeInfo.name
++        businessHoursLabel.text = storeInfo.businessHours
++        rateLabel.text = storeInfo.rating
++        uiLoadingFullView.interactor?.showLoading(request: UILoadingFullView.Loading.Request(show: false))
++    }
++    
++    func displayError(viewModel: HomeProduct.HomeProductError.ViewModel) {
++        let serviceError = viewModel.serviceError
++        let customAction = viewModel.customAction
++        uiLoadingFullView.interactor?.showError(request: UILoadingFullView.Error.Request(show: true, serviceError: serviceError, customAction: customAction))
++    }
++    
++    private func fetchInitialStoreInfo() {
++        router?.showFullViewLoading(destination: uiLoadingFullView)
++        interactor?.getStoreInfoInquiry(request: HomeProduct.StoreInfoInquiry.Request(customAction: fetchInitialStoreInfo))
++    }
++    
+     private func updateBottomView(isShow: Bool) {
+         orderButtonStackView.backgroundColor = isShow ? .primary : .lightGray
+         UIView.animate(withDuration: 0.2) { [weak self] in
+diff --git a/OPN-Challenge/Service/BaseAPI/BaseAPI.swift b/OPN-Challenge/Service/BaseAPI/BaseAPI.swift
+new file mode 100644
+index 0000000..07d1cf2
+--- /dev/null
++++ b/OPN-Challenge/Service/BaseAPI/BaseAPI.swift
+@@ -0,0 +1,43 @@
++import Moya
++
++enum BaseAPI {
++    case getStoreInfo
++    case getProducts
++    case postOrder(request: PostOrderRequestModel)
++}
++
++extension BaseAPI: TargetType {
++    var baseURL: URL { URL(string: Environment.BASE_URL)! }
++    var path: String {
++        switch self {
++        case .getStoreInfo:
++            return Environment.Endpoint.storeInfo
++        case .getProducts:
++            return Environment.Endpoint.products
++        case .postOrder:
++            return Environment.Endpoint.order
++        }
++    }
++    
++    var method: Moya.Method {
++        switch self {
++        case .getStoreInfo, .getProducts:
++            return .get
++        case .postOrder:
++            return .post
++        }
++    }
++    
++    var task: Task {
++        switch self{
++        case .getProducts, .getStoreInfo:
++            return .requestPlain
++        case let .postOrder(request):
++            return .requestParameters(parameters: ["products": request.products, "delivery_address": request.address], encoding: JSONEncoding.default)
++        }
++    }
++    
++    var headers: [String : String]? {
++        return ["Content-Type": "application/json"]
++    }
++}
+diff --git a/OPN-Challenge/Service/BaseAPI/Environment.swift b/OPN-Challenge/Service/BaseAPI/Environment.swift
+new file mode 100644
+index 0000000..06bc579
+--- /dev/null
++++ b/OPN-Challenge/Service/BaseAPI/Environment.swift
+@@ -0,0 +1,11 @@
++public struct Environment {
++    static let BASE_URL = "https://615dedf1-36b8-40fd-8fc4-fbc0998133cb.mock.pstmn.io"
++}
++
++extension Environment {
++    enum Endpoint {
++        static let storeInfo = "/storeInfo"
++        static let products = "/products"
++        static let order = "/order"
++    }
++}
+diff --git a/OPN-Challenge/Service/BaseService.swift b/OPN-Challenge/Service/BaseService.swift
+new file mode 100644
+index 0000000..de54244
+--- /dev/null
++++ b/OPN-Challenge/Service/BaseService.swift
+@@ -0,0 +1,52 @@
++import Moya
++
++protocol CachePolicyGettable {
++    var cachePolicy: URLRequest.CachePolicy { get }
++}
++
++final class CachePolicyPlugin: PluginType {
++    public func prepare(_ request: URLRequest, target: TargetType) -> URLRequest {
++        if let cachePolicyGettable = target as? CachePolicyGettable {
++            var mutableRequest = request
++            mutableRequest.cachePolicy = cachePolicyGettable.cachePolicy
++            return mutableRequest
++        }
++        return request
++    }
++}
++
++public class BaseService {
++    private let provider: MoyaProvider<BaseAPI>
++    private let requestRetrier = NetworkRequestRetrier()
++    
++    public init() {
++        provider = MoyaProvider<BaseAPI>(
++            session: Session(
++                configuration: URLSessionConfiguration.default,
++                startRequestsImmediately: false,
++                interceptor: requestRetrier
++            ),
++            plugins: [CachePolicyPlugin()]
++        )
++    }
++}
++
++extension BaseService {
++    func fetchStoreInfo(completionHandler: @escaping ((StoreInfoResponseModel) -> Void), errorHandler: @escaping (APIError) -> Void) {
++        provider.request(
++            BaseAPI.getStoreInfo,
++            completion: { response in
++                ResponseHandler().processResponse(result: response, success: completionHandler, failure: errorHandler)
++            }
++        )
++    }
++    
++    func fetchProducts(completionHandler: @escaping (([ProductsResponseModel]) -> Void), errorHandler: @escaping (APIError) -> Void) {
++        provider.request(
++            BaseAPI.getProducts,
++            completion: { response in
++                ResponseHandler().processResponse(result: response, success: completionHandler, failure: errorHandler)
++            }
++        )
++    }
++}
+diff --git a/OPN-Challenge/Service/Model/BaseErrorModel.swift b/OPN-Challenge/Service/Model/BaseErrorModel.swift
+new file mode 100644
+index 0000000..7d88bf3
+--- /dev/null
++++ b/OPN-Challenge/Service/Model/BaseErrorModel.swift
+@@ -0,0 +1,12 @@
++public class APIError: ServiceError {
++    public var error: BaseServiceError = BaseServiceError(name: "", header: "", message: "")
++    public required init() {}
++    
++    public required init(error: BaseServiceError) {
++        self.error = error
++    }
++}
++
++struct ErrorResponse: Decodable {
++    var error: BaseServiceError
++}
+diff --git a/OPN-Challenge/Service/Model/RequestModel.swift b/OPN-Challenge/Service/Model/RequestModel.swift
+new file mode 100644
+index 0000000..0f49fab
+--- /dev/null
++++ b/OPN-Challenge/Service/Model/RequestModel.swift
+@@ -0,0 +1,10 @@
++struct PostOrderRequestModel: Codable {
++    let products: [ProductRequestModel]
++    let address: String
++}
++
++struct ProductRequestModel: Codable {
++    let name: String
++    let price: Int
++    let imageUrl: String
++}
+diff --git a/OPN-Challenge/Service/Model/ResponseModel.swift b/OPN-Challenge/Service/Model/ResponseModel.swift
+new file mode 100644
+index 0000000..744cfe2
+--- /dev/null
++++ b/OPN-Challenge/Service/Model/ResponseModel.swift
+@@ -0,0 +1,12 @@
++struct StoreInfoResponseModel: Codable {
++    var name: String?
++    var rating: Float?
++    var openingTime: String?
++    var closingTime: String?
++}
++
++struct ProductsResponseModel: Codable {
++    var name: String?
++    var price: Int?
++    var imageUrl: String?
++}
+diff --git a/OPN-Challenge/Service/Model/ServiceError.swift b/OPN-Challenge/Service/Model/ServiceError.swift
+new file mode 100644
+index 0000000..9bac255
+--- /dev/null
++++ b/OPN-Challenge/Service/Model/ServiceError.swift
+@@ -0,0 +1,19 @@
++public struct BaseServiceError: Decodable {
++    var name: String
++    var header: String
++    var message: String
++}
++
++public protocol ServiceError: Error {
++    init()
++    init(_ error: BaseServiceError)
++    var error: BaseServiceError { get set }
++}
++
++public extension ServiceError {
++    init(_ error: BaseServiceError) {
++        self.init()
++        self.error = error
++    }
++}
++
+diff --git a/OPN-Challenge/Service/NetworkRequestRetrier.swift b/OPN-Challenge/Service/NetworkRequestRetrier.swift
+new file mode 100644
+index 0000000..ae5a3f9
+--- /dev/null
++++ b/OPN-Challenge/Service/NetworkRequestRetrier.swift
+@@ -0,0 +1,30 @@
++import Alamofire
++
++class NetworkRequestRetrier: Retrier {
++    init() {
++        super.init() { request, session, error, completion in
++            var retriedRequests: [String: Int] = [:]
++            guard request.task?.response == nil, let url = request.request?.url?.absoluteString else {
++                guard let url = request.request?.url?.absoluteString else { return }
++                retriedRequests.removeValue(forKey: url)
++                completion(.doNotRetry)
++                return
++            }
++            
++            guard let retryCount = retriedRequests[url] else {
++                retriedRequests[url] = 1
++                completion(.retryWithDelay(30))
++                return
++            }
++            
++            if retryCount <= 3 {
++                retriedRequests[url] = retryCount + 1
++                completion(.retryWithDelay(30))
++            } else {
++                guard let url = request.request?.url?.absoluteString else { return }
++                retriedRequests.removeValue(forKey: url)
++                completion(.doNotRetry)
++            }
++        }
++    }
++}
+diff --git a/OPN-Challenge/Service/ResponseHandler.swift b/OPN-Challenge/Service/ResponseHandler.swift
+new file mode 100644
+index 0000000..9ec8577
+--- /dev/null
++++ b/OPN-Challenge/Service/ResponseHandler.swift
+@@ -0,0 +1,73 @@
++import Moya
++
++typealias NetworkFailureBlock = (APIError) -> Void
++
++class ResponseHandler {
++    func processResponse<T>(result: Result<Moya.Response, MoyaError>, success: @escaping ((T) -> Void), failure: NetworkFailureBlock?) where T: Codable {
++        switch result {
++        case let .success(response):
++            self.validate(
++                response,
++                success: { () in
++                    do {
++                        let data = try response.map(T.self)
++                        success(data)
++                    } catch _ {
++                        print("fail:-map")
++                        failure?(APIError(
++                            error: BaseServiceError(
++                                name: "FAIL",
++                                header: "MAPError",
++                                message: "NULL_RESPONSE_MESSAGE"
++                            )
++                        ))
++                    }
++                },
++                error: { error in
++                    print("fail:-api", error)
++                    failure?(error)
++                }
++            )
++        case let .failure(error):
++            print("fail:-validate", error)
++            failure?(APIError(
++                error: BaseServiceError(
++                    name: "FAIL",
++                    header: "NETWORKError",
++                    message: "NULL_RESPONSE_MESSAGE"
++                )
++            ))
++        }
++    }
++    
++    func validate(_ response: Response, success: () -> Void, error: (APIError) -> Void) {
++        var errorManager: APIError
++        if response.statusCode >= 200 && response.statusCode < 300 {
++            success()
++        } else {
++            do {
++                let errorResponse = try response.map(ErrorResponse.self)
++                print("error", errorResponse)
++                errorManager = APIError(
++                    error: BaseServiceError(
++                        name: errorResponse.error.name,
++                        header: errorResponse.error.header,
++                        message: errorResponse.error.message
++                    )
++                )
++                print("fail:-apierror-success-map-error")
++            } catch {
++                print("error", error)
++                errorManager = APIError(
++                    error: BaseServiceError(
++                        name: "FAIL",
++                        header: "APIError",
++                        message: "NULL_RESPONSE_MESSAGE"
++                    )
++                )
++                print("fail:-apierror-fail-map-error")
++            }
++            error(errorManager)
++        }
++    }
++}
+diff --git a/OPN-Challenge/Service/ServiceConnection.swift b/OPN-Challenge/Service/ServiceConnection.swift
+new file mode 100644
+index 0000000..edea781
+--- /dev/null
++++ b/OPN-Challenge/Service/ServiceConnection.swift
+@@ -0,0 +1,33 @@
++class ServiceConnection {
++    func storeInfoService(completionHandler: @escaping (StoreInfoResponseModel) -> Void, errorHandler: @escaping (ServiceError?) -> Void) {
++        BaseService().fetchStoreInfo(
++            completionHandler: { (response: StoreInfoResponseModel) in
++                completionHandler(response)
++            }, errorHandler: { error in
++                errorHandler(error)
++            }
++        )
++    }
++    
++    func productsService(completionHandler: @escaping ([ProductsResponseModel]) -> Void, errorHandler: @escaping (ServiceError?) -> Void) {
++        BaseService().fetchProducts(
++            completionHandler: { (response: [ProductsResponseModel]) in
++                completionHandler(response)
++            }, errorHandler: { error in
++                errorHandler(error)
++            }
++        )
++    }
++    
++//    func CoinDetailService(uuid: String, completionHandler: @escaping (BaseCoinResponseData) -> Void, errorHandler: @escaping (ServiceError?) -> Void) {
++//        let requestData = CoinDetailRequestData(uuid: uuid)
++//        BaseService().fetchCoinDetail(
++//            uuid: requestData.uuid,
++//            completionHandler: { (response: BaseCoinResponseData) in
++//                completionHandler(response)
++//            }, errorHandler: { error in
++//                errorHandler(error)
++//            }
++//        )
++//    }
++}
+-- 
+2.39.3 (Apple Git-146)
+
