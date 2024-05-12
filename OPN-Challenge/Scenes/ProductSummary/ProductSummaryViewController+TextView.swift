@@ -11,7 +11,7 @@ extension ProductSummaryViewController: UITextViewDelegate {
     
     func textViewDidEndEditing(_ textView: UITextView) {
         textView.layer.borderColor = UIColor.lightGreyPrimary.cgColor
-        if textView.text.isEmpty {
+        if textView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             textView.text = "Please fill in address..."
             textView.textColor = UIColor.lightGreySecondary
             enableNextButton(false)
