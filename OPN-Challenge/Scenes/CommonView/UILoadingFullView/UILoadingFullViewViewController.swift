@@ -32,7 +32,6 @@ class UILoadingFullViewViewController: UIViewController, UILoadingFullViewDispla
         configure(viewController: self)
     }
 
-    //MARK: Setup
     func configure(viewController: UILoadingFullViewViewController) {
         let interactor = UILoadingFullViewInteractor()
         let presenter = UILoadingFullViewPresenter()
@@ -46,8 +45,7 @@ class UILoadingFullViewViewController: UIViewController, UILoadingFullViewDispla
         modalPresentationStyle = .overFullScreen
         modalTransitionStyle = .crossDissolve
     }
-  
-    //MARK: View lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()

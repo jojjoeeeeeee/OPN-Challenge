@@ -17,6 +17,10 @@ class ProductTableViewCell: UITableViewCell {
     @IBOutlet private weak var priceLabel: UILabel!
     @IBOutlet private weak var amountLabel: UILabel!
     @IBOutlet private weak var removeProductButton: UIButton!
+    @IBOutlet private weak var quantityEditStackView: UIStackView!
+    @IBOutlet private weak var quantityView: UIView!
+    @IBOutlet private weak var quantityViewLabel: UILabel!
+    @IBOutlet private weak var totalProductPriceLabel: UILabel!
     @IBOutlet private weak var addProductButton: UIButton!
     
     private var addProduct: (() -> ())?
@@ -35,6 +39,9 @@ class ProductTableViewCell: UITableViewCell {
             masksToBounds: false
         )
         menuImageView.roundCorner(cornerRadius: 8)
+        quantityView.roundCorner(cornerRadius: 8)
+        quantityView.layer.borderWidth = 1
+        quantityView.layer.borderColor = UIColor.lightGreyPrimary.cgColor
     }
     
     public func configureCell(product: HomeProduct.Product, addProduct: (() -> ())?, removeProduct: (() -> ())?) {
@@ -59,6 +66,27 @@ class ProductTableViewCell: UITableViewCell {
         } else if product.amount == 99 {
             addProductButton.tintColor = .lightGray
         }
+        
+        quantityEditStackView.isHidden = false
+        priceLabel.isHidden = false
+        quantityView.isHidden = true
+        totalProductPriceLabel.isHidden = true
+    }
+    
+    public func configureCellSummary(product: HomeProduct.Product) {
+        titleLabel.text = product.name
+        priceLabel.text = "฿\(product.price)"
+        ImageUtils.setImageWithUrl(
+            imageView: menuImageView,
+            url: product.imageUrl
+        )
+        amountLabel.text = "\(product.amount)"
+        quantityEditStackView.isHidden = true
+        priceLabel.isHidden = true
+        quantityView.isHidden = false
+        totalProductPriceLabel.isHidden = false
+        quantityViewLabel.text = "\(product.amount)"
+        totalProductPriceLabel.text = "฿\(product.price * product.amount)"
     }
     
     @IBAction func onTappedRemoveProduct(_ sender: Any) {

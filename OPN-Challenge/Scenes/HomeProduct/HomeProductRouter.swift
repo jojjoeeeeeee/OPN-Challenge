@@ -1,5 +1,6 @@
 protocol HomeProductRoutingLogic {
     func showFullViewLoading(destination: UILoadingFullViewViewController)
+    func routeToProductSummary(productCartContext: HomeProduct.ProductCartContext)
 }
 
 protocol HomeProductDataPassing {
@@ -10,8 +11,16 @@ class HomeProductRouter: HomeProductRoutingLogic, HomeProductDataPassing {
     weak var viewController: HomeProductViewController?
     var dataStore: HomeProductDataStore?
     
-    // MARK: Routing
-    public func showFullViewLoading(destination: UILoadingFullViewViewController) {
+    func showFullViewLoading(destination: UILoadingFullViewViewController) {
         viewController?.present(destination, animated: true)
+    }
+    
+    func routeToProductSummary(productCartContext: HomeProduct.ProductCartContext) {
+        guard let vc = ProductSummaryViewController.initStoryboard() else { return }
+        guard var vcDataStore = vc.router?.dataStore else {
+            return
+        }
+        vcDataStore.productCartContext = productCartContext
+        viewController?.navigationController?.pushViewController(vc, animated: true)
     }
 }

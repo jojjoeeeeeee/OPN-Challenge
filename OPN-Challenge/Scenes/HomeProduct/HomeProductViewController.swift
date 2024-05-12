@@ -24,11 +24,10 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
     
     public var uiLoadingFullView = UILoadingFullViewViewController()
     
+    var storeInfo = HomeProduct.StoreInfo(name: "", rating: "", businessHours: "")
     var productCart: [HomeProduct.Product] = []
     var totalPrice = 0
     var totalProduct = 0
-    
-    // MARK: Object lifecycle
     
     public static func initStoryboard() -> HomeProductViewController? {
         let storyboard = UIStoryboard(name: "HomeProduct", bundle: .main)
@@ -45,8 +44,6 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
         setup()
     }
     
-    // MARK: Setup
-    
     private func setup() {
         let viewController = self
         let interactor = HomeProductInteractor()
@@ -60,13 +57,10 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
         router.dataStore = interactor
     }
     
-    // MARK: View lifecycle
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupView()
         router?.showFullViewLoading(destination: uiLoadingFullView)
-        fetchInitialStoreInfo()
+        setupView()
         fetchInitialProducts()
     }
     
@@ -115,15 +109,17 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
         totalPrice = viewModel.totalPrice
         totalProduct = viewModel.totalProduct
         productTableView.reloadData()
-        updateBottomView(isShow: totalProduct > 0)
+        enableNextButton(totalProduct > 0)
     }
     
     func displayStoreInfo(viewModel: HomeProduct.StoreInfoInquiry.ViewModel) {
-        let storeInfo = viewModel.storeInfo
+        storeInfo = viewModel.storeInfo
         storeNameLabel.text = storeInfo.name
         businessHoursLabel.text = storeInfo.businessHours
         rateLabel.text = storeInfo.rating
-        uiLoadingFullView.interactor?.showLoading(request: UILoadingFullView.Loading.Request(show: false))
+        DispatchQueue.main.async { [weak self] in
+            self?.uiLoadingFullView.interactor?.showLoading(request: UILoadingFullView.Loading.Request(show: false))
+        }
     }
     
     func displayProducts(viewModel: HomeProduct.ProductsInquiry.ViewModel) {
@@ -133,8 +129,7 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
             productCart = viewModel.products
             productTableView.reloadData()
         }
-        
-        uiLoadingFullView.interactor?.showLoading(request: UILoadingFullView.Loading.Request(show: false))
+        fetchInitialStoreInfo()
     }
     
     func displayError(viewModel: HomeProduct.HomeProductError.ViewModel) {
@@ -161,13 +156,13 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
         }))
     }
     
-    private func updateBottomView(isShow: Bool) {
-        orderButtonStackView.backgroundColor = isShow ? .primary : .lightGray
+    private func enableNextButton(_ isEnable: Bool) {
+        orderButtonStackView.backgroundColor = isEnable ? .primary : .lightGray
         UIView.animate(withDuration: 0.2) { [weak self] in
-            self?.orderTotalPriceLabel.isHidden = !isShow
+            self?.orderTotalPriceLabel.isHidden = !isEnable
         }
         orderTotalPriceLabel.text = "฿\(totalPrice)"
-        orderButton.isUserInteractionEnabled = isShow
+        orderButton.isEnabled = isEnable
     }
     
     func updateProduct(cellIndex: Int, isAdd: Bool = true) {
@@ -187,6 +182,14 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
     }
     
     @IBAction func onTappedOrderButton(_ sender: Any) {
-        print("TappedOrder")
+        router?.routeToProductSummary(
+            productCartContext: HomeProduct.ProductCartContext(
+                store: storeInfo,
+                productList: productCart,
+                totalPrice: totalPrice,
+                totalProduct: totalProduct,
+                address: nil
+            )
+        )
     }
 }

@@ -53,6 +53,8 @@
 		73CE6B4F2BF102D20052CD8B /* ProductSummaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B492BF102D20052CD8B /* ProductSummaryViewController.swift */; };
 		73CE6B502BF102D20052CD8B /* ProductSummaryInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B4A2BF102D20052CD8B /* ProductSummaryInteractor.swift */; };
 		73CE6B522BF102EA0052CD8B /* ProductSummary.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 73CE6B512BF102EA0052CD8B /* ProductSummary.storyboard */; };
+		73CE6B542BF1107F0052CD8B /* ProductSumaryViewController+TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B532BF1107F0052CD8B /* ProductSumaryViewController+TableView.swift */; };
+		73CE6B562BF119880052CD8B /* ProductSummaryViewController+TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B552BF119880052CD8B /* ProductSummaryViewController+TextView.swift */; };
 		AA06D3D5FD48A457D3189C5C /* Pods_OPN_ChallengeTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBC011E77B1AF7ADBC527B7E /* Pods_OPN_ChallengeTests.framework */; };
 		B6DEC6E51521EC1B2633083C /* Pods_OPN_Challenge_OPN_ChallengeUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F457EF9EFD3978A42D1B43EB /* Pods_OPN_Challenge_OPN_ChallengeUITests.framework */; };
 		DFCEF3341560DBA2A56575C0 /* Pods_OPN_Challenge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B18C9219862D4F67521B275C /* Pods_OPN_Challenge.framework */; };
@@ -130,6 +132,8 @@
 		73CE6B492BF102D20052CD8B /* ProductSummaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductSummaryViewController.swift; sourceTree = "<group>"; };
 		73CE6B4A2BF102D20052CD8B /* ProductSummaryInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductSummaryInteractor.swift; sourceTree = "<group>"; };
 		73CE6B512BF102EA0052CD8B /* ProductSummary.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = ProductSummary.storyboard; sourceTree = "<group>"; };
+		73CE6B532BF1107F0052CD8B /* ProductSumaryViewController+TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProductSumaryViewController+TableView.swift"; sourceTree = "<group>"; };
+		73CE6B552BF119880052CD8B /* ProductSummaryViewController+TextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProductSummaryViewController+TextView.swift"; sourceTree = "<group>"; };
 		7D4AB8114A17238EF43803E6 /* Pods-OPN-Challenge.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OPN-Challenge.release.xcconfig"; path = "Target Support Files/Pods-OPN-Challenge/Pods-OPN-Challenge.release.xcconfig"; sourceTree = "<group>"; };
 		B18C9219862D4F67521B275C /* Pods_OPN_Challenge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OPN_Challenge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C453A3A53A15AE7491B28818 /* Pods-OPN-ChallengeTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OPN-ChallengeTests.debug.xcconfig"; path = "Target Support Files/Pods-OPN-ChallengeTests/Pods-OPN-ChallengeTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -371,6 +375,8 @@
 				73CE6B492BF102D20052CD8B /* ProductSummaryViewController.swift */,
 				73CE6B4A2BF102D20052CD8B /* ProductSummaryInteractor.swift */,
 				73CE6B512BF102EA0052CD8B /* ProductSummary.storyboard */,
+				73CE6B532BF1107F0052CD8B /* ProductSumaryViewController+TableView.swift */,
+				73CE6B552BF119880052CD8B /* ProductSummaryViewController+TextView.swift */,
 			);
 			path = ProductSummary;
 			sourceTree = "<group>";
@@ -654,6 +660,7 @@
 				7395561E2BF001A2004AC74E /* UIColorExtension.swift in Sources */,
 				739556332BF018F0004AC74E /* ProductTableViewCell.swift in Sources */,
 				739556642BF0DF5F004AC74E /* UILoadingFullViewViewController.swift in Sources */,
+				73CE6B542BF1107F0052CD8B /* ProductSumaryViewController+TableView.swift in Sources */,
 				739556272BF0129B004AC74E /* DateFormatter.swift in Sources */,
 				7395561A2BEFFC1B004AC74E /* HomeProductViewController.swift in Sources */,
 				739556632BF0DF5F004AC74E /* UILoadingFullViewRouter.swift in Sources */,
@@ -673,6 +680,7 @@
 				739555E22BEFF8DA004AC74E /* SceneDelegate.swift in Sources */,
 				739556612BF0DF5F004AC74E /* UILoadingFullViewModels.swift in Sources */,
 				7395564C2BF0CAE7004AC74E /* ServiceError.swift in Sources */,
+				73CE6B562BF119880052CD8B /* ProductSummaryViewController+TextView.swift in Sources */,
 				739556452BF0CA5B004AC74E /* NetworkRequestRetrier.swift in Sources */,
 				739556602BF0DF5F004AC74E /* UILoadingFullViewInteractor.swift in Sources */,
 				739556372BF028B6004AC74E /* ImageUtils.swift in Sources */,

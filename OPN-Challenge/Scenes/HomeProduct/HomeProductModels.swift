@@ -1,7 +1,6 @@
-import UIKit
+import Foundation
 
 enum HomeProduct {
-    // MARK: Use cases
     
     enum ProductCart {
         struct Request {
@@ -70,5 +69,13 @@ enum HomeProduct {
         let name: String
         let rating: String
         let businessHours: String
+    }
+    
+    public struct ProductCartContext {
+        let store: StoreInfo
+        let productList: [Product]
+        let totalPrice: Int
+        let totalProduct: Int
+        let address: String?
     }
 }

@@ -1,4 +1,4 @@
-import UIKit
+import Foundation
 
 protocol HomeProductPresentationLogic {
     func presentProductCart(response: HomeProduct.ProductCart.Response)
@@ -9,8 +9,6 @@ protocol HomeProductPresentationLogic {
 
 class HomeProductPresenter: HomeProductPresentationLogic {
     weak var viewController: HomeProductDisplayLogic?
-    
-    // MARK: Do something
     
     func presentProductCart(response: HomeProduct.ProductCart.Response) {
         let viewModel = HomeProduct.ProductCart.ViewModel(productList: response.productList, totalPrice: response.totalPrice, totalProduct: response.totalProduct)

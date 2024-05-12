@@ -1,5 +1,3 @@
-import UIKit
-
 protocol HomeProductBusinessLogic {
     func updateCart(request: HomeProduct.ProductCart.Request)
     func getStoreInfoInquiry(request: HomeProduct.StoreInfoInquiry.Request)
