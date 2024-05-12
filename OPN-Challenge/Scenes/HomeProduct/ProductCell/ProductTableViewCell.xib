@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="ProductTableViewCell" rowHeight="130" id="KGk-i7-Jjw" customClass="ProductTableViewCell" customModule="OPN_Challenge" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="393" height="130"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="393" height="130"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" horizontalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="coI-Bh-gKs">
+                        <rect key="frame" x="16" y="9" width="361" height="112"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="iLt-vF-ozf">
+                                <rect key="frame" x="16" y="16" width="80" height="80"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="80" id="A2O-Qp-1W5"/>
+                                    <constraint firstAttribute="height" constant="80" id="dGm-Rq-AMh"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Dark Tiramisu Mocha" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mSs-Sy-sif">
+                                <rect key="frame" x="104" y="16" width="241" height="28"/>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="16"/>
+                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="฿70" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aaX-L6-qR6">
+                                <rect key="frame" x="104" y="52" width="25" height="17"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <stackView opaque="NO" contentMode="scaleToFill" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="b3F-ZR-Wql">
+                                <rect key="frame" x="236" y="68" width="117" height="36"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="fill" contentVerticalAlignment="fill" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fLV-2R-uQF">
+                                        <rect key="frame" x="0.0" y="0.0" width="36" height="36"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="36" id="96y-dE-R6t"/>
+                                            <constraint firstAttribute="height" constant="36" id="OIB-BQ-Prc"/>
+                                        </constraints>
+                                        <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                        <state key="normal">
+                                            <imageReference key="image" image="minus.circle.fill" catalog="system" symbolScale="large"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="onTappedRemoveProduct:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="A3A-HQ-qat"/>
+                                        </connections>
+                                    </button>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="99" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ifU-fN-j8Z">
+                                        <rect key="frame" x="44" y="0.0" width="29" height="36"/>
+                                        <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="16"/>
+                                        <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="fill" contentVerticalAlignment="fill" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fYo-aK-1a4">
+                                        <rect key="frame" x="81" y="0.0" width="36" height="36"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="36" id="7tI-RY-VyS"/>
+                                            <constraint firstAttribute="height" constant="36" id="LtQ-h8-pi8"/>
+                                        </constraints>
+                                        <color key="tintColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                        <state key="normal">
+                                            <imageReference key="image" image="plus.circle.fill" catalog="system" symbolScale="large"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="onTappedAddProduct:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="VbR-cy-YA6"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                            </stackView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="b3F-ZR-Wql" firstAttribute="top" secondItem="mSs-Sy-sif" secondAttribute="bottom" constant="24" id="8eS-s3-r5x"/>
+                            <constraint firstItem="aaX-L6-qR6" firstAttribute="leading" secondItem="iLt-vF-ozf" secondAttribute="trailing" constant="8" id="A7w-ia-I5q"/>
+                            <constraint firstItem="mSs-Sy-sif" firstAttribute="leading" secondItem="iLt-vF-ozf" secondAttribute="trailing" constant="8" id="Any-1u-oCL"/>
+                            <constraint firstItem="iLt-vF-ozf" firstAttribute="leading" secondItem="coI-Bh-gKs" secondAttribute="leading" constant="16" id="BWa-yu-mJT"/>
+                            <constraint firstAttribute="trailing" secondItem="b3F-ZR-Wql" secondAttribute="trailing" constant="8" id="DAz-iN-n1j"/>
+                            <constraint firstAttribute="bottom" secondItem="b3F-ZR-Wql" secondAttribute="bottom" constant="8" id="Hek-Ea-89j"/>
+                            <constraint firstItem="mSs-Sy-sif" firstAttribute="top" secondItem="coI-Bh-gKs" secondAttribute="top" constant="16" id="IX9-3h-5PH"/>
+                            <constraint firstItem="aaX-L6-qR6" firstAttribute="top" secondItem="mSs-Sy-sif" secondAttribute="bottom" constant="8" id="KPg-DZ-s0O"/>
+                            <constraint firstAttribute="bottom" secondItem="iLt-vF-ozf" secondAttribute="bottom" constant="16" id="Pfx-Wh-RZP"/>
+                            <constraint firstItem="b3F-ZR-Wql" firstAttribute="leading" secondItem="iLt-vF-ozf" secondAttribute="trailing" constant="140" id="hww-gq-UZF"/>
+                            <constraint firstItem="iLt-vF-ozf" firstAttribute="top" secondItem="coI-Bh-gKs" secondAttribute="top" constant="16" id="ixn-yU-kvu"/>
+                            <constraint firstAttribute="trailing" secondItem="mSs-Sy-sif" secondAttribute="trailing" constant="16" id="ooO-b3-OGp"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                <constraints>
+                    <constraint firstItem="coI-Bh-gKs" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="FkT-rO-egb"/>
+                    <constraint firstAttribute="trailing" secondItem="coI-Bh-gKs" secondAttribute="trailing" constant="16" id="XK2-gc-YqJ"/>
+                    <constraint firstItem="coI-Bh-gKs" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="uoJ-7E-vVV"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <connections>
+                <outlet property="addProductButton" destination="fYo-aK-1a4" id="s7f-G7-sgq"/>
+                <outlet property="amountLabel" destination="ifU-fN-j8Z" id="8xn-D4-M31"/>
+                <outlet property="cellView" destination="coI-Bh-gKs" id="qPo-2c-kg7"/>
+                <outlet property="menuImageView" destination="iLt-vF-ozf" id="Hsx-uh-tyJ"/>
+                <outlet property="priceLabel" destination="aaX-L6-qR6" id="WQS-c0-6Ms"/>
+                <outlet property="removeProductButton" destination="fLV-2R-uQF" id="aWa-fo-FjT"/>
+                <outlet property="titleLabel" destination="mSs-Sy-sif" id="xN2-Cm-ZTA"/>
+            </connections>
+            <point key="canvasLocation" x="16.030534351145036" y="46.478873239436624"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="minus.circle.fill" catalog="system" width="128" height="123"/>
+        <image name="plus.circle.fill" catalog="system" width="128" height="123"/>
+    </resources>
+</document>
