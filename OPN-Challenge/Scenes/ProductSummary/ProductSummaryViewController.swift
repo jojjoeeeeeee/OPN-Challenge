@@ -2,6 +2,8 @@ import UIKit
 
 protocol ProductSummaryDisplayLogic: AnyObject {
     func displayProductCartContext(viewModel: ProductSummary.ProductCart.ViewModel)
+    func displayError(viewModel: ProductSummary.ProductSummaryError.ViewModel)
+    func displayOrderSuccess(viewModel: ProductSummary.OrderInquiry.ViewModel)
 }
 
 class ProductSummaryViewController: UIViewController, ProductSummaryDisplayLogic {
@@ -17,6 +19,8 @@ class ProductSummaryViewController: UIViewController, ProductSummaryDisplayLogic
     @IBOutlet private weak var orderButtonStackView: UIStackView!
     @IBOutlet private weak var bottomTotalPriceLabel: UILabel!
     @IBOutlet private weak var nextButton: UIButton!
+    
+    public var uiLoadingFullView = UILoadingFullViewViewController()
     
     var productCart: [HomeProduct.Product] = []
     var totalPrice = 0
@@ -94,7 +98,8 @@ class ProductSummaryViewController: UIViewController, ProductSummaryDisplayLogic
     }
     
     private func initialDataFromProductCartContext() {
-        interactor?.getProductCartContext(request: ProductSummary.ProductCart.Request())
+        guard let context = router?.dataStore?.productCartContext else { return }
+        interactor?.getProductCartContext(request: ProductSummary.ProductCart.Request(context: context))
     }
     
     @objc private func onTapDismissKeyboard() {
@@ -122,5 +127,21 @@ class ProductSummaryViewController: UIViewController, ProductSummaryDisplayLogic
         totalPriceLabel.text = "฿\(totalPrice)"
         bottomTotalPriceLabel.text = "฿\(totalPrice)"
         productListTableView.reloadData()
+    }
+    
+    func displayError(viewModel: ProductSummary.ProductSummaryError.ViewModel) {
+        let serviceError = viewModel.serviceError
+        uiLoadingFullView.interactor?.showError(request: UILoadingFullView.Error.Request(show: true, serviceError: serviceError, customAction: nil))
+    }
+    
+    func displayOrderSuccess(viewModel: ProductSummary.OrderInquiry.ViewModel) {
+        router?.routeToOrderSuccess()
+    }
+    
+    @IBAction func onTappedOrder(_ sender: Any) {
+        router?.showFullViewLoading(destination: uiLoadingFullView)
+        interactor?.postOrderInquiry(request: ProductSummary.OrderInquiry.Request(
+            productList: productCart, delivery_address: addressTextView.text)
+        )
     }
 }

@@ -34,7 +34,7 @@ class HomeProductInteractorTests: XCTestCase {
         let stub = StubHomeProductService(result: .success)
         sut = HomeProductInteractor(serviceConnection: stub)
         sut?.presenter = spy
-        sut?.getStoreInfoInquiry(request: .init(customAction: nil))
+        sut?.getStoreInfoInquiry(request: HomeProduct.StoreInfoInquiry.Request(customAction: nil))
         XCTAssertTrue(spy.presentStoreInfoCalled)
     }
     
@@ -43,7 +43,7 @@ class HomeProductInteractorTests: XCTestCase {
         let stub = StubHomeProductService(result: .error)
         sut = HomeProductInteractor(serviceConnection: stub)
         sut?.presenter = spy
-        sut?.getStoreInfoInquiry(request: .init(customAction: nil))
+        sut?.getStoreInfoInquiry(request: HomeProduct.StoreInfoInquiry.Request(customAction: nil))
         XCTAssertTrue(spy.presentErrorCalled)
     }
     
@@ -52,7 +52,7 @@ class HomeProductInteractorTests: XCTestCase {
         let stub = StubHomeProductService(result: .success)
         sut = HomeProductInteractor(serviceConnection: stub)
         sut?.presenter = spy
-        sut?.getProductsInquiry(request: .init(customAction: nil))
+        sut?.getProductsInquiry(request: HomeProduct.ProductsInquiry.Request(customAction: nil))
         XCTAssertTrue(spy.presentProductsCalled)
     }
     
@@ -61,7 +61,7 @@ class HomeProductInteractorTests: XCTestCase {
         let stub = StubHomeProductService(result: .error)
         sut = HomeProductInteractor(serviceConnection: stub)
         sut?.presenter = spy
-        sut?.getProductsInquiry(request: .init(customAction: nil))
+        sut?.getProductsInquiry(request: HomeProduct.ProductsInquiry.Request(customAction: nil))
         XCTAssertTrue(spy.presentErrorCalled)
     }
 

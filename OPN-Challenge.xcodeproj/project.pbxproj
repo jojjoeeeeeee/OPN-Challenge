@@ -55,6 +55,10 @@
 		73CE6B522BF102EA0052CD8B /* ProductSummary.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 73CE6B512BF102EA0052CD8B /* ProductSummary.storyboard */; };
 		73CE6B542BF1107F0052CD8B /* ProductSumaryViewController+TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B532BF1107F0052CD8B /* ProductSumaryViewController+TableView.swift */; };
 		73CE6B562BF119880052CD8B /* ProductSummaryViewController+TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B552BF119880052CD8B /* ProductSummaryViewController+TextView.swift */; };
+		73CE6B582BF14D4F0052CD8B /* JSONFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B572BF14D4F0052CD8B /* JSONFormatter.swift */; };
+		73CE6B5D2BF15D430052CD8B /* StubProductSummaryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B5C2BF15D430052CD8B /* StubProductSummaryService.swift */; };
+		73CE6B5F2BF15D500052CD8B /* ProductSummaryInteractorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B5E2BF15D500052CD8B /* ProductSummaryInteractorTests.swift */; };
+		73CE6B612BF15D560052CD8B /* ProductSummaryPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CE6B602BF15D560052CD8B /* ProductSummaryPresenterTests.swift */; };
 		AA06D3D5FD48A457D3189C5C /* Pods_OPN_ChallengeTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBC011E77B1AF7ADBC527B7E /* Pods_OPN_ChallengeTests.framework */; };
 		B6DEC6E51521EC1B2633083C /* Pods_OPN_Challenge_OPN_ChallengeUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F457EF9EFD3978A42D1B43EB /* Pods_OPN_Challenge_OPN_ChallengeUITests.framework */; };
 		DFCEF3341560DBA2A56575C0 /* Pods_OPN_Challenge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B18C9219862D4F67521B275C /* Pods_OPN_Challenge.framework */; };
@@ -134,6 +138,10 @@
 		73CE6B512BF102EA0052CD8B /* ProductSummary.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = ProductSummary.storyboard; sourceTree = "<group>"; };
 		73CE6B532BF1107F0052CD8B /* ProductSumaryViewController+TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProductSumaryViewController+TableView.swift"; sourceTree = "<group>"; };
 		73CE6B552BF119880052CD8B /* ProductSummaryViewController+TextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProductSummaryViewController+TextView.swift"; sourceTree = "<group>"; };
+		73CE6B572BF14D4F0052CD8B /* JSONFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONFormatter.swift; sourceTree = "<group>"; };
+		73CE6B5C2BF15D430052CD8B /* StubProductSummaryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StubProductSummaryService.swift; sourceTree = "<group>"; };
+		73CE6B5E2BF15D500052CD8B /* ProductSummaryInteractorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductSummaryInteractorTests.swift; sourceTree = "<group>"; };
+		73CE6B602BF15D560052CD8B /* ProductSummaryPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductSummaryPresenterTests.swift; sourceTree = "<group>"; };
 		7D4AB8114A17238EF43803E6 /* Pods-OPN-Challenge.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OPN-Challenge.release.xcconfig"; path = "Target Support Files/Pods-OPN-Challenge/Pods-OPN-Challenge.release.xcconfig"; sourceTree = "<group>"; };
 		B18C9219862D4F67521B275C /* Pods_OPN_Challenge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OPN_Challenge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C453A3A53A15AE7491B28818 /* Pods-OPN-ChallengeTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OPN-ChallengeTests.debug.xcconfig"; path = "Target Support Files/Pods-OPN-ChallengeTests/Pods-OPN-ChallengeTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -213,6 +221,7 @@
 		739555F52BEFF8E2004AC74E /* OPN-ChallengeTests */ = {
 			isa = PBXGroup;
 			children = (
+				73CE6B592BF15D2C0052CD8B /* ProductSummary */,
 				739556652BF0F352004AC74E /* HomeProduct */,
 			);
 			path = "OPN-ChallengeTests";
@@ -244,6 +253,7 @@
 			children = (
 				739556262BF0129B004AC74E /* DateFormatter.swift */,
 				739556362BF028B6004AC74E /* ImageUtils.swift */,
+				73CE6B572BF14D4F0052CD8B /* JSONFormatter.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -379,6 +389,32 @@
 				73CE6B552BF119880052CD8B /* ProductSummaryViewController+TextView.swift */,
 			);
 			path = ProductSummary;
+			sourceTree = "<group>";
+		};
+		73CE6B592BF15D2C0052CD8B /* ProductSummary */ = {
+			isa = PBXGroup;
+			children = (
+				73CE6B5B2BF15D340052CD8B /* Scenes */,
+				73CE6B5A2BF15D310052CD8B /* Stubs */,
+			);
+			path = ProductSummary;
+			sourceTree = "<group>";
+		};
+		73CE6B5A2BF15D310052CD8B /* Stubs */ = {
+			isa = PBXGroup;
+			children = (
+				73CE6B5C2BF15D430052CD8B /* StubProductSummaryService.swift */,
+			);
+			path = Stubs;
+			sourceTree = "<group>";
+		};
+		73CE6B5B2BF15D340052CD8B /* Scenes */ = {
+			isa = PBXGroup;
+			children = (
+				73CE6B5E2BF15D500052CD8B /* ProductSummaryInteractorTests.swift */,
+				73CE6B602BF15D560052CD8B /* ProductSummaryPresenterTests.swift */,
+			);
+			path = Scenes;
 			sourceTree = "<group>";
 		};
 		DA86BAAF8F2830EE47419387 /* Pods */ = {
@@ -673,6 +709,7 @@
 				739556212BF004EE004AC74E /* UIViewExtension.swift in Sources */,
 				7395565E2BF0DF5F004AC74E /* BaseXIBView.swift in Sources */,
 				739556522BF0CC7A004AC74E /* RequestModel.swift in Sources */,
+				73CE6B582BF14D4F0052CD8B /* JSONFormatter.swift in Sources */,
 				7395564A2BF0CABB004AC74E /* BaseErrorModel.swift in Sources */,
 				739556472BF0CA8F004AC74E /* ResponseHandler.swift in Sources */,
 				739555E02BEFF8DA004AC74E /* AppDelegate.swift in Sources */,
@@ -692,8 +729,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				73CE6B5D2BF15D430052CD8B /* StubProductSummaryService.swift in Sources */,
 				739556682BF0F396004AC74E /* StubHomeProductService.swift in Sources */,
 				7395566B2BF0F69C004AC74E /* HomeProductInteractorTests.swift in Sources */,
+				73CE6B612BF15D560052CD8B /* ProductSummaryPresenterTests.swift in Sources */,
+				73CE6B5F2BF15D500052CD8B /* ProductSummaryInteractorTests.swift in Sources */,
 				73CE6B432BF0FF650052CD8B /* HomeProductPresenterTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

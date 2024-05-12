@@ -38,7 +38,18 @@ class HomeProductPresenterTests: XCTestCase {
     func test_presentError() {
         let spy = SpyHomeProductDisplay()
         sut?.viewController = spy
-        sut?.presentError(response: HomeProduct.HomeProductError.Response(serviceError: APIError(error: BaseServiceError(name: "MOCK", header: "MOCK", message: "MOCK")), customAction: nil))
+        sut?.presentError(
+            response: HomeProduct.HomeProductError.Response(
+                serviceError: APIError(
+                    error: BaseServiceError(
+                        name: "MOCK",
+                        header: "MOCK",
+                        message: "MOCK"
+                    )
+                ),
+                customAction: nil
+            )
+        )
         XCTAssertTrue(spy.displayErrorCalled)
     }
     

@@ -87,10 +87,11 @@ class UILoadingFullViewViewController: UIViewController, UILoadingFullViewDispla
     }
     
     @IBAction func onTappedTryAgain(_ sender: Any) {
-        guard let action = customAction else { return }
         view.isHidden = true
         errorViewContainer.isHidden = true
         router?.close()
-        action()
+        if let action = customAction {
+            action()
+        }
     }
 }

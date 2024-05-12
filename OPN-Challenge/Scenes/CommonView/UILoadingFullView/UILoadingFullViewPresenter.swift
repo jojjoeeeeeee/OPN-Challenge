@@ -11,7 +11,6 @@ class UILoadingFullViewPresenter: UILoadingFullViewPresentationLogic {
     }
     
     func presentError(respose: UILoadingFullView.Error.Response) {
-        viewController?.displayError(viewModel: .init(show: respose.show, serviceError: respose.serviceError, customAction: respose.customAction))
+        viewController?.displayError(viewModel: UILoadingFullView.Error.ViewModel(show: respose.show, serviceError: respose.serviceError, customAction: respose.customAction))
     }
-    
 }

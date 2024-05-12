@@ -10,3 +10,7 @@ struct ProductsResponseModel: Codable {
     var price: Int?
     var imageUrl: String?
 }
+
+struct OrderResponseModel: Codable {
+    
+}

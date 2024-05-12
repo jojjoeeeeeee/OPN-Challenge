@@ -14,6 +14,6 @@ class UILoadingFullViewInteractor: UILoadingFullViewBusinessLogic, UILoadingFull
     }
     
     func showError(request: UILoadingFullView.Error.Request) {
-        presenter?.presentError(respose: .init(show: request.show, serviceError: request.serviceError, customAction: request.customAction))
+        presenter?.presentError(respose: UILoadingFullView.Error.Response(show: request.show, serviceError: request.serviceError, customAction: request.customAction))
     }
 }

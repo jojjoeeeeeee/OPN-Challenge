@@ -19,15 +19,13 @@ class ServiceConnection {
         )
     }
     
-//    func CoinDetailService(uuid: String, completionHandler: @escaping (BaseCoinResponseData) -> Void, errorHandler: @escaping (ServiceError?) -> Void) {
-//        let requestData = CoinDetailRequestData(uuid: uuid)
-//        BaseService().fetchCoinDetail(
-//            uuid: requestData.uuid,
-//            completionHandler: { (response: BaseCoinResponseData) in
-//                completionHandler(response)
-//            }, errorHandler: { error in
-//                errorHandler(error)
-//            }
-//        )
-//    }
+    func postOrderService(request: PostOrderRequestModel, completionHandler: @escaping ((OrderResponseModel) -> Void), errorHandler: @escaping (ServiceError?) -> Void) {
+        BaseService().fetchPostOrder(request: request,
+            completionHandler: { (response: OrderResponseModel) in
+                completionHandler(response)
+            }, errorHandler: { error in
+                errorHandler(error)
+            }
+        )
+    }
 }

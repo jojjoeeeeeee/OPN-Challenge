@@ -1,6 +1,6 @@
 struct PostOrderRequestModel: Codable {
     let products: [ProductRequestModel]
-    let address: String
+    let delivery_address: String
 }
 
 struct ProductRequestModel: Codable {

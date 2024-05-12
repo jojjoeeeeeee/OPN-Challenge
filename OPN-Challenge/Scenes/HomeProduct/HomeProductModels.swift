@@ -76,6 +76,6 @@ enum HomeProduct {
         let productList: [Product]
         let totalPrice: Int
         let totalProduct: Int
-        let address: String?
+        let delivery_address: String?
     }
 }
