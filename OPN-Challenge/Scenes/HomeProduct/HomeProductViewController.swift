@@ -1,8 +1,9 @@
 import UIKit
 
 protocol HomeProductDisplayLogic: AnyObject {
-    func displayProductList(viewModel: HomeProduct.ProductCart.ViewModel)
+    func displayProductCart(viewModel: HomeProduct.ProductCart.ViewModel)
     func displayStoreInfo(viewModel: HomeProduct.StoreInfoInquiry.ViewModel)
+    func displayProducts(viewModel: HomeProduct.ProductsInquiry.ViewModel)
     func displayError(viewModel: HomeProduct.HomeProductError.ViewModel)
 }
 
@@ -19,10 +20,11 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
     @IBOutlet private weak var orderTotalPriceLabel: UILabel!
     @IBOutlet private weak var orderButtonStackView: UIStackView!
     @IBOutlet private weak var orderButton: UIButton!
+    @IBOutlet private weak var noProductLabel: UILabel!
     
     public var uiLoadingFullView = UILoadingFullViewViewController()
     
-    var productCart: [HomeProduct.Product] = [HomeProduct.Product.init(name: "Latte", price: 50, imageUrl: URL(string: "https://www.nespresso.com/ncp/res/uploads/recipes/nespresso-recipes-Latte-Art-Tulip.jpg")!, amount: 0), HomeProduct.Product.init(name: "Dark Tiramisu Mocha", price: 75, imageUrl: URL(string: "https://www.nespresso.com/shared_res/mos/free_html/sg/b2b/b2ccoffeerecipes/listing-image/image/dark-tiramisu-mocha.jpg")!, amount: 0)]
+    var productCart: [HomeProduct.Product] = []
     var totalPrice = 0
     var totalProduct = 0
     
@@ -63,7 +65,9 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
+        router?.showFullViewLoading(destination: uiLoadingFullView)
         fetchInitialStoreInfo()
+        fetchInitialProducts()
     }
     
     private func setupView() {
@@ -98,6 +102,7 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
             shadowOffset: CGSize(width: 0, height: -4),
             masksToBounds: false
         )
+        noProductLabel.isHidden = true
     }
     
     func updateCart(productList: [HomeProduct.Product], updatedPrice: Int, updatedTotalProduct: Int) {
@@ -105,7 +110,7 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
         interactor?.updateCart(request: request)
     }
     
-    func displayProductList (viewModel: HomeProduct.ProductCart.ViewModel) {
+    func displayProductCart(viewModel: HomeProduct.ProductCart.ViewModel) {
         productCart = viewModel.productList
         totalPrice = viewModel.totalPrice
         totalProduct = viewModel.totalProduct
@@ -121,15 +126,39 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
         uiLoadingFullView.interactor?.showLoading(request: UILoadingFullView.Loading.Request(show: false))
     }
     
+    func displayProducts(viewModel: HomeProduct.ProductsInquiry.ViewModel) {
+        if viewModel.products.isEmpty {
+            noProductLabel.isHidden = false
+        } else {
+            productCart = viewModel.products
+            productTableView.reloadData()
+        }
+        
+        uiLoadingFullView.interactor?.showLoading(request: UILoadingFullView.Loading.Request(show: false))
+    }
+    
     func displayError(viewModel: HomeProduct.HomeProductError.ViewModel) {
         let serviceError = viewModel.serviceError
         let customAction = viewModel.customAction
         uiLoadingFullView.interactor?.showError(request: UILoadingFullView.Error.Request(show: true, serviceError: serviceError, customAction: customAction))
     }
     
-    private func fetchInitialStoreInfo() {
+    private func showLoadingAndFetchAgain(fetchAction: (() -> Void)?) {
+        guard let action = fetchAction else { return }
         router?.showFullViewLoading(destination: uiLoadingFullView)
-        interactor?.getStoreInfoInquiry(request: HomeProduct.StoreInfoInquiry.Request(customAction: fetchInitialStoreInfo))
+        action()
+    }
+    
+    private func fetchInitialStoreInfo() {
+        interactor?.getStoreInfoInquiry(request: HomeProduct.StoreInfoInquiry.Request(customAction: { [weak self] in
+            self?.showLoadingAndFetchAgain(fetchAction: self?.fetchInitialStoreInfo)
+        }))
+    }
+    
+    private func fetchInitialProducts() {
+        interactor?.getProductsInquiry(request: HomeProduct.ProductsInquiry.Request(customAction: { [weak self] in
+            self?.showLoadingAndFetchAgain(fetchAction: self?.fetchInitialProducts)
+        }))
     }
     
     private func updateBottomView(isShow: Bool) {

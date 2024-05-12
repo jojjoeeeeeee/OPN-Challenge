@@ -33,6 +33,19 @@ enum HomeProduct {
         }
     }
     
+    enum ProductsInquiry{
+        struct Request {
+            let customAction: (() -> Void)?
+        }
+        struct Response {
+            let productsResponse: [ProductsResponseModel]
+        }
+        struct ViewModel {
+            let products: [Product]
+        }
+    }
+
+    
     enum HomeProductError {
         struct Request {
         }

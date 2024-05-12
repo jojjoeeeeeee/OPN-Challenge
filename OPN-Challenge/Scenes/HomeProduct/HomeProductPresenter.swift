@@ -1,8 +1,9 @@
 import UIKit
 
 protocol HomeProductPresentationLogic {
-    func presentProductList(response: HomeProduct.ProductCart.Response)
+    func presentProductCart(response: HomeProduct.ProductCart.Response)
     func presentStoreInfo(response: HomeProduct.StoreInfoInquiry.Response)
+    func presentProducts(response: HomeProduct.ProductsInquiry.Response)
     func presentError(response: HomeProduct.HomeProductError.Response)
 }
 
@@ -11,9 +12,9 @@ class HomeProductPresenter: HomeProductPresentationLogic {
     
     // MARK: Do something
     
-    func presentProductList(response: HomeProduct.ProductCart.Response) {
+    func presentProductCart(response: HomeProduct.ProductCart.Response) {
         let viewModel = HomeProduct.ProductCart.ViewModel(productList: response.productList, totalPrice: response.totalPrice, totalProduct: response.totalProduct)
-        viewController?.displayProductList(viewModel: viewModel)
+        viewController?.displayProductCart(viewModel: viewModel)
     }
     
     func presentStoreInfo(response: HomeProduct.StoreInfoInquiry.Response) {
@@ -29,6 +30,12 @@ class HomeProductPresenter: HomeProductPresentationLogic {
         viewController?.displayStoreInfo(viewModel: viewModel)
     }
     
+    func presentProducts(response: HomeProduct.ProductsInquiry.Response) {
+        let mappedProducts = mapProducts(productResponse: response.productsResponse) ?? []
+        let viewModel = HomeProduct.ProductsInquiry.ViewModel(products: mappedProducts)
+        viewController?.displayProducts(viewModel: viewModel)
+    }
+    
     func presentError(response: HomeProduct.HomeProductError.Response) {
         let viewModel = HomeProduct.HomeProductError.ViewModel(serviceError: response.serviceError, customAction: response.customAction)
         viewController?.displayError(viewModel: viewModel)
@@ -40,5 +47,20 @@ class HomeProductPresenter: HomeProductPresentationLogic {
     
     func formatStoreRating(rate: Float) -> String {
         return String(format: "%.1f", rate)
+    }
+    
+    func mapProducts(productResponse: [ProductsResponseModel]) -> [HomeProduct.Product]? {
+        return productResponse.compactMap{ product -> HomeProduct.Product? in
+            if let imageUrl = URL(string: product.imageUrl ?? ""), let name = product.name, let price = product.price {
+                return HomeProduct.Product(
+                    name: name,
+                    price: price,
+                    imageUrl: imageUrl,
+                    amount: 0
+                )
+            } else {
+                return nil
+            }
+        }
     }
 }

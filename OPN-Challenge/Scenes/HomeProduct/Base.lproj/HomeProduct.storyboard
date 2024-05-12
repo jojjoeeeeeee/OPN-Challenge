@@ -91,6 +91,13 @@
                                     <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" dataMode="prototypes" style="plain" separatorStyle="none" allowsSelection="NO" rowHeight="130" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="vgt-ze-udJ">
                                         <rect key="frame" x="0.0" y="115" width="393" height="552"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                        <label key="tableFooterView" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No product found" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="AqE-2l-V54">
+                                            <rect key="frame" x="0.0" y="0.0" width="393" height="44"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
                                     </tableView>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -236,6 +243,7 @@
                         <outlet property="businessHoursLabel" destination="lMP-nf-EEq" id="e2l-AP-i2x"/>
                         <outlet property="contentView" destination="LIc-4J-wGZ" id="qQb-TZ-83z"/>
                         <outlet property="headerView" destination="Q2v-mN-N1M" id="hz7-65-fFc"/>
+                        <outlet property="noProductLabel" destination="AqE-2l-V54" id="aJQ-b9-gWE"/>
                         <outlet property="orderButton" destination="6rR-0n-5G6" id="Mbs-nW-C0J"/>
                         <outlet property="orderButtonStackView" destination="uHO-RU-aog" id="KeE-YX-6TK"/>
                         <outlet property="orderTotalPriceLabel" destination="Iqz-G3-Iuj" id="uad-X7-snc"/>
