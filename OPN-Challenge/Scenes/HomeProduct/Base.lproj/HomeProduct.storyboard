@@ -241,7 +241,7 @@
                         <outlet property="orderTotalPriceLabel" destination="Iqz-G3-Iuj" id="uad-X7-snc"/>
                         <outlet property="productTableView" destination="vgt-ze-udJ" id="P0h-8y-2US"/>
                         <outlet property="rateLabel" destination="VJs-tk-qdH" id="rsZ-P6-t8g"/>
-                        <outlet property="storeNameLabel" destination="0ny-is-QSm" id="S0X-7G-39t"/>
+                        <outlet property="storeNameLabel" destination="c5S-sz-aiI" id="5on-ut-RQy"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

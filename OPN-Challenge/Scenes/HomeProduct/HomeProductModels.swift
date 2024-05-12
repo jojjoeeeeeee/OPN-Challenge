@@ -5,19 +5,44 @@ enum HomeProduct {
     
     enum ProductCart {
         struct Request {
-            var productList: [Product]
-            var totalPrice: Int
-            var totalProduct: Int
+            let productList: [Product]
+            let totalPrice: Int
+            let totalProduct: Int
         }
         struct Response {
-            var productList: [Product]
-            var totalPrice: Int
-            var totalProduct: Int
+            let productList: [Product]
+            let totalPrice: Int
+            let totalProduct: Int
         }
         struct ViewModel {
-            var productList: [Product]
-            var totalPrice: Int
-            var totalProduct: Int
+            let productList: [Product]
+            let totalPrice: Int
+            let totalProduct: Int
+        }
+    }
+    
+    enum StoreInfoInquiry{
+        struct Request {
+            let customAction: (() -> Void)?
+        }
+        struct Response {
+            let storeResponse: StoreInfoResponseModel
+        }
+        struct ViewModel {
+            let storeInfo: StoreInfo
+        }
+    }
+    
+    enum HomeProductError {
+        struct Request {
+        }
+        struct Response {
+            let serviceError: ServiceError?
+            let customAction: (() -> Void)?
+        }
+        struct ViewModel {
+            let serviceError: ServiceError?
+            let customAction: (() -> Void)?
         }
     }
     
@@ -26,5 +51,11 @@ enum HomeProduct {
         var price: Int
         var imageUrl: URL
         var amount: Int
+    }
+    
+    public struct StoreInfo {
+        let name: String
+        let rating: String
+        let businessHours: String
     }
 }

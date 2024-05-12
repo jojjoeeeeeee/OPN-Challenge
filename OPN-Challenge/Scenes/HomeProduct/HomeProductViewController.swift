@@ -2,21 +2,25 @@ import UIKit
 
 protocol HomeProductDisplayLogic: AnyObject {
     func displayProductList(viewModel: HomeProduct.ProductCart.ViewModel)
+    func displayStoreInfo(viewModel: HomeProduct.StoreInfoInquiry.ViewModel)
+    func displayError(viewModel: HomeProduct.HomeProductError.ViewModel)
 }
 
 class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
     var interactor: HomeProductBusinessLogic?
-    var router: (NSObjectProtocol & HomeProductRoutingLogic & HomeProductDataPassing)?
+    var router: (HomeProductRoutingLogic & HomeProductDataPassing)?
     @IBOutlet private weak var headerView: UIView!
     @IBOutlet private weak var contentView: UIView!
     @IBOutlet private weak var rateLabel: UILabel!
     @IBOutlet private weak var businessHoursLabel: UILabel!
-    @IBOutlet private weak var storeNameLabel: NSLayoutConstraint!
+    @IBOutlet private weak var storeNameLabel: UILabel!
     @IBOutlet weak var productTableView: UITableView!
     @IBOutlet private weak var bottomView: UIView!
     @IBOutlet private weak var orderTotalPriceLabel: UILabel!
     @IBOutlet private weak var orderButtonStackView: UIStackView!
     @IBOutlet private weak var orderButton: UIButton!
+    
+    public var uiLoadingFullView = UILoadingFullViewViewController()
     
     var productCart: [HomeProduct.Product] = [HomeProduct.Product.init(name: "Latte", price: 50, imageUrl: URL(string: "https://www.nespresso.com/ncp/res/uploads/recipes/nespresso-recipes-Latte-Art-Tulip.jpg")!, amount: 0), HomeProduct.Product.init(name: "Dark Tiramisu Mocha", price: 75, imageUrl: URL(string: "https://www.nespresso.com/shared_res/mos/free_html/sg/b2b/b2ccoffeerecipes/listing-image/image/dark-tiramisu-mocha.jpg")!, amount: 0)]
     var totalPrice = 0
@@ -59,6 +63,7 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
+        fetchInitialStoreInfo()
     }
     
     private func setupView() {
@@ -72,8 +77,6 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
             shadowOffset: CGSize(width: 0, height: -4),
             masksToBounds: false
         )
-        
-        businessHoursLabel.text = DateFormatComponent().format(dateString: "15:01:01.772Z", sourcePattern: .HH_mm_ss_SSSS_Z, destinationPattern: .HH_mm)+" - "+DateFormatComponent().format(dateString: "19:45:51.365Z", sourcePattern: .HH_mm_ss_SSSS_Z, destinationPattern: .HH_mm)
         
         productTableView.delegate = self
         productTableView.dataSource = self
@@ -108,6 +111,25 @@ class HomeProductViewController: UIViewController, HomeProductDisplayLogic {
         totalProduct = viewModel.totalProduct
         productTableView.reloadData()
         updateBottomView(isShow: totalProduct > 0)
+    }
+    
+    func displayStoreInfo(viewModel: HomeProduct.StoreInfoInquiry.ViewModel) {
+        let storeInfo = viewModel.storeInfo
+        storeNameLabel.text = storeInfo.name
+        businessHoursLabel.text = storeInfo.businessHours
+        rateLabel.text = storeInfo.rating
+        uiLoadingFullView.interactor?.showLoading(request: UILoadingFullView.Loading.Request(show: false))
+    }
+    
+    func displayError(viewModel: HomeProduct.HomeProductError.ViewModel) {
+        let serviceError = viewModel.serviceError
+        let customAction = viewModel.customAction
+        uiLoadingFullView.interactor?.showError(request: UILoadingFullView.Error.Request(show: true, serviceError: serviceError, customAction: customAction))
+    }
+    
+    private func fetchInitialStoreInfo() {
+        router?.showFullViewLoading(destination: uiLoadingFullView)
+        interactor?.getStoreInfoInquiry(request: HomeProduct.StoreInfoInquiry.Request(customAction: fetchInitialStoreInfo))
     }
     
     private func updateBottomView(isShow: Bool) {
